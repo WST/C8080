@@ -1,6 +1,6 @@
-#pragma once
 
-#include <finlib/string.h>
+#include <finlib/strings.h>
+#include <string>
 
 enum CBaseType { cbtError, cbtVoid, cbtChar, cbtShort, cbtLong, cbtUChar, cbtUShort, cbtULong, cbtStruct, 
   cbtFlags
@@ -11,7 +11,7 @@ public:
   CBaseType baseType;
   int addr, i, arr, arr2, arr3;
   //Place place;
-  string needInclude;
+  std::string needInclude;
 
   bool operator == (CType a) const {
     return baseType==a.baseType && addr==a.addr && i==a.i 
@@ -20,7 +20,7 @@ public:
 
   inline CType() { arr=arr2=arr3=addr=0; }
   inline CType(CBaseType _baseType) { arr=arr2=arr3=addr=0; baseType=_baseType; }
-  string descr();
+  std::string descr();
   int size();
   int size1();
   int sizeElement();

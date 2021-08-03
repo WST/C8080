@@ -1,27 +1,27 @@
-// Открытая, бесплатная, ASIS версия библиотеки VinLib. В процессе написания
-// (с) 5-12-2011 vinxru
+// РћС‚РєСЂС‹С‚Р°СЏ, Р±РµСЃРїР»Р°С‚РЅР°СЏ, ASIS РІРµСЂСЃРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё VinLib. Р’ РїСЂРѕС†РµСЃСЃРµ РЅР°РїРёСЃР°РЅРёСЏ
+// (СЃ) 5-12-2011 vinxru
 
 #include <stdafx.h>
-#include "finlib/string.h"
+#include "finlib/strings.h"
 
-// Подсчет кол-ва символов в строке
+// РџРѕРґСЃС‡РµС‚ РєРѕР»-РІР° СЃРёРјРІРѕР»РѕРІ РІ СЃС‚СЂРѕРєРµ
 int charsCount(const char* ptr, char chr) {
   int c;
   for(c=0; ptr=strchr(ptr, chr); ptr++, c++);
   return c;
 }
 
-// Разделенеи строки на подстроки
+// Р Р°Р·РґРµР»РµРЅРµРё СЃС‚СЂРѕРєРё РЅР° РїРѕРґСЃС‚СЂРѕРєРё
 void explodeText(std::vector<string>& out, const char* str) {
-  // Подсчет строк  
+  // РџРѕРґСЃС‡РµС‚ СЃС‚СЂРѕРє  
   int lc = charsCount(str, '\n')+1;
 
-  // Выделение памяти
+  // Р’С‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё
   out.resize(lc);
   std::vector<string>::iterator outPtr = out.begin();
   std::vector<string>::iterator outEnd = out.end();
 
-  // Деление строки
+  // Р”РµР»РµРЅРёРµ СЃС‚СЂРѕРєРё
   const char* ptr = str;
   while(true) {
     const char* end = strchr(ptr, '\n');
@@ -38,7 +38,7 @@ void explodeText(std::vector<string>& out, const char* str) {
   }  
 }
 
-// Таблица заглавных букв CP1251
+// РўР°Р±Р»РёС†Р° Р·Р°РіР»Р°РІРЅС‹С… Р±СѓРєРІ CP1251
 const unsigned char upperCaseTbl[]={
   0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
   16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
@@ -58,7 +58,7 @@ const unsigned char upperCaseTbl[]={
   208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223
 };
 
-// Привести строку к верхнему регистру
+// РџСЂРёРІРµСЃС‚Рё СЃС‚СЂРѕРєСѓ Рє РІРµСЂС…РЅРµРјСѓ СЂРµРіРёСЃС‚СЂСѓ
 string upperCase(const char* in) {
   string out;
   out.resize(strlen(in));
@@ -70,35 +70,35 @@ string upperCase(const char* in) {
 
 int strcmpi_rus(const char* a, const char* b) {
   int result;
-  _asm {
-    mov eax, a
-    mov edx, b
-    push ebx
-    sub edx, eax
-    xor ecx, ecx
-_lp:  mov cl, [eax]
-      mov bl, byte ptr upperCaseTbl[ecx]
-      mov cl, [edx+eax]
-      cmp bl, byte ptr upperCaseTbl[ecx]
-      ja _a
-      jb _b
-      inc eax
-      test bl, bl
-    jnz _lp
-    xor eax, eax
-    pop ebx
-    jmp _ret
+  __asm__ (
+    "mov eax, a"
+    "mov edx, b"
+    "push ebx"
+    "sub edx, eax"
+    "xor ecx, ecx"
+"_lp:  mov cl, [eax]"
+      "mov bl, byte ptr upperCaseTbl[ecx]"
+      "mov cl, [edx+eax]"
+      "cmp bl, byte ptr upperCaseTbl[ecx]"
+      "ja _a"
+      "jb _b"
+      "inc eax"
+      "test bl, bl"
+    "jnz _lp"
+    "xor eax, eax"
+    "pop ebx"
+    "jmp _ret"
 
-_a: mov eax, 1
-    pop ebx
-    jmp _ret
+"_a: mov eax, 1"
+    "pop ebx"
+    "jmp _ret"
 
-_b: pop ebx
-    mov eax, -1
-    jmp _ret
-_ret:
-    mov result, eax;
-  }
+"_b: pop ebx"
+    "mov eax, -1"
+    "jmp _ret"
+"_ret:"
+    "mov result, eax;"
+  );
   return result;
 }
 
@@ -107,7 +107,7 @@ void explode1(std::vector<std::string>& out, const char_t* sep, const char_t* st
   const char_t* ptr;
   int seplen=_tcslen(sep);
 
-  // Подсчет строк
+  // РџРѕРґСЃС‡РµС‚ СЃС‚СЂРѕРє
   int lc=1;
   ptr=str;
   while(true) {    
@@ -117,13 +117,13 @@ void explode1(std::vector<std::string>& out, const char_t* sep, const char_t* st
     lc++;
   }
 
-  // Выделение памяти
+  // Р’С‹РґРµР»РµРЅРёРµ РїР°РјСЏС‚Рё
   out.resize(lc);
   string* outPtr=&out[0];
 //  assert(outPtr!=0);
   string* outEnd=outPtr + out.size();
 
-  // Деление строки
+  // Р”РµР»РµРЅРёРµ СЃС‚СЂРѕРєРё
   ptr=str;
   while(true) {
     const char_t* end=_tcsstr(ptr, sep);
