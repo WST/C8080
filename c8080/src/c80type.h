@@ -6,20 +6,20 @@ enum CBaseType { cbtError, cbtVoid, cbtChar, cbtShort, cbtLong, cbtUChar, cbtUSh
   cbtFlags
 };
 
-class CType {
+class C80Type {
 public:
   CBaseType baseType;
   int addr, i, arr, arr2, arr3;
   //Place place;
   std::string needInclude;
 
-  bool operator == (CType a) const {
+  bool operator == (C80Type a) const {
     return baseType==a.baseType && addr==a.addr && i==a.i 
       && arr==a.arr && arr2==a.arr2 && arr3==a.arr3;
   }
 
-  inline CType() { arr=arr2=arr3=addr=0; }
-  inline CType(CBaseType _baseType) { arr=arr2=arr3=addr=0; baseType=_baseType; }
+  inline C80Type() { arr=arr2=arr3=addr=0; }
+  inline C80Type(CBaseType _baseType) { arr=arr2=arr3=addr=0; baseType=_baseType; }
   std::string descr();
   int size();
   int size1();

@@ -1,12 +1,12 @@
-// Открытая, бесплатная, ASIS версия библиотеки VinLib. В процессе написания
-// (с) 5-12-2011 vinxru
+// РћС‚РєСЂС‹С‚Р°СЏ, Р±РµСЃРїР»Р°С‚РЅР°СЏ, ASIS РІРµСЂСЃРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё VinLib. Р’ РїСЂРѕС†РµСЃСЃРµ РЅР°РїРёСЃР°РЅРёСЏ
+// (СЃ) 5-12-2011 vinxru
 
 #include <stdafx.h>
 #include "finlib/types.h"
 #include "finlib/exception.h"
 
 inline bool tryAdd(uint& o, uint a, uint b) {
-  __int64 r=(unsigned __int64)a+(unsigned __int64)b; // может вылезти тольк один бит
+  __int64 r=(unsigned __int64)a+(unsigned __int64)b; // РјРѕР¶РµС‚ РІС‹Р»РµР·С‚Рё С‚РѕР»СЊРє РѕРґРёРЅ Р±РёС‚
   if(r>(unsigned __int64)UINT_MAX) return false;
   o = uint(r);
   return true;
@@ -16,22 +16,22 @@ Exception::Exception(const char_t* what, const char_t* module, int line, Excepti
   BEGIN_NO_EXCEPTION
     e=0;
 
-    // Необходимый обьем памяти
+    // РќРµРѕР±С…РѕРґРёРјС‹Р№ РѕР±СЊРµРј РїР°РјСЏС‚Рё
     uint what_size, module_size, len;
     if(!tryAdd(what_size, _tcslen(what), 1)) return;
     if(!tryAdd(module_size, _tcslen(module), 1)) return;
     if(!tryAdd(len, what_size, module_size)) return;
     if(!tryAdd(len, len, sizeof(Exception1))) return;
 
-    // Выделяем память
+    // Р’С‹РґРµР»СЏРµРј РїР°РјСЏС‚СЊ
     try {
-      e = (Exception1*)new char_t[len]; //! Переполнение
+      e = (Exception1*)new char_t[len]; //! РџРµСЂРµРїРѕР»РЅРµРЅРёРµ
     } catch(...) { 
       e = 0;
       return; 
     }
 
-    // Заполняем структуру    
+    // Р—Р°РїРѕР»РЅСЏРµРј СЃС‚СЂСѓРєС‚СѓСЂСѓ    
     e->len    = len;
     e->line   = line;
     e->cls    = cls;
@@ -129,5 +129,5 @@ void Exception::raise() const {
 }
 
 void overflow() {
-  raise("Переполнение");
+  raise("РџРµСЂРµРїРѕР»РЅРµРЅРёРµ");
 }

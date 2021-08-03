@@ -1,4 +1,4 @@
-﻿//! Если в коде нет чтения из переменной, то и сохранять туда не надо!!
+//! Если в коде нет чтения из переменной, то и сохранять туда не надо!!
 
 //! Надо запомнить адрес последнего сохраненного HL. И проконтроллировать,что регистр DE не используется!
 
@@ -92,7 +92,7 @@ bool z80 = false;
 
 
 
-NodeVar* nodeConvert(NodeVar* x, CType type);
+NodeVar* nodeConvert(NodeVar* x, C80Type type);
 NodeVar* addFlag(NodeVar* a);
 
 
@@ -168,7 +168,7 @@ Reg NodeVar::isRegVar() {
   return regNone;
 }
 
-NodeVar* nodeOperator2(CType type, Operator o, NodeVar* a, NodeVar* b, NodeVar* cond) {
+NodeVar* nodeOperator2(C80Type type, Operator o, NodeVar* a, NodeVar* b, NodeVar* cond) {
   // Сравнение дает флаги
   switch(o) {
     case oE: 
@@ -226,7 +226,7 @@ NodeVar* nodeOperator2(CType type, Operator o, NodeVar* a, NodeVar* b, NodeVar* 
     } else {
       if(a->nodeType==ntConstS && a->cast<NodeConst>()->var->reg) raise("Нельзя получить адрес регистровой переменной");
       if(b->nodeType==ntConstS && a->cast<NodeConst>()->var->reg) raise("Нельзя получить адрес регистровой переменной");
-  //    CType t=type; t.addr++; // NodeConst порождает новую переменную!!! Это плохо. Этот код что бы обойти првоерку.
+  //    C80Type t=type; t.addr++; // NodeConst порождает новую переменную!!! Это плохо. Этот код что бы обойти првоерку.
       switch(o) {
         case oAdd: x = new NodeConst("(" + name_(a) + ")+("  + name_(b) + ")", type); break;
         case oSub: x = new NodeConst("(" + name_(a) + ")-("  + name_(b) + ")", type); break;
@@ -265,7 +265,7 @@ NodeVar* newNodeCond(NodeVar* a) {
 }
 
 NodeVar* nodeOperator0(Operator o, NodeVar* a, NodeVar* b, bool noMul, NodeVar* cond) {
-  CType type;
+  C80Type type;
 
   // Сложение указателя и числа
   if(o==oAdd && a->dataType.addr!=0 && b->dataType.addr==0 && b->dataType.isStackType()) {
@@ -285,7 +285,7 @@ NodeVar* nodeOperator0(Operator o, NodeVar* a, NodeVar* b, bool noMul, NodeVar* 
 
   // Вычитание указателя из указателя
   if(o==oSub && a->dataType.addr!=0 && a->dataType.addr==b->dataType.addr && a->dataType.baseType==b->dataType.baseType) {
-    CType stdType;
+    C80Type stdType;
     stdType.baseType = cbtUShort;
     stdType.addr = 0;
     NodeVar* n = nodeOperator2(stdType, o, a, b, cond);
@@ -330,11 +330,11 @@ NodeVar* nodeOperator0(Operator o, NodeVar* a, NodeVar* b, bool noMul, NodeVar* 
   //!!! Это не совсем правильно, так как OR, AND всегда будут давать 8 битный результат
 
   // Число приводится к типу второго аргумента.
-  CType at=a->dataType, bt=b->dataType;
+  C80Type at=a->dataType, bt=b->dataType;
   if(a->nodeType == ntConstI && b->nodeType != ntConstI) at = b->dataType; else
   if(b->nodeType == ntConstI && a->nodeType != ntConstI) bt = a->dataType;
 
-  CType dataType;
+  C80Type dataType;
   if(o==oSet) {
     //! Проверить типы!!!
 
@@ -489,13 +489,13 @@ std::vector<string> includeDirs;
 std::list<CStruct> structs;
 //std::vector<Stack> stack;
 //int returnLabel;
-CType retType;
+C80Type retType;
 string fnName;
 //bool retPopBC;
 
 void asm_pop();
 
-string CType::descr() {
+string C80Type::descr() {
   string s;
   switch(baseType) {
     case cbtVoid:   s = "void"; break;
@@ -506,13 +506,13 @@ string CType::descr() {
     case cbtUShort: s = "ushort"; break;
     case cbtULong:  s = "ulong"; break;
     case cbtStruct: s = "struct " + get(structs, i).name; break;
-    default: raise("CType.descr");
+    default: raise("C80Type.descr");
   }
   for(int i=0; i<addr; i++) s += "*";
   return s;
 }
 
-int CType::size1() {
+int C80Type::size1() {
   if(addr > 0) return 2;
   switch(baseType) {
     case cbtVoid:   return 0;
@@ -520,7 +520,7 @@ int CType::size1() {
     case cbtUShort: case cbtShort: return 2;
     case cbtULong:  case cbtLong:  return 4;
     case cbtStruct: return get(structs, i).size;
-    default: raise("CType.size"); throw;
+    default: raise("C80Type.size"); throw;
   }
 }
 
@@ -536,7 +536,7 @@ Operator invert(Operator a) {
   return a;
 }
 
-int CType::sizeElement() {
+int C80Type::sizeElement() {
   if(addr==0) return size1();
   addr--;
   int s = size1();
@@ -544,14 +544,14 @@ int CType::sizeElement() {
   return s;
 }
 
-int CType::size() {
+int C80Type::size() {
   return arr ? arr*sizeElement() : size1();
 }
 
 
 struct Typedef {
   string name;
-  CType type;
+  C80Type type;
 };
 
 std::list<Typedef> typedefs;
@@ -588,7 +588,7 @@ void asm_decl3(FillBuffer& b, cstring name, int additional, std::vector<char>* i
 }
 
 // Описать переменную
-void asm_decl(FillBuffer& decl, cstring fn, cstring var, CType type) {
+void asm_decl(FillBuffer& decl, cstring fn, cstring var, C80Type type) {
   asm_decl3(decl, fn+"_"+var, type.size()); // str(fn).str("_").str(var).str(" ds ").i2s(type.size()).str("\r\n");
 }
 
@@ -624,7 +624,7 @@ void asm_pushInteger(int n) {
 //int tmpCounter = 0;
 //string makeTmpName() { return "tmp"+i2s(tmpCounter++); }
 
-void asm_convert(int l, CType a, CType b);
+void asm_convert(int l, C80Type a, C80Type b);
 
 // Команды: cp, add, sub, or, xor, and
 
@@ -646,14 +646,14 @@ const char* placeDescr[] = {
 struct Var {
   int indexName;
   string name;
-  CType type;
+  C80Type type;
   inline Var() { indexName=-1; }
 };
 
 std::vector<Function> functions;
 Function* curFn;
 std::vector<string> globalNames, functionNames;
-std::vector<CType>  globalTypes;
+std::vector<C80Type>  globalTypes;
 std::vector<Var> stackNamesD;
 std::map<string, int> stackNamesI;
 
@@ -676,7 +676,7 @@ int parseStruct2(int m);
 
 NodeVar* readVar(int);
 
-NodeVar* nodeConvert(NodeVar* x, CType type) {
+NodeVar* nodeConvert(NodeVar* x, C80Type type) {
   // Преобразовывать не надо
   if(type == x->dataType) return x;
   // Условие
@@ -710,7 +710,7 @@ NodeVar* nodeConvert(NodeVar* x, CType type) {
 }
 
 // Чтение константы и преобразование её к определенному типу
-int readConst(CType& to) {
+int readConst(C80Type& to) {
   // Эта функция не генерирует код
   NodeVar* n = nodeConvert(readVar(-1), to);
 
@@ -723,7 +723,7 @@ int readConst(CType& to) {
 }
 
 int readConstV() {  
-  CType type2;
+  C80Type type2;
   type2.addr = 0;
   type2.baseType = cbtUShort;
   type2.arr = 0;
@@ -731,7 +731,7 @@ int readConstV() {
 }
 
 // Чтение типа данных
-CType readType(Parser& p, bool error) {
+C80Type readType(Parser& p, bool error) {
   bool const1 = p.ifToken("const");
   //! Учесть
 
@@ -767,7 +767,7 @@ CType readType(Parser& p, bool error) {
     for(auto s=structs.begin(); s!=structs.end(); s++, i++) {
       if(p.ifToken(s->name)) {
         if(p.ifToken("{")) p.logicError_("Структура с таким именем уже определена");
-        CType type;
+        C80Type type;
         type.baseType = cbtStruct;
         type.i = i;
         return type;
@@ -776,7 +776,7 @@ CType readType(Parser& p, bool error) {
     int si = parseStruct2(su);  
 
     // Возврат структуры
-    CType type;
+    C80Type type;
     type.baseType = cbtStruct;
     type.i = si; 
     return type;
@@ -792,7 +792,7 @@ void needFile(const char* fn) {
   lastInclude.push_back(fn);
 }
 
-void readModifiers(Parser& p, CType& t) {
+void readModifiers(Parser& p, C80Type& t) {
   while(p.ifToken("*")) t.addr++;
 }
 
@@ -807,7 +807,7 @@ NodeVar* bindVar_2(Parser& p) {
     buf += p.buf;
     while(p.ifToken(ttString2))
       buf += p.buf;
-    CType type;
+    C80Type type;
     type.addr = 1;
     type.baseType = cbtChar;
     return new NodeConst(regString(buf.c_str()), type);
@@ -821,7 +821,7 @@ NodeVar* bindVar_2(Parser& p) {
   if(p.ifToken("sizeof")) {
     p.needToken("(");
     // Если там указан тип, то нет проблем
-    CType type1 = readType(p, false);
+    C80Type type1 = readType(p, false);
     if(type1.baseType == cbtError) { 
       NodeVar* a = readVar(-1);
       type1 = a->dataType;
@@ -834,7 +834,7 @@ NodeVar* bindVar_2(Parser& p) {
   // Это либо просто скобки, либо преобразование типов
   if(p.ifToken(_T("("))) { 
     // Преобразование типа
-    CType type = readType(p, false);
+    C80Type type = readType(p, false);
     if(type.baseType != cbtError) {
       readModifiers(p, type);
       p.needToken(")");
@@ -850,7 +850,7 @@ NodeVar* bindVar_2(Parser& p) {
   int i;
   if(p.ifToken(stackNamesI, i)) {
     auto& x = stackNamesD[i];
-    CType t = x.type;
+    C80Type t = x.type;
     if(!t.arr) t.addr++;        
     string name;
     if(x.indexName != -1) {
@@ -879,7 +879,7 @@ NodeVar* bindVar_2(Parser& p) {
     if(g.arr) return new NodeConst(globalNames[i], g);
 
     // Переменная описана без адреса. int как int. Но в реальности надо обернуть все переменные в DEADDR
-    CType t = g;
+    C80Type t = g;
     t.addr++;
     return new NodeDeaddr(new NodeConst(globalNames[i], t));
   }
@@ -1047,7 +1047,7 @@ xx:   if(a->dataType.baseType!=cbtStruct || a->dataType.addr!=0) raise("Ожид
           if(s.items[i].offset != 0) {
             a = nodeOperator(oAdd, a, new NodeConst(s.items[i].offset), true);
           }
-          CType type = s.items[i].type;
+          C80Type type = s.items[i].type;
           if(type.arr) {
             a = nodeConvert(a, type);          
           } else {
@@ -1518,11 +1518,11 @@ Node* readCommand1() {
   }
 
   bool reg = p.ifToken("register");  
-  CType t = readType(p, false);    
+  C80Type t = readType(p, false);    
   if(t.baseType != cbtError) {
     Node *first=0, *last=0;
     do {
-      CType t1 = t;
+      C80Type t1 = t;
       readModifiers(p, t1);
       const char* n = p.needIdent();
       stackNamesI[n] = stackNamesD.size();
@@ -1537,7 +1537,7 @@ Node* readCommand1() {
       //const char* nn = stringBuf(n);
       v.type = t1;
       asm_decl(curFn->decl, fnName, n, t1);
-      CType t2 = t1;
+      C80Type t2 = t1;
       t2.addr++;
       NodeConst nc(fnName+"_"+n, t2, /*stack*/true);
       curFn->localVars.push_back(nc.var);
@@ -1588,7 +1588,7 @@ int parseStruct2(int m) {
 
 void parseStruct(CStruct& s, int m) {
   do {
-    CType type0;
+    C80Type type0;
     const char* xx[] = { "struct", "union", 0 };
     int su;
     if(p.ifToken(xx, su)) {
@@ -1612,7 +1612,7 @@ void parseStruct(CStruct& s, int m) {
     }
     do {
       CStructItem& si = add(s.items);
-      CType type = type0;
+      C80Type type = type0;
       readModifiers(p, type);
       si.type = type;
       si.offset = m==0 ? s.size : 0;
@@ -1646,8 +1646,8 @@ void parseStructHdr(int m) {
   p.needToken(";");
 }
 
-void parseFunction(CType& retType, cstring fnName) {
-  std::vector<CType> argTypes;
+void parseFunction(C80Type& retType, cstring fnName) {
+  std::vector<C80Type> argTypes;
   if(!p.ifToken(")")) {
     do {
       if(p.ifToken("...")) {
@@ -1655,7 +1655,7 @@ void parseFunction(CType& retType, cstring fnName) {
         break;
       }
 
-      CType t = readType(p, true);
+      C80Type t = readType(p, true);
       readModifiers(p, t);
       if(t.baseType==cbtVoid && t.addr==0) break;      
       if(p.ifToken(ttWord)) {
@@ -1724,7 +1724,7 @@ void parseFunction(CType& retType, cstring fnName) {
  // int cc = asm_startProc(fnName);
 
 //  if(f.args.size() != 0) {
-//    CType t = f.args.back();
+//    C80Type t = f.args.back();
 //    if(t.isStackType() && stackNamesD[f.args.size()-1].name!=0) {
 //      if(t.is8()) w.ld_ref_a (fnName+"_"+i2s(f.args.size()));
 //             else w.ld_ref_hl(fnName+"_"+i2s(f.args.size()));
@@ -1775,7 +1775,7 @@ const char* getString1(int n) {
   return "";
 }
 
-void arrayInit(std::vector<char>& data, CType& fnType) {
+void arrayInit(std::vector<char>& data, C80Type& fnType) {
   // Эта функция не генерирует код
   NodeVar* c = readVar(-1);
 
@@ -1928,14 +1928,14 @@ void compileFile(cstring fileName) {
     bool extren1 = !typedef1 && p.ifToken("extern");
     bool static1 = !typedef1 && !extren1 && p.ifToken("static");
 
-    CType fnType1;
+    C80Type fnType1;
 
     fnType1 = readType(p, true);    
 
     if(p.ifToken(";")) continue;
 
     while(1) {
-      CType fnType = fnType1;
+      C80Type fnType = fnType1;
       readModifiers(p, fnType);
       string fnName = p.needIdent();
 
@@ -1990,7 +1990,7 @@ void compileFile(cstring fileName) {
               } while(p.ifString2(s));              
             } else 
             if(fnType.addr>0 && p.ifToken("{")) {
-              CType fnType1 = fnType;
+              C80Type fnType1 = fnType;
               fnType1.addr--;
               fnType1.arr=0;
               while(1) {
@@ -2274,7 +2274,7 @@ bool caclRegVars(Function* f) {
   std::map<int, NodeVariable*> varUsing16;
   for(auto v : varUsing) {
     //if(v.second < 3) continue;
-    CType t = v.first->dataType;
+    C80Type t = v.first->dataType;
     if(t.addr==0 || t.arr!=0 ) 
       continue;
     t.addr--;

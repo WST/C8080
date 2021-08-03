@@ -67,40 +67,40 @@ string upperCase(const char* in) {
     *o++=upperCaseTbl[(int)(unsigned char)*in++];
   return out;
 }
-
+/*
 int strcmpi_rus(const char* a, const char* b) {
   int result;
-  __asm__ (
-    "mov eax, a"
-    "mov edx, b"
-    "push ebx"
-    "sub edx, eax"
-    "xor ecx, ecx"
-"_lp:  mov cl, [eax]"
-      "mov bl, byte ptr upperCaseTbl[ecx]"
-      "mov cl, [edx+eax]"
-      "cmp bl, byte ptr upperCaseTbl[ecx]"
-      "ja _a"
-      "jb _b"
-      "inc eax"
-      "test bl, bl"
-    "jnz _lp"
-    "xor eax, eax"
-    "pop ebx"
-    "jmp _ret"
+  _asm {
+    mov eax, a
+    mov edx, b
+    push ebx
+    sub edx, eax
+    xor ecx, ecx
+_lp:  mov cl, [eax]
+      mov bl, byte ptr upperCaseTbl[ecx]
+      mov cl, [edx+eax]
+      cmp bl, byte ptr upperCaseTbl[ecx]
+      ja _a
+      jb _b
+      inc eax
+      test bl, bl
+    jnz _lp
+    xor eax, eax
+    pop ebx
+    jmp _ret
 
-"_a: mov eax, 1"
-    "pop ebx"
-    "jmp _ret"
+_a: mov eax, 1
+    pop ebx
+    jmp _ret
 
-"_b: pop ebx"
-    "mov eax, -1"
-    "jmp _ret"
-"_ret:"
-    "mov result, eax;"
-  );
+_b: pop ebx
+    mov eax, -1
+    jmp _ret
+_ret:
+    mov result, eax;
+  }
   return result;
-}
+}*/
 
 void explode1(std::vector<std::string>& out, const char_t* sep, const char_t* str) {
   if(sep[0]==0) return;

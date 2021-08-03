@@ -1,9 +1,9 @@
 #pragma once
 
-#include <finlib/string.h>
+#include <finlib/strings.h>
 #include <finlib/exception.h>
 #include <map>
-#include "ctype.h"
+#include "c80type.h"
 #include <assert.h>
 
 class NodeOperator;
@@ -31,7 +31,7 @@ public:
   string name;  
   bool stack;  
   Reg reg;
-  CType dataType;
+  C80Type dataType;
 
   NodeVariable() { stack=false; reg=regNone; }
 };
@@ -53,7 +53,7 @@ public:
 
 class NodeVar : public Node {
 public:
-  CType dataType;
+  C80Type dataType;
 
   Reg isRegVar();
 };
@@ -86,7 +86,7 @@ public:
   void setDefault(Node* label) { defaultLabel = label; }
 
   void addCase(int value, Node* label) { 
-    if(cases.find(value) != cases.end()) raise("case óæå áûë");
+    if(cases.find(value) != cases.end()) raise("case ˜˜˜ ˜˜˜");
     cases[value] = label;
   }
 };
@@ -94,7 +94,7 @@ public:
 class NodeConvert : public NodeVar {
 public:
   NodeVar* var;
-  NodeConvert(NodeVar* _var, CType _dataType) { 
+  NodeConvert(NodeVar* _var, C80Type _dataType) { 
     assert(_var->dataType.baseType != cbtFlags);
     nodeType = ntConvert;
     var = _var;
@@ -120,9 +120,9 @@ public:
   NodeVariable* var;
 
   NodeConst(int _value) { nodeType = ntConstI; value = _value; dataType.baseType = cbtUShort; dataType.addr = 0; }
-  NodeConst(int _value, CType _dataType) { nodeType = ntConstI; value = _value; dataType = _dataType; }
+  NodeConst(int _value, C80Type _dataType) { nodeType = ntConstI; value = _value; dataType = _dataType; }
 
-  NodeConst(cstring _name, CType _dataType, bool stack=false) { 
+  NodeConst(cstring _name, C80Type _dataType, bool stack=false) { 
     nodeType = ntConstS;
     dataType = _dataType; 
     auto& f = nodeVars[_name];
@@ -135,7 +135,7 @@ public:
       //f->dataType.addr--;
       f->name = _name;
     } else {
-      //! íå ïðîõîäèò! assert(f->dataType.baseType == dataType.baseType && f->dataType.addr == dataType.addr);
+      //! ˜˜ ˜˜˜˜˜˜˜˜! assert(f->dataType.baseType == dataType.baseType && f->dataType.addr == dataType.addr);
     }
     var = f;
   }
@@ -147,8 +147,8 @@ public:
   int addr;
   string name;
   
-  NodeCall(int _addr, CType _dataType, std::vector<NodeVar*>& _args) { nodeType = ntCallI; addr = _addr; dataType = _dataType; args=_args; }
-  NodeCall(cstring _name, CType _dataType, std::vector<NodeVar*>& _args) { nodeType = ntCallS; name = _name; dataType = _dataType; args=_args; }
+  NodeCall(int _addr, C80Type _dataType, std::vector<NodeVar*>& _args) { nodeType = ntCallI; addr = _addr; dataType = _dataType; args=_args; }
+  NodeCall(cstring _name, C80Type _dataType, std::vector<NodeVar*>& _args) { nodeType = ntCallS; name = _name; dataType = _dataType; args=_args; }
 };
 
 class NodeMonoOperator : public NodeVar {
@@ -169,7 +169,7 @@ public:
   NodeVar* b;
   NodeVar* cond;
 
-  NodeOperator(CType& _dataType, Operator _o, NodeVar* _a, NodeVar* _b, NodeVar* _cond) {
+  NodeOperator(C80Type& _dataType, Operator _o, NodeVar* _a, NodeVar* _b, NodeVar* _cond) {
     dataType = _dataType; o=_o; a=_a; b=_b; cond=_cond;    
     nodeType = ntOperator;
   }
@@ -190,7 +190,7 @@ public:
     nodeType = ntDeaddr;
     var = _var; 
     if(var->dataType.addr==0) 
-      raise("Àðãóìåíò äîëæåí áûòü óêàçàòåëåì");
+      raise("˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜ ˜˜˜˜ ˜˜˜˜˜˜˜˜˜˜");
     dataType = var->dataType;
     dataType.addr--;
   } 
@@ -224,7 +224,7 @@ public:
     label = _label; 
     ifZero = _ifZero; 
 
-    // Îïòèìèçàöèÿ while(const) è ïîäîáíûõ
+    // ˜˜˜˜˜˜˜˜˜˜˜ while(const) ˜ ˜˜˜˜˜˜˜˜
     if(_cond && _cond->nodeType == ntConstI) {
       auto nc = _cond->cast<NodeConst>();
       bool check = nc->value != 0;

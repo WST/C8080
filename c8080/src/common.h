@@ -3,7 +3,7 @@
 
 #include <finlib/std.h>
 #include "c_parser.h"
-#include "ctype.h"
+#include "C80Type.h"
 
 
 /*
@@ -35,7 +35,7 @@ enum Place {
 
 struct Stack {
   Place  place;
-  CType  type;
+  C80Type  type;
   string name;
   union {
     int    value;  
@@ -48,9 +48,9 @@ class Node;
 class NodeVariable;
 
 struct Function {
-  CType retType;
+  C80Type retType;
   string name;
-  std::vector<CType> args;
+  std::vector<C80Type> args;
   string needInclude;
   bool callAddr;
   int addr;
@@ -63,7 +63,7 @@ struct Function {
 };
 struct CStructItem {
   string name;
-  CType type;
+  C80Type type;
   int offset;
 };
 
@@ -116,22 +116,22 @@ void mulHL(int x);
 void mulA(int x);
 void set8();
 void set16();
-void resultFlags(CType& out, CBaseType t);
+void resultFlags(C80Type& out, CBaseType t);
 //void alu16(Operator o, Opcode cmd1, Opcode cmd2, bool canSwap, bool self);
-void asm_convert(int l, CType a, CType b);
+void asm_convert(int l, C80Type a, C80Type b);
 void sub16(int e, bool self=false);
 //const char* opName(Operator o);
 void cmd_shr16_1(bool,int x); 
 void cmd_shl16_1(bool,int x); 
 void cmd_shr8_1(bool,int x); 
 void cmd_shl8_1(bool,int x);
-char cmpImm16(CBaseType t, CBaseType t1, CType& a, int delta=0, int delta2=0);
-void convertToConfition(CType& type);
+char cmpImm16(CBaseType t, CBaseType t1, C80Type& a, int delta=0, int delta2=0);
+void convertToConfition(C80Type& type);
 void doAddr();
-//void asm_callMonoOperator(MonoOperator mo, CType& type);
-//void asm_index(CType idxType, CType& arrType);
-//void asm_struct(int offset, CType& type, CType& toType);
-//void asm_callOperator(Operator o, CType& a, CType b);
+//void asm_callMonoOperator(MonoOperator mo, C80Type& type);
+//void asm_index(C80Type idxType, C80Type& arrType);
+//void asm_struct(int offset, C80Type& type, C80Type& toType);
+//void asm_callOperator(Operator o, C80Type& a, C80Type b);
 void needFile(const char*);
 
 #endif

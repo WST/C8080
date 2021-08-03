@@ -38,7 +38,7 @@ inline std::string i2s(int d) { char buf[256]; sprintf(buf, "%i", d); return buf
 //inline std::string hex(int d) { char buf[256]; sprintf_s(buf, sizeof(buf), "%X", d); return buf; }
 inline std::string hex(int d) { char buf[256]; sprintf(buf, "%X", d); return buf; }
 
-int strcmpi_rus(const char* a, const char* b);
+//int strcmpi_rus(const char* a, const char* b);
 void explode1(std::vector<std::string>& out, const char_t* sep, const char_t* str);
 
 #endif

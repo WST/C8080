@@ -1,88 +1,88 @@
-// Открытая, бесплатная, ASIS версия библиотеки VinLib. В процессе написания
-// (с) 5-12-2011 vinxru
+// РћС‚РєСЂС‹С‚Р°СЏ, Р±РµСЃРїР»Р°С‚РЅР°СЏ, ASIS РІРµСЂСЃРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё VinLib. Р’ РїСЂРѕС†РµСЃСЃРµ РЅР°РїРёСЃР°РЅРёСЏ
+// (СЃ) 5-12-2011 vinxru
 
 #ifndef VINLIB_EXCEPTION_H
 #define VINLIB_EXCEPTION_H
 
-#include <finlib/string.h>
+#include <finlib/strings.h>
 
 enum ExceptionClass { ecSilentException,ecException,ecUnknown,ecBreakException,ecLangException }; // ecAlt,
 
-// Стандартный класс исключения отстой, и он не поддерживает UNICODE.
+// РЎС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РєР»Р°СЃСЃ РёСЃРєР»СЋС‡РµРЅРёСЏ РѕС‚СЃС‚РѕР№, Рё РѕРЅ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ UNICODE.
 
 class Exception {
 protected:
   struct Exception1 {
     int len;           
-    ExceptionClass cls;  // Класс ошибки
-    char_t* what;        // Текст ошибки
-    char_t* module;      // Модуль
-    int line;            // Строка в модуле
+    ExceptionClass cls;  // РљР»Р°СЃСЃ РѕС€РёР±РєРё
+    char_t* what;        // РўРµРєСЃС‚ РѕС€РёР±РєРё
+    char_t* module;      // РњРѕРґСѓР»СЊ
+    int line;            // РЎС‚СЂРѕРєР° РІ РјРѕРґСѓР»Рµ
   };
-  Exception1* e; // Надо что бы исключение занимало как можно меньше памяти, иначе интерпретатор, в котором тясяча исключений, съедает весь стек. Для этого и применен указатель.
+  Exception1* e; // РќР°РґРѕ С‡С‚Рѕ Р±С‹ РёСЃРєР»СЋС‡РµРЅРёРµ Р·Р°РЅРёРјР°Р»Рѕ РєР°Рє РјРѕР¶РЅРѕ РјРµРЅСЊС€Рµ РїР°РјСЏС‚Рё, РёРЅР°С‡Рµ РёРЅС‚РµСЂРїСЂРµС‚Р°С‚РѕСЂ, РІ РєРѕС‚РѕСЂРѕРј С‚СЏСЃСЏС‡Р° РёСЃРєР»СЋС‡РµРЅРёР№, СЃСЉРµРґР°РµС‚ РІРµСЃСЊ СЃС‚РµРє. Р”Р»СЏ СЌС‚РѕРіРѕ Рё РїСЂРёРјРµРЅРµРЅ СѓРєР°Р·Р°С‚РµР»СЊ.
 public:
-  Exception(const char_t* what=_T("Неизвестная ошибка"), const char_t* module=_T(""), int line=0, ExceptionClass cls=ecException) throw();
+  Exception(const char_t* what="Unknown error", const char_t* module="", int line=0, ExceptionClass cls=ecException) throw();
   Exception(const Exception& src) throw();  
   void operator = (const Exception& src) throw();
   const char_t* what() const throw();
   const char_t* module() const throw();
   int line() const  throw();
   ExceptionClass cls() const  throw(); 
-  void raise() const; // Единственный метод вызывающий исключение
+  void raise() const; // Р•РґРёРЅСЃС‚РІРµРЅРЅС‹Р№ РјРµС‚РѕРґ РІС‹Р·С‹РІР°СЋС‰РёР№ РёСЃРєР»СЋС‡РµРЅРёРµ
   ~Exception() throw();
 };
 
-// Вывести исключение пользователю и продолжить выполнение программы
+// Р’С‹РІРµСЃС‚Рё РёСЃРєР»СЋС‡РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ Рё РїСЂРѕРґРѕР»Р¶РёС‚СЊ РІС‹РїРѕР»РЅРµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
 #define BEGIN_PROCESS_EXCEPTION try {
 #define END_PROCESS_EXCEPTION } catch(Exception& e) { ::error(&e,0); } catch(...) { ::error(0,0); }
 #define END_PROCESS_EXCEPTION_ADDR(A) } catch(Exception& e) { ::error(&e,A); } catch(...) { ::error(0,A); }
 
-// Блок, в котором не должно быть исключений
+// Р‘Р»РѕРє, РІ РєРѕС‚РѕСЂРѕРј РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РёСЃРєР»СЋС‡РµРЅРёР№
 #define BEGIN_NO_EXCEPTION try {
 #define END_NO_EXCEPTION } catch(Exception& e) { fatal(&e,0); } catch(...) { fatal(0,0); }
-#define END_NO_EXCEPTION_ADDR(A) } catch(Exception& e) { fatal(&e,_T(A)); } catch(...) { fatal(0,_T(A)); }
+#define END_NO_EXCEPTION_ADDR(A) } catch(Exception& e) { fatal(&e,A); } catch(...) { fatal(0,A); }
 
-// Добавить в текст исключения строку
+// Р”РѕР±Р°РІРёС‚СЊ РІ С‚РµРєСЃС‚ РёСЃРєР»СЋС‡РµРЅРёСЏ СЃС‚СЂРѕРєСѓ
 #define BEGIN_EXT_EXCEPTION try {
 #define END_EXT_EXCEPTION(text) \
   } catch(Exception& e) { \
-    string tmp; /*! Заменить на статический буфер*/ \
-    cat(tmp, text, _T("\n"), e.what()); \
+    string tmp; /*! Р—Р°РјРµРЅРёС‚СЊ РЅР° СЃС‚Р°С‚РёС‡РµСЃРєРёР№ Р±СѓС„РµСЂ*/ \
+    cat(tmp, text, "\n", e.what()); \
     raise(tmp.c_str(), e.module(), e.line(), e.cls()); \
     throw Exception(); \
   } catch(...) { \
-    raise((string)text + _T("\nНеизвестная ошибка"));  /*! Заменить на статический буфер*/ \
+    raise((string)text + "\nUnknown error");  /*! Р—Р°РјРµРЅРёС‚СЊ РЅР° СЃС‚Р°С‚РёС‡РµСЃРєРёР№ Р±СѓС„РµСЂ*/ \
     throw Exception(); \
   }
 
-// Обычно нажатие кнопки Break. Такие исключения в виртуальной машине игнорирует блок except, что 
-// бы предотвратить бесконечный цикл.
+// РћР±С‹С‡РЅРѕ РЅР°Р¶Р°С‚РёРµ РєРЅРѕРїРєРё Break. РўР°РєРёРµ РёСЃРєР»СЋС‡РµРЅРёСЏ РІ РІРёСЂС‚СѓР°Р»СЊРЅРѕР№ РјР°С€РёРЅРµ РёРіРЅРѕСЂРёСЂСѓРµС‚ Р±Р»РѕРє except, С‡С‚Рѕ 
+// Р±С‹ РїСЂРµРґРѕС‚РІСЂР°С‚РёС‚СЊ Р±РµСЃРєРѕРЅРµС‡РЅС‹Р№ С†РёРєР».
 
 class BreakException : public Exception {
 public:
-  inline BreakException(const char_t* what, const char_t* module=_T(""), int l=0) :  Exception(what,module,l,ecBreakException) {}
+  inline BreakException(const char_t* what, const char_t* module="", int l=0) :  Exception(what,module,l,ecBreakException) {}
 };
 
 class LangException : public Exception {
 public:
-  inline LangException(const char_t* what, const char_t* module=_T(""), int l=0) :  Exception(what,module,l,ecLangException) {}
+  inline LangException(const char_t* what, const char_t* module="", int l=0) :  Exception(what,module,l,ecLangException) {}
 };
 
 class SilentException : public Exception {
 public:
-  inline SilentException(const char_t* what, const char_t* module=_T(""), int l=0) :  Exception(what,module,l,ecSilentException) {}
+  inline SilentException(const char_t* what, const char_t* module="", int l=0) :  Exception(what,module,l,ecSilentException) {}
 };
 
-// Генерация исключения
+// Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ
 void overflow();
 void error(Exception* e, const char_t* str);
 inline void raise(const char_t* str) { Exception e(str); throw e; }
 inline void raise(cstring str) { raise(str.c_str()); }
 
-// Эта функция должна быть описана в программе
+// Р­С‚Р° С„СѓРЅРєС†РёСЏ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РѕРїРёСЃР°РЅР° РІ РїСЂРѕРіСЂР°РјРјРµ
 void warning(cstring errorText);
 
-// Эта функция должна быть описана в программе
+// Р­С‚Р° С„СѓРЅРєС†РёСЏ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РѕРїРёСЃР°РЅР° РІ РїСЂРѕРіСЂР°РјРјРµ
 void fatal(const Exception* e, const char_t* fn);
 
 #endif
