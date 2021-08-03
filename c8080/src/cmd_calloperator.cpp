@@ -6,37 +6,37 @@ bool cmd_alu_swap(Opcode op, bool self, bool flags=false);
 void cmd_alu(Opcode op, bool self, bool flags=false);
 void alu16(Operator o, Opcode cmd1, Opcode cmd2, bool canSwap, bool self);
 
-void asm_callOperator(Operator o, CType& a, CType b) {    
-  // Оператор всегда уменьшает кол-во аргументов в стеке
+void asm_callOperator(Operator o, C80Type& a, C80Type b) {    
+  // РћРїРµСЂР°С‚РѕСЂ РІСЃРµРіРґР° СѓРјРµРЅСЊС€Р°РµС‚ РєРѕР»-РІРѕ Р°СЂРіСѓРјРµРЅС‚РѕРІ РІ СЃС‚РµРєРµ
   //CheckStack st(-1);
 
-  // Тип данных cbtVoid ничего не кладет в стек, поэтому ниже будет ошибка
+  // РўРёРї РґР°РЅРЅС‹С… cbtVoid РЅРёС‡РµРіРѕ РЅРµ РєР»Р°РґРµС‚ РІ СЃС‚РµРє, РїРѕСЌС‚РѕРјСѓ РЅРёР¶Рµ Р±СѓРґРµС‚ РѕС€РёР±РєР°
   if((a.baseType==cbtVoid && a.addr==0) || (b.baseType==cbtVoid && b.addr==0))
-    p.logicError_("Операции с типом void недопустимы.");
+    p.logicError_("РћРїРµСЂР°С†РёРё СЃ С‚РёРїРѕРј void РЅРµРґРѕРїСѓСЃС‚РёРјС‹.");
 
-  // Аргументы
+  // РђСЂРіСѓРјРµРЅС‚С‹
   Stack& as = stack[stack.size()-2];
   Stack& bs = stack[stack.size()-1];
 
-  // *** Операция между указателем и числом (константа обрабатывается внутри) ***
+  // *** РћРїРµСЂР°С†РёСЏ РјРµР¶РґСѓ СѓРєР°Р·Р°С‚РµР»РµРј Рё С‡РёСЃР»РѕРј (РєРѕРЅСЃС‚Р°РЅС‚Р° РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚СЃСЏ РІРЅСѓС‚СЂРё) ***
 
   if(a.addr>0 && b.addr==0) {
-    // Сравнение указателя с нулем или запись в указатель нуля обрабатывается как обычное 16-битное
+    // РЎСЂР°РІРЅРµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ СЃ РЅСѓР»РµРј РёР»Рё Р·Р°РїРёСЃСЊ РІ СѓРєР°Р·Р°С‚РµР»СЊ РЅСѓР»СЏ РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚СЃСЏ РєР°Рє РѕР±С‹С‡РЅРѕРµ 16-Р±РёС‚РЅРѕРµ
     if(o==oE || o==oNE) {
-      if(bs.place!=pConst || bs.value!=0) p.logicError_("Указатель можно сравнивать только с нулем или другим указателем");
+      if(bs.place!=pConst || bs.value!=0) p.logicError_("РЈРєР°Р·Р°С‚РµР»СЊ РјРѕР¶РЅРѕ СЃСЂР°РІРЅРёРІР°С‚СЊ С‚РѕР»СЊРєРѕ СЃ РЅСѓР»РµРј РёР»Рё РґСЂСѓРіРёРј СѓРєР°Р·Р°С‚РµР»РµРј");
       goto ok;
     }
 
-    // Сравнение указателя с нулем или запись в указатель нуля обрабатывается как обычное 16-битное
+    // РЎСЂР°РІРЅРµРЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ СЃ РЅСѓР»РµРј РёР»Рё Р·Р°РїРёСЃСЊ РІ СѓРєР°Р·Р°С‚РµР»СЊ РЅСѓР»СЏ РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚СЃСЏ РєР°Рє РѕР±С‹С‡РЅРѕРµ 16-Р±РёС‚РЅРѕРµ
     if(o==oSet) {
-      if(bs.place!=pConst || bs.value!=0) p.logicError_("Указателю можно присваивать только нуль или другой указатель");
+      if(bs.place!=pConst || bs.value!=0) p.logicError_("РЈРєР°Р·Р°С‚РµР»СЋ РјРѕР¶РЅРѕ РїСЂРёСЃРІР°РёРІР°С‚СЊ С‚РѕР»СЊРєРѕ РЅСѓР»СЊ РёР»Рё РґСЂСѓРіРѕР№ СѓРєР°Р·Р°С‚РµР»СЊ");
       goto ok;
     }
 
-    // Число надо преобразовать к 16 битному значению
+    // Р§РёСЃР»Рѕ РЅР°РґРѕ РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ Рє 16 Р±РёС‚РЅРѕРјСѓ Р·РЅР°С‡РµРЅРёСЋ
     asm_convert(0, b, cbtUShort);
 
-    // Сложение или вычитание указателя
+    // РЎР»РѕР¶РµРЅРёРµ РёР»Рё РІС‹С‡РёС‚Р°РЅРёРµ СѓРєР°Р·Р°С‚РµР»СЏ
     switch(o) {
       case oAdd:  add16(a.sizeElement()); return;
       case oSub:  sub16(a.sizeElement()); return;
@@ -44,34 +44,34 @@ void asm_callOperator(Operator o, CType& a, CType b) {
       case oSSub: sub16(a.sizeElement(),true); return; 
     }
 
-    p.logicError_("К указателю можно только прибавлять или вычитать числа. А так же вычитать укзатель из указателя.");
+    p.logicError_("Рљ СѓРєР°Р·Р°С‚РµР»СЋ РјРѕР¶РЅРѕ С‚РѕР»СЊРєРѕ РїСЂРёР±Р°РІР»СЏС‚СЊ РёР»Рё РІС‹С‡РёС‚Р°С‚СЊ С‡РёСЃР»Р°. Рђ С‚Р°Рє Р¶Рµ РІС‹С‡РёС‚Р°С‚СЊ СѓРєР·Р°С‚РµР»СЊ РёР· СѓРєР°Р·Р°С‚РµР»СЏ.");
   }
 
-  // *** Операция между двумя указателями ***
+  // *** РћРїРµСЂР°С†РёСЏ РјРµР¶РґСѓ РґРІСѓРјСЏ СѓРєР°Р·Р°С‚РµР»СЏРјРё ***
 
   if(a.addr>0 && b.addr>0) {
-    // Возможные операции
+    // Р’РѕР·РјРѕР¶РЅС‹Рµ РѕРїРµСЂР°С†РёРё
     if(o!=oSub && o!=oSet && o!=oL && o!=oG && o!=oLE && o!=oGE && o!=oE && o!=oNE) 
-      p.logicError_("Указатели можно только вычитать, сравнивать и присваивать с другими указателями.");
+      p.logicError_("РЈРєР°Р·Р°С‚РµР»Рё РјРѕР¶РЅРѕ С‚РѕР»СЊРєРѕ РІС‹С‡РёС‚Р°С‚СЊ, СЃСЂР°РІРЅРёРІР°С‚СЊ Рё РїСЂРёСЃРІР°РёРІР°С‚СЊ СЃ РґСЂСѓРіРёРјРё СѓРєР°Р·Р°С‚РµР»СЏРјРё.");
 
-    // У указателей должны быть идентичные типы
+    // РЈ СѓРєР°Р·Р°С‚РµР»РµР№ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РёРґРµРЅС‚РёС‡РЅС‹Рµ С‚РёРїС‹
     if(a.addr!=b.addr || a.baseType!=b.baseType) 
-      p.logicError_((string)"Операция "+opName(o)+" невозможна между "+a.descr()+" и "+b.descr());
+      p.logicError_((string)"РћРїРµСЂР°С†РёСЏ "+opName(o)+" РЅРµРІРѕР·РјРѕР¶РЅР° РјРµР¶РґСѓ "+a.descr()+" Рё "+b.descr());
 
-    //! Надо обработать вычисление указателей (вызов деления)    
+    //! РќР°РґРѕ РѕР±СЂР°Р±РѕС‚Р°С‚СЊ РІС‹С‡РёСЃР»РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№ (РІС‹Р·РѕРІ РґРµР»РµРЅРёСЏ)    
 
-    // Работаем с указателями, как с 16-битными значениями
+    // Р Р°Р±РѕС‚Р°РµРј СЃ СѓРєР°Р·Р°С‚РµР»СЏРјРё, РєР°Рє СЃ 16-Р±РёС‚РЅС‹РјРё Р·РЅР°С‡РµРЅРёСЏРјРё
     a.addr=0; a.baseType=cbtUShort; b.addr=0; b.baseType=cbtUShort;
     goto ok;
   }
 
-  // *** Операция между двумя константами ***
+  // *** РћРїРµСЂР°С†РёСЏ РјРµР¶РґСѓ РґРІСѓРјСЏ РєРѕРЅСЃС‚Р°РЅС‚Р°РјРё ***
 
   if(as.place==pConst && bs.place==pConst) {
     bool i = a.addr==0 && (a.baseType==cbtChar || a.baseType==cbtShort);
     switch(o) {
-      case oDiv: if(bs.value==0) p.logicError_("Деление на 0"); if(i) as.value = (int)as.value / (int)bs.value; else as.value = (unsigned int)as.value / (unsigned int)bs.value; break;
-      case oMod: if(bs.value==0) p.logicError_("Деление на 0"); if(i) as.value = (int)as.value % (int)bs.value; else as.value = (unsigned int)as.value % (unsigned int)bs.value; break;
+      case oDiv: if(bs.value==0) p.logicError_("Р”РµР»РµРЅРёРµ РЅР° 0"); if(i) as.value = (int)as.value / (int)bs.value; else as.value = (unsigned int)as.value / (unsigned int)bs.value; break;
+      case oMod: if(bs.value==0) p.logicError_("Р”РµР»РµРЅРёРµ РЅР° 0"); if(i) as.value = (int)as.value % (int)bs.value; else as.value = (unsigned int)as.value % (unsigned int)bs.value; break;
       case oMul: if(i) as.value = (int)as.value * (int)bs.value; else as.value = (unsigned int)as.value * (unsigned int)bs.value; break;
       case oMul8: if(i) as.value = (as.value * bs.value)&0xFF; else as.uvalue = (as.uvalue * bs.value)&0xFF; break;
       case oSub: as.value -= bs.value; break;
@@ -90,14 +90,14 @@ void asm_callOperator(Operator o, CType& a, CType b) {
       case oLAnd:as.value = (as.value && bs.value); break;
       case oLOr: as.value = (as.value && bs.value); break;
       case oSet: case oSAdd: case oSSub: case oSMul: case oSDiv: case oSMod: case oSShl: case oSShr: 
-      case oSAnd: case oSXor: case oSOr: p.logicError_("Нельзя изменить константу");
-      default: p.logicError_((string)"Калькулятор для "+a.descr()+" "+opName(o)+" не написан");
+      case oSAnd: case oSXor: case oSOr: p.logicError_("РќРµР»СЊР·СЏ РёР·РјРµРЅРёС‚СЊ РєРѕРЅСЃС‚Р°РЅС‚Сѓ");
+      default: p.logicError_((string)"РљР°Р»СЊРєСѓР»СЏС‚РѕСЂ РґР»СЏ "+a.descr()+" "+opName(o)+" РЅРµ РЅР°РїРёСЃР°РЅ");
     }
     asm_pop(); 
     return;
   }
 
-  // *** Операция между двумя константами. Вычислять будет ассемблер ***
+  // *** РћРїРµСЂР°С†РёСЏ РјРµР¶РґСѓ РґРІСѓРјСЏ РєРѕРЅСЃС‚Р°РЅС‚Р°РјРё. Р’С‹С‡РёСЃР»СЏС‚СЊ Р±СѓРґРµС‚ Р°СЃСЃРµРјР±Р»РµСЂ ***
 
   if((as.place==pConstStr || as.place==pConst) && (bs.place==pConstStr || bs.place==pConst)) {
     string av = as.place==pConstStr ? as.name : i2s(as.value);
@@ -122,28 +122,28 @@ void asm_callOperator(Operator o, CType& a, CType b) {
       case oXor: as.name = "("+av+")|("+bv+")"; break;
       case oOr:  as.name = "("+av+")^("+bv+")"; break;
       case oSet: case oSAdd: case oSSub: case oSMul: case oSDiv: case oSMod: case oSShl: case oSShr: 
-      case oSAnd: case oSXor: case oSOr: p.logicError_("Нельзя изменить константу");
-      default: p.logicError_((string)"Калькулятор для "+a.descr()+" "+opName(o)+" не написан");
+      case oSAnd: case oSXor: case oSOr: p.logicError_("РќРµР»СЊР·СЏ РёР·РјРµРЅРёС‚СЊ РєРѕРЅСЃС‚Р°РЅС‚Сѓ");
+      default: p.logicError_((string)"РљР°Р»СЊРєСѓР»СЏС‚РѕСЂ РґР»СЏ "+a.descr()+" "+opName(o)+" РЅРµ РЅР°РїРёСЃР°РЅ");
     }
     if(a.addr==0) {
       bool i = (a.baseType==cbtChar || a.baseType==cbtShort);
-      if(i) a.baseType=cbtShort; else a.baseType=cbtUShort;  //! Проверить корректность преобразования к signed
+      if(i) a.baseType=cbtShort; else a.baseType=cbtUShort;  //! РџСЂРѕРІРµСЂРёС‚СЊ РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ Рє signed
     }
     asm_pop(); 
     return;
   }
 
-  // *** Контроль типов ***
+  // *** РљРѕРЅС‚СЂРѕР»СЊ С‚РёРїРѕРІ ***
   
-  //! Переписать весь блок ниже
+  //! РџРµСЂРµРїРёСЃР°С‚СЊ РІРµСЃСЊ Р±Р»РѕРє РЅРёР¶Рµ
 
-  // Обратное преобразование константы USHORT в UCHAR
+  // РћР±СЂР°С‚РЅРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹ USHORT РІ UCHAR
   if(a.addr==0 && b.addr==0) {
     if(bs.place==pConst) b.baseType = a.baseType; else
     if(as.place==pConst) a.baseType = b.baseType;
   }
 
-  // Прямое преобразование
+  // РџСЂСЏРјРѕРµ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ
   if(b.addr==0 && a.addr==0) {
     if(o!=oSet && o!=oSAdd && o!=oSAnd && o!=oSDiv && o!=oSMod && o!=oSMul && o!=oSOr && o!=oSShl && o!=oSShr && o!=oSSub) {
       if(a.baseType==cbtUChar && b.baseType==cbtShort) b.baseType = cbtUShort;
@@ -166,15 +166,15 @@ void asm_callOperator(Operator o, CType& a, CType b) {
     }
   }
 
-  //! Это не совсем корректно!
+  //! Р­С‚Рѕ РЅРµ СЃРѕРІСЃРµРј РєРѕСЂСЂРµРєС‚РЅРѕ!
   if(a.baseType!=b.baseType || a.addr !=b.addr) 
-    p.logicError_((string)"Операция "+opName(o)+" невозможна между "+a.descr()+" и "+b.descr());
+    p.logicError_((string)"РћРїРµСЂР°С†РёСЏ "+opName(o)+" РЅРµРІРѕР·РјРѕР¶РЅР° РјРµР¶РґСѓ "+a.descr()+" Рё "+b.descr());
 
 
 ok:
 
 
-  // *** 8 битные типы данных ***
+  // *** 8 Р±РёС‚РЅС‹Рµ С‚РёРїС‹ РґР°РЅРЅС‹С… ***
 
   if(a.is8()) {
     bool i = a.baseType==cbtChar;
@@ -198,13 +198,13 @@ ok:
       case oShl:  if(bs.place==pConst) { int x=bs.value; asm_pop(); cmd_shl8_1(false,x); return; } cmd_call_operator("op_shl"); return;
       case oSShl: if(bs.place==pConst) { int x=bs.value; asm_pop(); cmd_shl8_1(true ,x); return; } cmd_call_operator("op_shl", true); return;
       case oMul:
-        if(a.baseType==cbtUChar && bs.place==pConst) { // Умножение беззнаковых чисел на константу
+        if(a.baseType==cbtUChar && bs.place==pConst) { // РЈРјРЅРѕР¶РµРЅРёРµ Р±РµР·Р·РЅР°РєРѕРІС‹С… С‡РёСЃРµР» РЅР° РєРѕРЅСЃС‚Р°РЅС‚Сѓ
           switch(bs.value) {
             case 1: asm_pop(); return;
             case 2: case 4: case 5: case 8: case 16: asm_pop(); asm_convert(0,a,cbtUShort); pushHL(); mulHL(bs.value); popTmpHL(); a.baseType = cbtUShort; return;
           }
         }
-        if(b.baseType==cbtUChar && as.place==pConst) { // Умножение беззнаковых чисел на константу
+        if(b.baseType==cbtUChar && as.place==pConst) { // РЈРјРЅРѕР¶РµРЅРёРµ Р±РµР·Р·РЅР°РєРѕРІС‹С… С‡РёСЃРµР» РЅР° РєРѕРЅСЃС‚Р°РЅС‚Сѓ
           switch(as.value) {
             case 1: asm_pop(); return;
             case 2: case 4: case 5: case 8: case 16: asm_convert(0,b,cbtUShort); pushHL(); asm_pop(); mulHL(as.value); popTmpHL(); a.baseType = cbtUShort; return;
@@ -212,13 +212,13 @@ ok:
         }
         useHL(); cmd_call_operator_swap(i ? "op_imul" : "op_mul", 0, false, true);  a.baseType = i ? cbtShort : cbtUShort; return;
       case oMul8:
-        if(a.baseType==cbtUChar && bs.place==pConst) { // Умножение беззнаковых чисел на константу
+        if(a.baseType==cbtUChar && bs.place==pConst) { // РЈРјРЅРѕР¶РµРЅРёРµ Р±РµР·Р·РЅР°РєРѕРІС‹С… С‡РёСЃРµР» РЅР° РєРѕРЅСЃС‚Р°РЅС‚Сѓ
           switch(bs.value) {
             case 1: asm_pop(); return;
             case 2: case 4: case 5: case 8: case 16: asm_pop(); pushA(); mulA(bs.value); popTmpA(); return;
           }
         }
-        if(b.baseType==cbtUChar && as.place==pConst) { // Умножение беззнаковых чисел на константу
+        if(b.baseType==cbtUChar && as.place==pConst) { // РЈРјРЅРѕР¶РµРЅРёРµ Р±РµР·Р·РЅР°РєРѕРІС‹С… С‡РёСЃРµР» РЅР° РєРѕРЅСЃС‚Р°РЅС‚Сѓ
           switch(as.value) {
             case 1: asm_pop(); return;
             case 2: case 4: case 5: case 8: case 16: pushA(); asm_pop(); mulA(as.value); popTmpA(); return;
@@ -262,10 +262,10 @@ ok:
       case oE:    cmd_alu_swap(c_cpz_r, false, true); a.baseType = cbtFlagsE;  return;
       case oNE:   cmd_alu_swap(c_cpz_r, false, true); a.baseType = cbtFlagsNE; return;
     }
-    p.logicError_((string)"Операция "+opName(o)+" невозможна между "+a.descr()+" и "+b.descr());
+    p.logicError_((string)"РћРїРµСЂР°С†РёСЏ "+opName(o)+" РЅРµРІРѕР·РјРѕР¶РЅР° РјРµР¶РґСѓ "+a.descr()+" Рё "+b.descr());
   }
 
-  // Копирование структур
+  // РљРѕРїРёСЂРѕРІР°РЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂ
   if(a.baseType==cbtStruct && b.baseType==cbtStruct && a.i==b.i && o==oSet) {
    // peekHL();
     asm_arg("memcpy",cbtUShort,1,false);
@@ -310,17 +310,17 @@ ok:
                   if(i) { bc().callFile(swap ? "op_ige16" : "op_il16"); add(stack).place = pFlags; a.baseType = cbtFlagsE; return; }
                   bc().callFile("op_cmp16"); resultFlags(a, swap ? cbtFlagsG : cbtFlagsL); return; }
 
-      case oLE: { if(cmpImm16(cbtFlagsLE, cbtFlagsG, a, -1)) return; //! Скорее всего тут ошибка, проверить
+      case oLE: { if(cmpImm16(cbtFlagsLE, cbtFlagsG, a, -1)) return; //! РЎРєРѕСЂРµРµ РІСЃРµРіРѕ С‚СѓС‚ РѕС€РёР±РєР°, РїСЂРѕРІРµСЂРёС‚СЊ
                   bool swap = pushHLDE(true);
                   if(i) { bc().callFile(swap ? "op_ig16" : "op_ile16"); add(stack).place = pFlags; a.baseType = cbtFlagsE; return; }
                   bc().callFile("op_cmp16"); resultFlags(a, swap ? cbtFlagsGE : cbtFlagsLE); return; }
 
-      case oG:  { if(cmpImm16(cbtFlagsG, cbtFlagsLE, a, -1)) return; //! Скорее всего тут ошибка, проверить
+      case oG:  { if(cmpImm16(cbtFlagsG, cbtFlagsLE, a, -1)) return; //! РЎРєРѕСЂРµРµ РІСЃРµРіРѕ С‚СѓС‚ РѕС€РёР±РєР°, РїСЂРѕРІРµСЂРёС‚СЊ
                   bool swap = pushHLDE(true);
                   if(i) { bc().callFile(swap ? "op_ile16" : "op_ig16"); add(stack).place = pFlags; a.baseType = cbtFlagsE; return; }
                   bc().callFile("op_cmp16"); resultFlags(a, swap ? cbtFlagsL : cbtFlagsG); return; }
 
-      case oGE: { if(cmpImm16(cbtFlagsGE, cbtFlagsL, a, 0, -1)) return; //! Скорее всего тут ошибка, проверить
+      case oGE: { if(cmpImm16(cbtFlagsGE, cbtFlagsL, a, 0, -1)) return; //! РЎРєРѕСЂРµРµ РІСЃРµРіРѕ С‚СѓС‚ РѕС€РёР±РєР°, РїСЂРѕРІРµСЂРёС‚СЊ
                   bool swap = pushHLDE(true);
                   if(i) { bc().callFile(swap ? "op_il16" : "op_ige16"); add(stack).place = pFlags; a.baseType = cbtFlagsE; return; }
                   bc().callFile("op_cmp16"); resultFlags(a, swap ? cbtFlagsLE : cbtFlagsGE); return; }
@@ -331,8 +331,8 @@ ok:
       case oNE:   if(cmpImm16(cbtFlagsNE, cbtFlagsNE, a)) return;
                   pushHLDE(true); bc().callFile("op_cmp16"); resultFlags(a, cbtFlagsNE); return;
     }
-    p.logicError_((string)"Операция "+opName(o)+" невозможна между "+a.descr()+" и "+b.descr());
+    p.logicError_((string)"РћРїРµСЂР°С†РёСЏ "+opName(o)+" РЅРµРІРѕР·РјРѕР¶РЅР° РјРµР¶РґСѓ "+a.descr()+" Рё "+b.descr());
   }
 
-  p.logicError_("Операции с типом данных "+a.descr()+" не поддерживаются");
+  p.logicError_("РћРїРµСЂР°С†РёРё СЃ С‚РёРїРѕРј РґР°РЅРЅС‹С… "+a.descr()+" РЅРµ РїРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ");
 }

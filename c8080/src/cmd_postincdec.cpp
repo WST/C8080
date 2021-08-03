@@ -1,4 +1,4 @@
-// Команды увеличения, уменьшения
+// РљРѕРјР°РЅРґС‹ СѓРІРµР»РёС‡РµРЅРёСЏ, СѓРјРµРЅСЊС€РµРЅРёСЏ
 
 #include <stdafx.h>
 #include "stackLoadSave.h"
@@ -8,24 +8,24 @@ void postIncDec16(int v) {
   Stack& s = stack.back();
   Writer& w = bc();
 
-  // Ошибка
-  if(v==0) p.logicError_("Этот тип не поддерживает арифметические операции");
+  // РћС€РёР±РєР°
+  if(v==0) p.logicError_("Р­С‚РѕС‚ С‚РёРї РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚ Р°СЂРёС„РјРµС‚РёС‡РµСЃРєРёРµ РѕРїРµСЂР°С†РёРё");
   
-  // Переменная хранится в регистре BC
+  // РџРµСЂРµРјРµРЅРЅР°СЏ С…СЂР°РЅРёС‚СЃСЏ РІ СЂРµРіРёСЃС‚СЂРµ BC
   if(s.place == pBC) {
     asm_pop();
     if(v<-4 || v>4) {
-      w.ld_hl(v).ld_de_bc().add_hl_bc().ld_bc_hl().ex_hl_de(); // 44 такта
+      w.ld_hl(v).ld_de_bc().add_hl_bc().ld_bc_hl().ex_hl_de(); // 44 С‚Р°РєС‚Р°
     } else {
       useHL();
       w.ld_hl_bc();
-      for(;v<0; v++) w.dec_bc(); for(;v>0; v--) w.inc_bc(); // 10+5*n тактов
+      for(;v<0; v++) w.dec_bc(); for(;v>0; v--) w.inc_bc(); // 10+5*n С‚Р°РєС‚РѕРІ
     }
     popTmpHL();
     return;
   }
 
-  // Команда PokeHL не использует регистр DE и мы то же, поэтому мы для временного хранения используем DE
+  // РљРѕРјР°РЅРґР° PokeHL РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚ СЂРµРіРёСЃС‚СЂ DE Рё РјС‹ С‚Рѕ Р¶Рµ, РїРѕСЌС‚РѕРјСѓ РјС‹ РґР»СЏ РІСЂРµРјРµРЅРЅРѕРіРѕ С…СЂР°РЅРµРЅРёСЏ РёСЃРїРѕР»СЊР·СѓРµРј DE
   bool bigNumber = (v<-4 || v>4);
   if(!pokeHL_checkDE() && !bigNumber) {
     peekHL();
@@ -39,7 +39,7 @@ void postIncDec16(int v) {
 
   peekHL();
   w.push_hl();
-  // Если надо слишком много INC или DEC, то заменяем на ADD HL, DE
+  // Р•СЃР»Рё РЅР°РґРѕ СЃР»РёС€РєРѕРј РјРЅРѕРіРѕ INC РёР»Рё DEC, С‚Рѕ Р·Р°РјРµРЅСЏРµРј РЅР° ADD HL, DE
   if(bigNumber) {
     w.ld_de(v).add_hl_de();
   } else  {
@@ -68,10 +68,10 @@ void postIncDec8(bool inc) {
     return;
   }
 
-  if(s.place==pA) raise("Нельзя изменять временное значение");
+  if(s.place==pA) raise("РќРµР»СЊР·СЏ РёР·РјРµРЅСЏС‚СЊ РІСЂРµРјРµРЅРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ");
 
   useA();  
-  pushAasHL_(); // pConstStrRef8, pBCRef8, pHLRef8, pConstStrRefRef8, pConstRef8 и сам вызовет useHL();
+  pushAasHL_(); // pConstStrRef8, pBCRef8, pHLRef8, pConstStrRefRef8, pConstRef8 Рё СЃР°Рј РІС‹Р·РѕРІРµС‚ useHL();
   w.ld_a_HL();
   if(inc) w.inc_HL(); else w.dec_HL();
   popTmpA();

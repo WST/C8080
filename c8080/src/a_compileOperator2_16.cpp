@@ -3,27 +3,27 @@
 #include "b.h"
 
 bool compileOperator2_16(NodeOperator* no, bool swap, Assembler::Reg16 second, const std::function<bool(bool, int)>& result) {
-  // Результат сравнения в флагах
+  // Р РµР·СѓР»СЊС‚Р°С‚ СЃСЂР°РІРЅРµРЅРёСЏ РІ С„Р»Р°РіР°С…
   if(no->o==oNE || no->o==oE || no->o==oGE || no->o==oLE || no->o==oG || no->o==oL) {
     assert(second == Assembler::DE);
-    saveRegAAndUsed(); // op_cmp16 может портить регистр A
+    saveRegAAndUsed(); // op_cmp16 РјРѕР¶РµС‚ РїРѕСЂС‚РёС‚СЊ СЂРµРіРёСЃС‚СЂ A
     out.call("op_cmp16", need_op_cmp16); out.t += 50;
     return result(swap, 0);
   }
 
-  // Регистр HL будет изменен, поэтому сохраняем переменную хранящуюся в нем
+  // Р РµРіРёСЃС‚СЂ HL Р±СѓРґРµС‚ РёР·РјРµРЅРµРЅ, РїРѕСЌС‚РѕРјСѓ СЃРѕС…СЂР°РЅСЏРµРј РїРµСЂРµРјРµРЅРЅСѓСЋ С…СЂР°РЅСЏС‰СѓСЋСЃСЏ РІ РЅРµРј
   saveRegHLAndUsed();
 
-  // Аппаратное сложение  
+  // РђРїРїР°СЂР°С‚РЅРѕРµ СЃР»РѕР¶РµРЅРёРµ  
   if(no->o == oAdd) {
     out.dad(second);
     return result(swap, regHL);
   }
 
-  // Второй аргумент должен быть в DE
+  // Р’С‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РІ DE
   assert(second==Assembler::DE); 
 
-  // Вызываем подпрограмму. Она испортитв все регистры.
+  // Р’С‹Р·С‹РІР°РµРј РїРѕРґРїСЂРѕРіСЂР°РјРјСѓ. РћРЅР° РёСЃРїРѕСЂС‚РёС‚РІ РІСЃРµ СЂРµРіРёСЃС‚СЂС‹.
   saveRegAAndUsed();
   saveRegDEAndUsed();  
 

@@ -1,5 +1,5 @@
-// Открытая, бесплатная, ASIS версия библиотеки VinLib. В процессе написания
-// (с) 5-12-2011 vinxru
+// РћС‚РєСЂС‹С‚Р°СЏ, Р±РµСЃРїР»Р°С‚РЅР°СЏ, ASIS РІРµСЂСЃРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё VinLib. Р’ РїСЂРѕС†РµСЃСЃРµ РЅР°РїРёСЃР°РЅРёСЏ
+// (СЃ) 5-12-2011 vinxru
 
 #include <stdafx.h>
 #include "finlib/findfiles.h"
@@ -14,13 +14,13 @@ public:
     handle = INVALID_HANDLE_VALUE;
   }
 
-  // Получить первый файл
+  // РџРѕР»СѓС‡РёС‚СЊ РїРµСЂРІС‹Р№ С„Р°Р№Р»
   bool findFirst(const char* mask, WIN32_FIND_DATA& fd);
 
-  // Получить следующий файл
+  // РџРѕР»СѓС‡РёС‚СЊ СЃР»РµРґСѓСЋС‰РёР№ С„Р°Р№Р»
   bool findNext(WIN32_FIND_DATA& fd);
 
-  // Закрыть хендл поиска (автоматически вызывается в findFirst и дестракторе)
+  // Р—Р°РєСЂС‹С‚СЊ С…РµРЅРґР» РїРѕРёСЃРєР° (Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РІС‹Р·С‹РІР°РµС‚СЃСЏ РІ findFirst Рё РґРµСЃС‚СЂР°РєС‚РѕСЂРµ)
   void close();
 
   inline ~FindHandle() { 
@@ -58,7 +58,7 @@ void findFiles(std::vector<FindData>& out, const char* mask) {
         x.writeTime    = *(__int64*)&fd.ftLastWriteTime;
         x.creationTime = *(__int64*)&fd.ftCreationTime;
         x.size         = ((unsigned __int64)fd.nFileSizeHigh<<32) | (unsigned __int64)fd.nFileSizeLow;
-        if(x.size<0) x.size=0x7FFFFFFFFFFFFFFF; //!! Ограничение платформы
+        if(x.size<0) x.size=0x7FFFFFFFFFFFFFFF; //!! РћРіСЂР°РЅРёС‡РµРЅРёРµ РїР»Р°С‚С„РѕСЂРјС‹
       }
     } while(h.findNext(fd));
 };

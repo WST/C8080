@@ -3,7 +3,7 @@
 #include "b.h"
 
 bool compileSaveA(NodeVar* b, bool noResult, const std::function<bool(bool,int)>& result) {
-  // Используется в ++, --
+  // РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РІ ++, --
   if(b->nodeType==ntConstI) {
     out.sta(b->cast<NodeConst>()->value);
     return result(false, regA);
@@ -14,16 +14,16 @@ bool compileSaveA(NodeVar* b, bool noResult, const std::function<bool(bool,int)>
     return result(false, regA);
   }
 
-  // Надо узнать, использует ли скомпилированный код эти регистры
+  // РќР°РґРѕ СѓР·РЅР°С‚СЊ, РёСЃРїРѕР»СЊР·СѓРµС‚ Р»Рё СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅРЅС‹Р№ РєРѕРґ СЌС‚Рё СЂРµРіРёСЃС‚СЂС‹
   bool old_a_used  = s.a.used;  s.a.used = false;
   bool old_de_used = s.de.used; s.de.used = false;
      
-  // Заранее сохраняем А
+  // Р—Р°СЂР°РЅРµРµ СЃРѕС…СЂР°РЅСЏРµРј Рђ
   int poly = out.size(); out.push(Assembler::PSW);
        
-  // Компилируем адрес в HL
+  // РљРѕРјРїРёР»РёСЂСѓРµРј Р°РґСЂРµСЃ РІ HL
   return compileVar(b, regHL, [&](int){
-    // А не было изменено, сохранение не нужно
+    // Рђ РЅРµ Р±С‹Р»Рѕ РёР·РјРµРЅРµРЅРѕ, СЃРѕС…СЂР°РЅРµРЅРёРµ РЅРµ РЅСѓР¶РЅРѕ
     if(!s.a.used) {
       ChangeCode cc(poly, -TIMINGS_PUSH, Assembler::cNop);
       out.mov(Assembler::M, Assembler::A);              
@@ -31,9 +31,9 @@ bool compileSaveA(NodeVar* b, bool noResult, const std::function<bool(bool,int)>
       s.de.used = old_de_used;
       return result(false, regA);
     }
-    // А было изменено, но свободно D, сохраняем туда
+    // Рђ Р±С‹Р»Рѕ РёР·РјРµРЅРµРЅРѕ, РЅРѕ СЃРІРѕР±РѕРґРЅРѕ D, СЃРѕС…СЂР°РЅСЏРµРј С‚СѓРґР°
     if(!s.de.used) {
-      auto reg = Assembler::D; //@ Сохранить кстати можем в любой регистр
+      auto reg = Assembler::D; //@ РЎРѕС…СЂР°РЅРёС‚СЊ РєСЃС‚Р°С‚Рё РјРѕР¶РµРј РІ Р»СЋР±РѕР№ СЂРµРіРёСЃС‚СЂ
       ChangeCode cc(poly, TIMINGS_MOV_D_A-TIMINGS_PUSH, Assembler::cMOV, reg, Assembler::A); 
       out.mov(Assembler::M, reg);
       s.a.used  = true;
@@ -42,9 +42,9 @@ bool compileSaveA(NodeVar* b, bool noResult, const std::function<bool(bool,int)>
       out.mov(Assembler::A, reg);
       return result(false, regA);
     }
-    // В стек
-    //! А почему не в A!!!!
-    out.pop(Assembler::PSW).mov(Assembler::M, Assembler::A); //@ Вытащить кстати можем в любой регистр        
+    // Р’ СЃС‚РµРє
+    //! Рђ РїРѕС‡РµРјСѓ РЅРµ РІ A!!!!
+    out.pop(Assembler::PSW).mov(Assembler::M, Assembler::A); //@ Р’С‹С‚Р°С‰РёС‚СЊ РєСЃС‚Р°С‚Рё РјРѕР¶РµРј РІ Р»СЋР±РѕР№ СЂРµРіРёСЃС‚СЂ        
     s.a.used  = true;
     s.de.used = old_de_used;
     return result(false, regA);
@@ -52,33 +52,33 @@ bool compileSaveA(NodeVar* b, bool noResult, const std::function<bool(bool,int)>
 }
 
 //-----------------------------------------------------------------------------
-// Скомпилировать код сохранения регистра HL по адресу
+// РЎРєРѕРјРїРёР»РёСЂРѕРІР°С‚СЊ РєРѕРґ СЃРѕС…СЂР°РЅРµРЅРёСЏ СЂРµРіРёСЃС‚СЂР° HL РїРѕ Р°РґСЂРµСЃСѓ
 
 bool compileSaveHL(NodeVar* b, bool noResult, const std::function<bool(bool,int)>& result) {
   
-  //! Поддержка STAX B !!!
+  //! РџРѕРґРґРµСЂР¶РєР° STAX B !!!
 
-  // Используется в ++, --
+  // РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РІ ++, --
   if(b->nodeType==ntConstI) {
     out.shld(b->cast<NodeConst>()->value);
     return result(false, regHL);
   }
-  // Далее может быть XCHG, поэтому надо сохранить регистр.
+  // Р”Р°Р»РµРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ XCHG, РїРѕСЌС‚РѕРјСѓ РЅР°РґРѕ СЃРѕС…СЂР°РЅРёС‚СЊ СЂРµРіРёСЃС‚СЂ.
   saveRegs(regHL);
-  // Заранее сохраняем HL
+  // Р—Р°СЂР°РЅРµРµ СЃРѕС…СЂР°РЅСЏРµРј HL
   int poly3 = out.size(); out.push(Assembler::HL);
-  // Надо надо узнать, использует ли скомпилированный код регистры HL и DE?
+  // РќР°РґРѕ РЅР°РґРѕ СѓР·РЅР°С‚СЊ, РёСЃРїРѕР»СЊР·СѓРµС‚ Р»Рё СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅРЅС‹Р№ РєРѕРґ СЂРµРіРёСЃС‚СЂС‹ HL Рё DE?
   bool old_deUsed = s.de.used; s.de.used = false;
   bool old_hlUsed = s.hl.used; s.hl.used = false;
-  // Компилируем адрес в HL
+  // РљРѕРјРїРёР»РёСЂСѓРµРј Р°РґСЂРµСЃ РІ HL
   return compileVar(b, regHL, [&](int inReg) { 
     if(!s.de.used) {
-      ChangeCode cc(poly3, TIMINGS_XCHG-TIMINGS_PUSH, Assembler::cXCHG); // DE не используется, сохраняем адрес там
+      ChangeCode cc(poly3, TIMINGS_XCHG-TIMINGS_PUSH, Assembler::cXCHG); // DE РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, СЃРѕС…СЂР°РЅСЏРµРј Р°РґСЂРµСЃ С‚Р°Рј
       out.mov(Assembler::M, Assembler::E).inx(Assembler::HL).mov(Assembler::M, Assembler::D); s.hl.delta++;
       s.de.used = true;
       s.hl.used = true;
       if(noResult) return result(false, 0);
-      // Сейчас результат в DE. Переносим его в DE
+      // РЎРµР№С‡Р°СЃ СЂРµР·СѓР»СЊС‚Р°С‚ РІ DE. РџРµСЂРµРЅРѕСЃРёРј РµРіРѕ РІ DE
       saveRegHLAndUsed();
       saveRegDEAndUsed();
       out.xchg();
@@ -89,7 +89,7 @@ bool compileSaveHL(NodeVar* b, bool noResult, const std::function<bool(bool,int)
     s.de.used = true;
     s.hl.used = true;
     if(noResult) return result(false, 0);
-    // Сейчас результат в DE. Переносим его в DE
+    // РЎРµР№С‡Р°СЃ СЂРµР·СѓР»СЊС‚Р°С‚ РІ DE. РџРµСЂРµРЅРѕСЃРёРј РµРіРѕ РІ DE
     saveRegHLAndUsed();
     saveRegDEAndUsed();
     out.xchg();

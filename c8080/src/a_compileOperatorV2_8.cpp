@@ -3,10 +3,10 @@
 #include "b.h"
 
 bool compileOperatorV2_8(NodeOperator* o, bool swap, NodeVar* a, NodeVar* b, const std::function<bool(bool, int)>& result) {
-  // Регистры B,C можно сравнивать с нулем без участия второго регистра  
+  // Р РµРіРёСЃС‚СЂС‹ B,C РјРѕР¶РЅРѕ СЃСЂР°РІРЅРёРІР°С‚СЊ СЃ РЅСѓР»РµРј Р±РµР· СѓС‡Р°СЃС‚РёСЏ РІС‚РѕСЂРѕРіРѕ СЂРµРіРёСЃС‚СЂР°  
   if((o->o==oE || o->o==oNE) && b->nodeType==ntConstI && b->cast<NodeConst>()->value==0) {
     auto reg = a->isRegVar();
-    if(s.a.in && s.a.in->reg!=reg) { // Только если переменная не в аккумуляторе!
+    if(s.a.in && s.a.in->reg!=reg) { // РўРѕР»СЊРєРѕ РµСЃР»Рё РїРµСЂРµРјРµРЅРЅР°СЏ РЅРµ РІ Р°РєРєСѓРјСѓР»СЏС‚РѕСЂРµ!
       if(reg!=regNone) {
         auto r = toAsmReg8(reg);
         if(!zFlagFor8(r)) out.dcr(r).inr(r);
@@ -16,25 +16,25 @@ bool compileOperatorV2_8(NodeOperator* o, bool swap, NodeVar* a, NodeVar* b, con
   }     
 
   return compileVar(a, regA, [&](int inReg){
-    // В качестве второго аргумента используется регистр B или C и его можно исползовать как второй аргумент команды.
+    // Р’ РєР°С‡РµСЃС‚РІРµ РІС‚РѕСЂРѕРіРѕ Р°СЂРіСѓРјРµРЅС‚Р° РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ СЂРµРіРёСЃС‚СЂ B РёР»Рё C Рё РµРіРѕ РјРѕР¶РЅРѕ РёСЃРїРѕР»Р·РѕРІР°С‚СЊ РєР°Рє РІС‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ РєРѕРјР°РЅРґС‹.
     auto reg = b->isRegVar();
     if(reg!=regNone && compileOperator2_8_checkAnyReg(o)) {
       return compileOperator2_8(o, !swap, toAsmReg8(reg), result);
     }
 
-    // Если второй аргумент константа, загружаем её непосредственно в регистр D. Или даже выполняем короткую команду.
-    // Функция compileOperatorV2_8_const инвертирует SWAP, поэтому туда нельзя!
+    // Р•СЃР»Рё РІС‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ РєРѕРЅСЃС‚Р°РЅС‚Р°, Р·Р°РіСЂСѓР¶Р°РµРј РµС‘ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РІ СЂРµРіРёСЃС‚СЂ D. РР»Рё РґР°Р¶Рµ РІС‹РїРѕР»РЅСЏРµРј РєРѕСЂРѕС‚РєСѓСЋ РєРѕРјР°РЅРґСѓ.
+    // Р¤СѓРЅРєС†РёСЏ compileOperatorV2_8_const РёРЅРІРµСЂС‚РёСЂСѓРµС‚ SWAP, РїРѕСЌС‚РѕРјСѓ С‚СѓРґР° РЅРµР»СЊР·СЏ!
     if(b->isConst() && !(swap && o->o==oSub)) return compileOperatorV2_8_const(o, swap, b->cast<NodeConst>(), result);
 
-    // Если второй аргумент не константа, узнаем, нужны ли для его расчета регистры A или DE
+    // Р•СЃР»Рё РІС‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ РЅРµ РєРѕРЅСЃС‚Р°РЅС‚Р°, СѓР·РЅР°РµРј, РЅСѓР¶РЅС‹ Р»Рё РґР»СЏ РµРіРѕ СЂР°СЃС‡РµС‚Р° СЂРµРіРёСЃС‚СЂС‹ A РёР»Рё DE
     s.de.used = false;
-    // Заранее сохраняем А или HL
+    // Р—Р°СЂР°РЅРµРµ СЃРѕС…СЂР°РЅСЏРµРј Рђ РёР»Рё HL
     int poly = out.size(); out.push(Assembler::PSW);
-    // Компилируем    
+    // РљРѕРјРїРёР»РёСЂСѓРµРј    
     return compileVar(b, regA, [&](int inReg){
-      // Тут оба аргумента одинаковой разрядности      
-      if(!s.de.used) { //! Отдельно D и E
-        // Если DE не используется, то сохраняем в ней
+      // РўСѓС‚ РѕР±Р° Р°СЂРіСѓРјРµРЅС‚Р° РѕРґРёРЅР°РєРѕРІРѕР№ СЂР°Р·СЂСЏРґРЅРѕСЃС‚Рё      
+      if(!s.de.used) { //! РћС‚РґРµР»СЊРЅРѕ D Рё E
+        // Р•СЃР»Рё DE РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, С‚Рѕ СЃРѕС…СЂР°РЅСЏРµРј РІ РЅРµР№
         ChangeCode cc(poly, TIMINGS_MOV_D_A-TIMINGS_PUSH, Assembler::cMOV, Assembler::D, Assembler::A);
         s.de.used = true;
         return compileOperator2_8(o, swap, Assembler::D, result);

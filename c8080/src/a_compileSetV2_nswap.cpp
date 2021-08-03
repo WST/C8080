@@ -5,20 +5,20 @@
 bool compileSetV2_nswap(NodeVar* a, NodeVar* b, NodeOperator* no, const std::function<bool(bool,int)>& result) {
   assert(a->dataType.is16());
 
-  // Компилируем адрес HL (не в A!) или значение в HL или А
+  // РљРѕРјРїРёР»РёСЂСѓРµРј Р°РґСЂРµСЃ HL (РЅРµ РІ A!) РёР»Рё Р·РЅР°С‡РµРЅРёРµ РІ HL РёР»Рё Рђ
   return compileVar(a, regHL, [&](int){
-    // Далее может быть XCHG, поэтому надо сохранить регистр.
+    // Р”Р°Р»РµРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ XCHG, РїРѕСЌС‚РѕРјСѓ РЅР°РґРѕ СЃРѕС…СЂР°РЅРёС‚СЊ СЂРµРіРёСЃС‚СЂ.
     saveRegs(regHL);
-    // Заранее сохраняем HL
+    // Р—Р°СЂР°РЅРµРµ СЃРѕС…СЂР°РЅСЏРµРј HL
     int poly2 = out.size(); out.push(Assembler::HL);
-    // Надо надо узнать, использует ли скомпилированный код эти регистры
+    // РќР°РґРѕ РЅР°РґРѕ СѓР·РЅР°С‚СЊ, РёСЃРїРѕР»СЊР·СѓРµС‚ Р»Рё СЃРєРѕРјРїРёР»РёСЂРѕРІР°РЅРЅС‹Р№ РєРѕРґ СЌС‚Рё СЂРµРіРёСЃС‚СЂС‹
     bool old_hlUsed = s.hl.used; s.hl.used = false;
     bool old_deUsed = s.de.used; s.de.used = false;
-    // 8 битное значение
+    // 8 Р±РёС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ
     if(b->dataType.is8()) {
       return compileVar(b, regA, [&](int){
         if(!s.hl.used) {
-          ChangeCode cc(poly2, -TIMINGS_PUSH, Assembler::cNop); // И перемещать его в DE
+          ChangeCode cc(poly2, -TIMINGS_PUSH, Assembler::cNop); // Р РїРµСЂРµРјРµС‰Р°С‚СЊ РµРіРѕ РІ DE
           out.mov(Assembler::M, Assembler::A);
           s.a.used  = true;
           s.hl.used = old_hlUsed;
@@ -26,26 +26,26 @@ bool compileSetV2_nswap(NodeVar* a, NodeVar* b, NodeOperator* no, const std::fun
           return result(false, regA);
         }
         if(!s.de.used) {
-          ChangeCode cc(poly2, TIMINGS_XCHG-TIMINGS_PUSH, Assembler::cXCHG); // DE не используется, сохраняем адрес там
+          ChangeCode cc(poly2, TIMINGS_XCHG-TIMINGS_PUSH, Assembler::cXCHG); // DE РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, СЃРѕС…СЂР°РЅСЏРµРј Р°РґСЂРµСЃ С‚Р°Рј
           out.stax(Assembler::DE);
           s.a.used  = true;
           s.hl.used = old_hlUsed;
           s.de.used = true;
           return result(false, regA);          
         }
-        out.pop(Assembler::DE).stax(Assembler::DE); //@ А можно еще pop hl + mov m, a. 
+        out.pop(Assembler::DE).stax(Assembler::DE); //@ Рђ РјРѕР¶РЅРѕ РµС‰Рµ pop hl + mov m, a. 
         s.a.used  = true;
         s.hl.used = old_hlUsed;
         s.de.used = true;
         return result(false, regA);        
       });
     }    
-    // 16 битное значение.
+    // 16 Р±РёС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ.
     if(b->dataType.is16()) {
       return compileVar(b, regA|regHL, [&](int inReg) { 
         if(inReg==regA) {
           if(!s.hl.used) {
-            ChangeCode cc(poly2, -TIMINGS_PUSH, Assembler::cNop); // HL не используется, сохраняем адрес там
+            ChangeCode cc(poly2, -TIMINGS_PUSH, Assembler::cNop); // HL РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, СЃРѕС…СЂР°РЅСЏРµРј Р°РґСЂРµСЃ С‚Р°Рј
             out.mov(Assembler::M, Assembler::A).inx(Assembler::HL).mvi(Assembler::M, 0); s.hl.delta++;
             s.hl.used = old_hlUsed;
             s.de.used = old_deUsed;
@@ -53,14 +53,14 @@ bool compileSetV2_nswap(NodeVar* a, NodeVar* b, NodeOperator* no, const std::fun
             throw;
           }
           if(!s.de.used) {
-            ChangeCode cc(poly2, TIMINGS_XCHG-TIMINGS_PUSH, Assembler::cXCHG); // DE не используется, сохраняем адрес там
+            ChangeCode cc(poly2, TIMINGS_XCHG-TIMINGS_PUSH, Assembler::cXCHG); // DE РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, СЃРѕС…СЂР°РЅСЏРµРј Р°РґСЂРµСЃ С‚Р°Рј
             out.stax(Assembler::DE);
             s.hl.used = old_hlUsed;
             s.de.used = true;
             if(no->o==oSetVoid) return result(false, 0);
             throw;
           }
-          //@ Тут можно еще в HL восстановиться
+          //@ РўСѓС‚ РјРѕР¶РЅРѕ РµС‰Рµ РІ HL РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊСЃСЏ
           out.pop(Assembler::DE).stax(Assembler::DE);
           s.hl.used = old_hlUsed;
           s.de.used = true;
@@ -68,13 +68,13 @@ bool compileSetV2_nswap(NodeVar* a, NodeVar* b, NodeOperator* no, const std::fun
           throw;
         } 
         assert(inReg==regHL);
-        // Проверять !s.hl.used нет смысла
+        // РџСЂРѕРІРµСЂСЏС‚СЊ !s.hl.used РЅРµС‚ СЃРјС‹СЃР»Р°
         if(!s.de.used) {
-          ChangeCode cc(poly2, TIMINGS_XCHG-TIMINGS_PUSH, Assembler::cXCHG); // DE не используется, сохраняем адрес там
+          ChangeCode cc(poly2, TIMINGS_XCHG-TIMINGS_PUSH, Assembler::cXCHG); // DE РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, СЃРѕС…СЂР°РЅСЏРµРј Р°РґСЂРµСЃ С‚Р°Рј
           saveRegs(regHL);
           out.xchg();
           out.mov(Assembler::M, Assembler::E).inx(Assembler::HL).mov(Assembler::M, Assembler::D); s.hl.delta++;
-          //@ Тут можно восстановить HL добавить XCHG
+          //@ РўСѓС‚ РјРѕР¶РЅРѕ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ HL РґРѕР±Р°РІРёС‚СЊ XCHG
           s.hl.used = true;
           s.de.used = true;
           if(no->o==oSetVoid) return result(false, 0);
@@ -83,10 +83,10 @@ bool compileSetV2_nswap(NodeVar* a, NodeVar* b, NodeOperator* no, const std::fun
         saveRegs(regHL);
         out.pop(Assembler::DE).xchg();
         out.mov(Assembler::M, Assembler::E).inx(Assembler::HL).mov(Assembler::M, Assembler::D); s.hl.delta++;
-        //@ Тут можно восстановить HL
+        //@ РўСѓС‚ РјРѕР¶РЅРѕ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ HL
         if(no->o==oSetVoid) return result(false, 0);
         out.xchg();
-        return result(false, regHL); //! Вернуть в DE
+        return result(false, regHL); //! Р’РµСЂРЅСѓС‚СЊ РІ DE
       });
     }
     throw;

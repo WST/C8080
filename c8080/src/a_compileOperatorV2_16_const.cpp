@@ -3,19 +3,19 @@
 #include "b.h"
 
 bool compileOperatorV2_16_const(NodeOperator* o, bool swap, NodeConst* bc, const std::function<bool(bool, int)>& result) {  
-  // Оптимизация сложения
+  // РћРїС‚РёРјРёР·Р°С†РёСЏ СЃР»РѕР¶РµРЅРёСЏ
   if(o->o == oAdd && bc->nodeType == ntConstI) {
     return compileOperatorV2_16_const_add(o, swap, bc, result);
   }
 
-  // Сравнение с нулем и нужен только флаг Z
+  // РЎСЂР°РІРЅРµРЅРёРµ СЃ РЅСѓР»РµРј Рё РЅСѓР¶РµРЅ С‚РѕР»СЊРєРѕ С„Р»Р°Рі Z
   if((o->o == oE || o->o == oNE) && bc->value==0) {
     saveRegAAndUsed();
     out.mov(Assembler::A, Assembler::H).alu(Assembler::OR, Assembler::L);
     return result(swap, 0); 
   }
 
-  // Сокращаем умножение
+  // РЎРѕРєСЂР°С‰Р°РµРј СѓРјРЅРѕР¶РµРЅРёРµ
   if(bc->nodeType==ntConstI && o->o==oMul && bc->value!=0) {
     saveRegHLAndUsed();
 
@@ -26,9 +26,9 @@ bool compileOperatorV2_16_const(NodeOperator* o, bool swap, NodeConst* bc, const
       if(*m++ = (d & 1))
         needSaveDE = true;
 
-    // Нужен DE
+    // РќСѓР¶РµРЅ DE
     if(needSaveDE) {
-      saveRegDEAndUsed(); // Как вариант, можно и в стек. А можно пометить, что HL теперь в DE!
+      saveRegDEAndUsed(); // РљР°Рє РІР°СЂРёР°РЅС‚, РјРѕР¶РЅРѕ Рё РІ СЃС‚РµРє. Рђ РјРѕР¶РЅРѕ РїРѕРјРµС‚РёС‚СЊ, С‡С‚Рѕ HL С‚РµРїРµСЂСЊ РІ DE!
       out.mov(Assembler::D, Assembler::H).mov(Assembler::E, Assembler::L);
     }
 
@@ -41,10 +41,10 @@ bool compileOperatorV2_16_const(NodeOperator* o, bool swap, NodeConst* bc, const
     return result(false, regHL); 
   }
 
-  // Поместить константу в DE
+  // РџРѕРјРµСЃС‚РёС‚СЊ РєРѕРЅСЃС‚Р°РЅС‚Сѓ РІ DE
   return loadInDE(bc, false, [&](){
     return compileOperator2_16(o, !swap, Assembler::DE, result);
   });    
 
-  //! Попробовать еще в BC. Только в этой реализации в DE лежит регистр
+  //! РџРѕРїСЂРѕР±РѕРІР°С‚СЊ РµС‰Рµ РІ BC. РўРѕР»СЊРєРѕ РІ СЌС‚РѕР№ СЂРµР°Р»РёР·Р°С†РёРё РІ DE Р»РµР¶РёС‚ СЂРµРіРёСЃС‚СЂ
 }

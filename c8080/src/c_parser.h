@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------
   VinLib  
-  Парсер
+  РџР°СЂСЃРµСЂ
  
   This Software is owned by Aleksey Morozov (vinxru) and is
   protected by copyright law and international copyright treaty.
@@ -84,7 +84,7 @@ protected:
 
 public:    
   FunctionHelp* functionHelp;
-  // Настройки
+  // РќР°СЃС‚СЂРѕР№РєРё
   string fileName;
   bool anyChar;
   bool floatAsCurrency;
@@ -92,8 +92,8 @@ public:
   bool noIdent;
   bool caseSel;
   bool dontUnquoteCEscape;
-  bool cescape; // \ - последовательности
-  bool mysqlQuote; // Идентификаторы в `
+  bool cescape; // \ - РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё
+  bool mysqlQuote; // РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹ РІ `
   bool ignoreFloat;
   bool needEol;
   bool functionHelpMode;
@@ -107,7 +107,7 @@ public:
   int breakCol;
   int breakLine;
 
-  // Результат
+  // Р РµР·СѓР»СЊС‚Р°С‚
   char_t tokenText[maxTokenText+1];
   char_t buf[maxTokenText+1];
   int bufInt;
@@ -119,10 +119,10 @@ public:
 //  Currency tokenCurrency;
   int  tokenInteger;
 
-  // Буфер для loadFromString
+  // Р‘СѓС„РµСЂ РґР»СЏ loadFromString
   string source_;
 
-  // Исходник
+  // РСЃС…РѕРґРЅРёРє
   const char_t* cursor, *prevCursor;
   int line;
   int col;
@@ -159,7 +159,7 @@ public:
     ~ParserMacroOff() { p.macroOff=oldMacroOff; }
   };
 
-  // Заполняется только breakCol breakLine
+  // Р—Р°РїРѕР»РЅСЏРµС‚СЃСЏ С‚РѕР»СЊРєРѕ breakCol breakLine
 
   std::function<void()> preprocessor;
 
@@ -176,9 +176,9 @@ public:
   bool ifToken(const std::vector<std::string>& strs, int& n);
   bool ifToken(const std::map<string,int>& hash, int& n);
   bool ifToken_pos(const std::map<string,int>& hash, int& n);  
-  void syntaxError(cstring str=_T("Синтаксическая ошибка"));
+  void syntaxError(cstring str=_T("РЎРёРЅС‚Р°РєСЃРёС‡РµСЃРєР°СЏ РѕС€РёР±РєР°"));
   void enterMacro(int killMacro, string* buffer, int disabledMacro, bool dontCallNextToken);
-  void syntaxError(int y, int x0, int x1, cstring str=_T("Синтаксическая ошибка"));
+  void syntaxError(int y, int x0, int x1, cstring str=_T("РЎРёРЅС‚Р°РєСЃРёС‡РµСЃРєР°СЏ РѕС€РёР±РєР°"));
   void logicError_(const char_t* str=_T(""));
   void logicError_(cstring str) { logicError_(str.c_str()); }
   void logicError_(int y, int x0, int x1, const char_t* str=_T(""));
@@ -327,7 +327,7 @@ public:
   Parser& p;
 
   inline ParserLogicError(Parser& _p) : p(_p) { 
-    a = b = c = 0; // Делаем CppCheck счастливым
+    a = b = c = 0; // Р”РµР»Р°РµРј CppCheck СЃС‡Р°СЃС‚Р»РёРІС‹Рј
     startLine = p.prevLine;
     startCol = p.prevCol; 
     fixed = false; 

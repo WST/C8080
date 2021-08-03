@@ -1,22 +1,22 @@
-// Открытая, бесплатная, ASIS версия библиотеки VinLib. В процессе написания
-// (с) 5-12-2011 vinxru
+// РћС‚РєСЂС‹С‚Р°СЏ, Р±РµСЃРїР»Р°С‚РЅР°СЏ, ASIS РІРµСЂСЃРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё VinLib. Р’ РїСЂРѕС†РµСЃСЃРµ РЅР°РїРёСЃР°РЅРёСЏ
+// (СЃ) 5-12-2011 vinxru
 
 #ifndef VINLIB_WINAPI_EXCEPTION_H
 #define VINLIB_WINAPI_EXCEPTION_H
 
 #include "finlib/string.h"
 
-// Получение текста ошибки Windows 
+// РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСЃС‚Р° РѕС€РёР±РєРё Windows 
 void getOsErrorMessage(const char* prefix, string& error);
 
-// Вывод предупреждения
+// Р’С‹РІРѕРґ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёСЏ
 void warning_os(const char* preFix);
 
-// Генерация исключения с добавлением текста ошибки Windows
+// Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ СЃ РґРѕР±Р°РІР»РµРЅРёРµРј С‚РµРєСЃС‚Р° РѕС€РёР±РєРё Windows
 void raise_os(const char* preFix);
 inline void raise_os(cstring text) { raise_os(text.c_str()); }
 
-// Прототип главной функции
+// РџСЂРѕС‚РѕС‚РёРї РіР»Р°РІРЅРѕР№ С„СѓРЅРєС†РёРё
 #ifndef _CONSOLE
 int main(const char*);
 #else

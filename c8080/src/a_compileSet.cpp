@@ -3,23 +3,23 @@
 #include "b.h"
 
 bool compileSet(NodeOperator* no, const std::function<bool(bool,int)>& result) {
-  // Âûäåðãèâàåì àäðåñ, äàëåå áóäåò ðàáîòàòü òîëüêî ñ íèì
+  // Ð’Ñ‹Ð´ÐµÑ€Ð³Ð¸Ð²Ð°ÐµÐ¼ Ð°Ð´Ñ€ÐµÑ, Ð´Ð°Ð»ÐµÐµ Ð±ÑƒÐ´ÐµÑ‚ Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ñ‚ÑŒ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ñ Ð½Ð¸Ð¼
   if(no->a->nodeType != ntDeaddr) raise("compileSet !ntDeaddr");
   auto dest = no->a->cast<NodeDeaddr>();  
 
-  // Ñàìûé ïðîñòîé âèä çàïèñè. Óêàçàí àäðåñ, ïîýòîìó ìû èñïîëüçóåì êîìàíäû sta è shld
+  // Ð¡Ð°Ð¼Ñ‹Ð¹ Ð¿Ñ€Ð¾ÑÑ‚Ð¾Ð¹ Ð²Ð¸Ð´ Ð·Ð°Ð¿Ð¸ÑÐ¸. Ð£ÐºÐ°Ð·Ð°Ð½ Ð°Ð´Ñ€ÐµÑ, Ð¿Ð¾ÑÑ‚Ð¾Ð¼Ñƒ Ð¼Ñ‹ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐµÐ¼ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñ‹ sta Ð¸ shld
 
   if(dest->var->isConst()) {
     auto destAddr = dest->var->cast<NodeConst>();
-    // Êîíñòàíòà=êîíñòàíòà, ïîääåðæèâàåòñÿ òîëüêî äëÿ ðåãèñòðîâûõ ïåðåìåííûõ
+    // ÐšÐ¾Ð½ÑÑ‚Ð°Ð½Ñ‚Ð°=ÐºÐ¾Ð½ÑÑ‚Ð°Ð½Ñ‚Ð°, Ð¿Ð¾Ð´Ð´ÐµÑ€Ð¶Ð¸Ð²Ð°ÐµÑ‚ÑÑ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð¾Ð²Ñ‹Ñ… Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ñ‹Ñ…
     if(no->b->isConst() && destAddr->nodeType == ntConstS && destAddr->var->reg) {
-      // Òåïåðü â ðåãèñòðàõ íåêîððåêòíîå çíà÷åíèå
-      if(s.hl.in==destAddr->var) s.hl.in=0; // òóò s.hl.tmp==0
+      // Ð¢ÐµÐ¿ÐµÑ€ÑŒ Ð² Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð°Ñ… Ð½ÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ
+      if(s.hl.in==destAddr->var) s.hl.in=0; // Ñ‚ÑƒÑ‚ s.hl.tmp==0
       if(s.a.in==destAddr->var) s.a.in=0;
       auto constb = no->b->cast<NodeConst>();
       if(no->b->dataType.is8()) {
         if(constb->nodeType==ntConstI && s.a.const_ && s.a.const_value==constb->value) {
-          out.mov(toAsmReg8(destAddr->var->reg), Assembler::A);  //! Äðóãèå ðåãèñòðû!
+          out.mov(toAsmReg8(destAddr->var->reg), Assembler::A);  //! Ð”Ñ€ÑƒÐ³Ð¸Ðµ Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ñ‹!
         } else {
           out.mvi(toAsmReg8(destAddr->var->reg), constb); 
         }
@@ -31,24 +31,24 @@ bool compileSet(NodeOperator* no, const std::function<bool(bool,int)>& result) {
       out.lxi(Assembler::HL, no->b->cast<NodeConst>());
       return result(false, regHL);
     }    
-    // Êîìïèëèðóåì çíà÷åíèå
+    // ÐšÐ¾Ð¼Ð¿Ð¸Ð»Ð¸Ñ€ÑƒÐµÐ¼ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ
     if(no->b->dataType.is8()) {
-      // Åñëè â ðåãèñòðå A ëåæèò ïåðåìåííàÿ, êîòîðóþ èçìåíÿåì, òî íàäî å¸ âûêèíóòü! À òî äîáàâèòñÿ STA!
+      // Ð•ÑÐ»Ð¸ Ð² Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ðµ A Ð»ÐµÐ¶Ð¸Ñ‚ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ð°Ñ, ÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¸Ð·Ð¼ÐµÐ½ÑÐµÐ¼, Ñ‚Ð¾ Ð½Ð°Ð´Ð¾ ÐµÑ‘ Ð²Ñ‹ÐºÐ¸Ð½ÑƒÑ‚ÑŒ! Ð Ñ‚Ð¾ Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑÑ STA!
       if(destAddr->nodeType == ntConstS && s.a.in && s.a.in == destAddr->var) {
         s.a.changed = false;
       }
-      // Ïîìåùàåì çíà÷åíèå â A
+      // ÐŸÐ¾Ð¼ÐµÑ‰Ð°ÐµÐ¼ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð² A
       return compileVar(no->b, regA, [&](int inReg) {
-        // Çíà÷åíèå äîëæíî áûòü â A 
+        // Ð—Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ Ð´Ð¾Ð»Ð¶Ð½Ð¾ Ð±Ñ‹Ñ‚ÑŒ Ð² A 
         if(destAddr->nodeType == ntConstS) {
-          // Îòëîæåííàÿ çàïèñü
+          // ÐžÑ‚Ð»Ð¾Ð¶ÐµÐ½Ð½Ð°Ñ Ð·Ð°Ð¿Ð¸ÑÑŒ
           bool o = s.a.const_;
-          loadInA(destAddr->var); // Äîáàâèò òîëüêî ëèøü êîìàíäó STA, åñëè êîïèðâîàíèå èç íå ñîõðàíåííîãî ðåãèñòðà
+          loadInA(destAddr->var); // Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð»Ð¸ÑˆÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ STA, ÐµÑÐ»Ð¸ ÐºÐ¾Ð¿Ð¸Ñ€Ð²Ð¾Ð°Ð½Ð¸Ðµ Ð¸Ð· Ð½Ðµ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð½Ð¾Ð³Ð¾ Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð°
           s.a.const_ = o;
           s.a.changed = true;
           return result(false, regA);
         }
-        // Ñðàçó çàïèñûâàåì
+        // Ð¡Ñ€Ð°Ð·Ñƒ Ð·Ð°Ð¿Ð¸ÑÑ‹Ð²Ð°ÐµÐ¼
         assert(destAddr->nodeType == ntConstI);
         s.a.used = true;        
         out.sta(destAddr->value);
@@ -56,20 +56,20 @@ bool compileSet(NodeOperator* no, const std::function<bool(bool,int)>& result) {
       });
     }
     if(no->b->dataType.is16()) {
-      // Åñëè â ðåãèñòðå A ëåæèò ïåðåìåííàÿ, êîòîðóþ èçìåíÿåì, òî íàäî å¸ âûêèíóòü! À òî äîáàâèòñÿ STA!
+      // Ð•ÑÐ»Ð¸ Ð² Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ðµ A Ð»ÐµÐ¶Ð¸Ñ‚ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ð°Ñ, ÐºÐ¾Ñ‚Ð¾Ñ€ÑƒÑŽ Ð¸Ð·Ð¼ÐµÐ½ÑÐµÐ¼, Ñ‚Ð¾ Ð½Ð°Ð´Ð¾ ÐµÑ‘ Ð²Ñ‹ÐºÐ¸Ð½ÑƒÑ‚ÑŒ! Ð Ñ‚Ð¾ Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑÑ STA!
       if(destAddr->nodeType == ntConstS && s.hl.in && s.hl.in == destAddr->var) {
         s.hl.changed = false;
       }
       return compileVar(no->b, regHL, [&](int inReg) {
         if(destAddr->nodeType == ntConstS) {
-          // Îòëîæåííàÿ çàïèñü
+          // ÐžÑ‚Ð»Ð¾Ð¶ÐµÐ½Ð½Ð°Ñ Ð·Ð°Ð¿Ð¸ÑÑŒ
           bool o = s.hl.const_;
-          loadInHL(destAddr->var); // Äîáàâèò òîëüêî ëèøü êîìàíäó SHLD, åñëè êîïèðâîàíèå èç íå ñîõðàíåííîãî ðåãèñòðà
+          loadInHL(destAddr->var); // Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð»Ð¸ÑˆÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ SHLD, ÐµÑÐ»Ð¸ ÐºÐ¾Ð¿Ð¸Ñ€Ð²Ð¾Ð°Ð½Ð¸Ðµ Ð¸Ð· Ð½Ðµ ÑÐ¾Ñ…Ñ€Ð°Ð½ÐµÐ½Ð½Ð¾Ð³Ð¾ Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð°
           s.hl.const_ = o;
           s.hl.changed = true;
           return result(false, regHL);
         }
-        // Ñðàçó çàïèñûâàåì
+        // Ð¡Ñ€Ð°Ð·Ñƒ Ð·Ð°Ð¿Ð¸ÑÑ‹Ð²Ð°ÐµÐ¼
         assert(destAddr->nodeType == ntConstI);
         s.hl.used = true;
         out.shld(destAddr->value);
@@ -79,12 +79,12 @@ bool compileSet(NodeOperator* no, const std::function<bool(bool,int)>& result) {
     throw Exception("compileSet big");
   }
 
-  // Âòîðîé ïðîñòîé âèä çàïèñè, ìû çàïèñûâàåì êîíñòàíòó ïî âû÷èñëÿåìîìó çíà÷åíèþ
+  // Ð’Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð¿Ñ€Ð¾ÑÑ‚Ð¾Ð¹ Ð²Ð¸Ð´ Ð·Ð°Ð¿Ð¸ÑÐ¸, Ð¼Ñ‹ Ð·Ð°Ð¿Ð¸ÑÑ‹Ð²Ð°ÐµÐ¼ ÐºÐ¾Ð½ÑÑ‚Ð°Ð½Ñ‚Ñƒ Ð¿Ð¾ Ð²Ñ‹Ñ‡Ð¸ÑÐ»ÑÐµÐ¼Ð¾Ð¼Ñƒ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸ÑŽ
   if(no->b->isConst()) {
     auto nb = no->b->cast<NodeConst>();
 
-    //! Ýòî íàäî èñêëþ÷èòü. È ðàçáèòü íà äâå âåòêè
-    // Åñëè àäðåñ õðàíèñòÿ â BC, òî ìû èñïîëüóçåì êîìàíäó MVI+STAX B
+    //! Ð­Ñ‚Ð¾ Ð½Ð°Ð´Ð¾ Ð¸ÑÐºÐ»ÑŽÑ‡Ð¸Ñ‚ÑŒ. Ð˜ Ñ€Ð°Ð·Ð±Ð¸Ñ‚ÑŒ Ð½Ð° Ð´Ð²Ðµ Ð²ÐµÑ‚ÐºÐ¸
+    // Ð•ÑÐ»Ð¸ Ð°Ð´Ñ€ÐµÑ Ñ…Ñ€Ð°Ð½Ð¸ÑÑ‚Ñ Ð² BC, Ñ‚Ð¾ Ð¼Ñ‹ Ð¸ÑÐ¿Ð¾Ð»ÑŒÑƒÐ·ÐµÐ¼ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ MVI+STAX B
     if(dest->var->nodeType==ntDeaddr && dest->var->cast<NodeDeaddr>()->var->nodeType==ntConstS && dest->var->cast<NodeDeaddr>()->var->cast<NodeConst>()->var->reg==regBC) {
       if(no->b->dataType.is8()) {
         return compileVar(no->b, regA, [&](int reg) {
@@ -99,8 +99,8 @@ bool compileSet(NodeOperator* no, const std::function<bool(bool,int)>& result) {
       raise("compileSet big1");
     }
 
-    // Êîìïèëèðóåì àäðåñ. Îí äîëæåí áûòü â HL
-    return compileVar(dest->var, regHL, [&](int){ //! Ïîïðîáîâàòü â BC, DE
+    // ÐšÐ¾Ð¼Ð¿Ð¸Ð»Ð¸Ñ€ÑƒÐµÐ¼ Ð°Ð´Ñ€ÐµÑ. ÐžÐ½ Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ Ð² HL
+    return compileVar(dest->var, regHL, [&](int){ //! ÐŸÐ¾Ð¿Ñ€Ð¾Ð±Ð¾Ð²Ð°Ñ‚ÑŒ Ð² BC, DE
       switch(no->b->dataType.getSize()) {
         case 8:  out.mvi(Assembler::M, nb); break;
         case 16: out.mvi(Assembler::M, nb).inx(Assembler::HL).mvih(Assembler::M, nb); s.hl.delta++; break;

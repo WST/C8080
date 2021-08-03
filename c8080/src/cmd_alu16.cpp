@@ -7,19 +7,19 @@ void alu16_const(Operator o, cstring v1, cstring v2, Opcode cmd1, Opcode cmd2, i
 void alu16(Operator o, Opcode cmd1, Opcode cmd2, bool canSwap, bool self) {
   //CheckStack st(-1);
 
-  // Аргументы
+  // РђСЂРіСѓРјРµРЅС‚С‹
   Stack& a = stack[stack.size()-2];
   Stack& b = stack[stack.size()-1];
 
-  // Второй аргумент константа
+  // Р’С‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ РєРѕРЅСЃС‚Р°РЅС‚Р°
   if(b.place==pConst || b.place==pConstStr) {
-    // Вычитание можно реализовать через ADD HL, DE
+    // Р’С‹С‡РёС‚Р°РЅРёРµ РјРѕР¶РЅРѕ СЂРµР°Р»РёР·РѕРІР°С‚СЊ С‡РµСЂРµР· ADD HL, DE
     if(o==oSub) { 
       if(b.place==pConst) b.value = -b.value; else b.name = "-("+b.name+")";
       add16(1, self); 
       return; 
     }
-    // Далее вычисляем в функции alu16_const
+    // Р”Р°Р»РµРµ РІС‹С‡РёСЃР»СЏРµРј РІ С„СѓРЅРєС†РёРё alu16_const
     string v1 = b.place==pConst ? i2s(b.value      & 0xFF) : "("+b.name+") & 0FFh";
     string v2 = b.place==pConst ? i2s((b.value>>8) & 0xFF) : "(("+b.name+") >> 8) & 0FFh";
     asm_pop();
@@ -29,9 +29,9 @@ void alu16(Operator o, Opcode cmd1, Opcode cmd2, bool canSwap, bool self) {
     return;
   }
 
-  // Первый аргумент константа
+  // РџРµСЂРІС‹Р№ Р°СЂРіСѓРјРµРЅС‚ РєРѕРЅСЃС‚Р°РЅС‚Р°
   if(a.place==pConst || a.place==pConstStr) {
-    // Далее вычисляем в функции alu16_const
+    // Р”Р°Р»РµРµ РІС‹С‡РёСЃР»СЏРµРј РІ С„СѓРЅРєС†РёРё alu16_const
     string v1 = a.place==pConst ? i2s( a.value     & 0xFF) : "("+a.name+") & 0FFh";
     string v2 = a.place==pConst ? i2s((a.value>>8) & 0xFF) : "(("+a.name+") >> 8) & 0FFh";
     pushPeekHL(self);
@@ -41,7 +41,7 @@ void alu16(Operator o, Opcode cmd1, Opcode cmd2, bool canSwap, bool self) {
     return;
   }
 
-  // Первый аргумент BC
+  // РџРµСЂРІС‹Р№ Р°СЂРіСѓРјРµРЅС‚ BC
   if(a.place==pBC) {
     if(self) {
       pushHL();
@@ -55,7 +55,7 @@ void alu16(Operator o, Opcode cmd1, Opcode cmd2, bool canSwap, bool self) {
     return;
   }
 
-  // Второй аргумент BC
+  // Р’С‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ BC
   if(b.place==pBC) {
     asm_pop();
     pushPeekHL(self);
@@ -64,7 +64,7 @@ void alu16(Operator o, Opcode cmd1, Opcode cmd2, bool canSwap, bool self) {
     return;
   }
 
-  // Стандартное вычисление
+  // РЎС‚Р°РЅРґР°СЂС‚РЅРѕРµ РІС‹С‡РёСЃР»РµРЅРёРµ
   bool sw = pushHLDE(false/*true*/, self);
   if(sw) bc().ld_a_e().alu_l(cmd1).ld_l_a().ld_a_d().alu_h(cmd2).ld_h_a(); 
     else bc().ld_a_l().alu_e(cmd1).ld_l_a().ld_a_h().alu_d(cmd2).ld_h_a(); 
@@ -72,12 +72,12 @@ void alu16(Operator o, Opcode cmd1, Opcode cmd2, bool canSwap, bool self) {
 }
 
 //---------------------------------------------------------------------------
-// Сборка команды для 16 битной арифметики, где один из аргументов константа
+// РЎР±РѕСЂРєР° РєРѕРјР°РЅРґС‹ РґР»СЏ 16 Р±РёС‚РЅРѕР№ Р°СЂРёС„РјРµС‚РёРєРё, РіРґРµ РѕРґРёРЅ РёР· Р°СЂРіСѓРјРµРЅС‚РѕРІ РєРѕРЅСЃС‚Р°РЅС‚Р°
 
 void alu16_const(Operator o, cstring v1, cstring v2, Operator cmd1, Operator cmd2, int mode) {
   bool ignore0 = (o==oOr || o==oXor);
 
-  // Комментарий выведен выше
+  // РљРѕРјРјРµРЅС‚Р°СЂРёР№ РІС‹РІРµРґРµРЅ РІС‹С€Рµ
     
   if(o==oAnd && v1=="0") {
     code.mvi_l(0); // bc().ld_l(0);

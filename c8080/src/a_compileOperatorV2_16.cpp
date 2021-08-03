@@ -3,32 +3,32 @@
 #include "b.h"
 
 bool compileOperatorV2_16(NodeOperator* o, bool swap, NodeVar* a, NodeVar* b, const std::function<bool(bool, int)>& result) {
-  // Обьединение сложения с дельтой
+  // РћР±СЊРµРґРёРЅРµРЅРёРµ СЃР»РѕР¶РµРЅРёСЏ СЃ РґРµР»СЊС‚РѕР№
   if(o->o==oAdd && b->nodeType==ntConstI && a->nodeType==ntDeaddr && a->cast<NodeDeaddr>()->var->nodeType==ntConstS && s.hl.tmp == a->cast<NodeDeaddr>()->var->cast<NodeConst>()->var) {
     return compileOperatorV2_16_const_add(o, swap, b->cast<NodeConst>(), result);
   }
 
   return compileVar(a, regHL, [&](int inReg){
-    // В качестве второго аргумента используется регистр BC и его можно исползовать как второй аргумент команды.
+    // Р’ РєР°С‡РµСЃС‚РІРµ РІС‚РѕСЂРѕРіРѕ Р°СЂРіСѓРјРµРЅС‚Р° РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ СЂРµРіРёСЃС‚СЂ BC Рё РµРіРѕ РјРѕР¶РЅРѕ РёСЃРїРѕР»Р·РѕРІР°С‚СЊ РєР°Рє РІС‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ РєРѕРјР°РЅРґС‹.
     auto reg = b->isRegVar();
     if(reg!=regNone && o->o==oAdd) {
       return compileOperator2_16(o, !swap, toAsmReg16(reg), result);
     }
 
-    // Если второй аргумент константа, загружаем её непосредственно в регистр D/DE. Или даже выполняем короткую команду.
+    // Р•СЃР»Рё РІС‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ РєРѕРЅСЃС‚Р°РЅС‚Р°, Р·Р°РіСЂСѓР¶Р°РµРј РµС‘ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ РІ СЂРµРіРёСЃС‚СЂ D/DE. РР»Рё РґР°Р¶Рµ РІС‹РїРѕР»РЅСЏРµРј РєРѕСЂРѕС‚РєСѓСЋ РєРѕРјР°РЅРґСѓ.
     if(b->isConst()) return compileOperatorV2_16_const(o, swap, b->cast<NodeConst>(), result);
 
-    // Если второй аргумент не константа, узнаем, нужны ли для его расчета регистры A или DE
+    // Р•СЃР»Рё РІС‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ РЅРµ РєРѕРЅСЃС‚Р°РЅС‚Р°, СѓР·РЅР°РµРј, РЅСѓР¶РЅС‹ Р»Рё РґР»СЏ РµРіРѕ СЂР°СЃС‡РµС‚Р° СЂРµРіРёСЃС‚СЂС‹ A РёР»Рё DE
     s.de.used = false;
-    // Далее может быть XCHG, поэтому надо сохранить регистр.
+    // Р”Р°Р»РµРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ XCHG, РїРѕСЌС‚РѕРјСѓ РЅР°РґРѕ СЃРѕС…СЂР°РЅРёС‚СЊ СЂРµРіРёСЃС‚СЂ.
     saveRegHLAndUsed();
-    // Заранее сохраняем А или HL
+    // Р—Р°СЂР°РЅРµРµ СЃРѕС…СЂР°РЅСЏРµРј Рђ РёР»Рё HL
     int poly = out.size(); out.push(Assembler::HL);
-    // Компилируем    
+    // РљРѕРјРїРёР»РёСЂСѓРµРј    
     return compileVar(b, regHL, [&](int inReg){
-      // Тут оба аргумента одинаковой разрядности      
+      // РўСѓС‚ РѕР±Р° Р°СЂРіСѓРјРµРЅС‚Р° РѕРґРёРЅР°РєРѕРІРѕР№ СЂР°Р·СЂСЏРґРЅРѕСЃС‚Рё      
       if(!s.de.used) {
-        // Если DE не используется, то сохраняем в ней
+        // Р•СЃР»Рё DE РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, С‚Рѕ СЃРѕС…СЂР°РЅСЏРµРј РІ РЅРµР№
         ChangeCode cc(poly, TIMINGS_XCHG-TIMINGS_PUSH, Assembler::cXCHG);
         s.de.used = true;
         return compileOperator2_16(o, swap, Assembler::DE, result);

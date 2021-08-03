@@ -6,7 +6,7 @@ void popB();
 void popC();
 
 void set8() {
-  // Аргументы
+  // РђСЂРіСѓРјРµРЅС‚С‹
   Stack& as = stack[stack.size()-2];
   Stack& bs = stack[stack.size()-1];
 
@@ -15,26 +15,26 @@ void set8() {
   switch(as.place) {
     case pConstRef8:
       switch(bs.place) {
-        case pConst: case pConstStr: bc().ld_hl(as).ld_HL(bs); asm_pop(); return; // Оптимизация. Можно заменить MVI A+LHLD+MOV M,A на LHLD+MVI M
+        case pConst: case pConstStr: bc().ld_hl(as).ld_HL(bs); asm_pop(); return; // РћРїС‚РёРјРёР·Р°С†РёСЏ. РњРѕР¶РЅРѕ Р·Р°РјРµРЅРёС‚СЊ MVI A+LHLD+MOV M,A РЅР° LHLD+MVI M
       }
       break;      
     case pConstStrRefRef8:
       switch(bs.place) {
         case pB: bc().ld_hl_ref(as).ld_HL_b(); asm_pop(); return;
         case pC: bc().ld_hl_ref(as).ld_HL_c(); asm_pop(); return;
-        case pConst: case pConstStr: bc().ld_hl_ref(as).ld_HL(bs); asm_pop(); return; // Оптимизация. Можно заменить MVI A+LHLD+MOV M,A на LHLD+MVI M
+        case pConst: case pConstStr: bc().ld_hl_ref(as).ld_HL(bs); asm_pop(); return; // РћРїС‚РёРјРёР·Р°С†РёСЏ. РњРѕР¶РЅРѕ Р·Р°РјРµРЅРёС‚СЊ MVI A+LHLD+MOV M,A РЅР° LHLD+MVI M
       }
       break;
     case pHLRef8:
       switch(bs.place) {
-        case pConst: case pConstStr: bc().ld_HL(bs); asm_pop(); return; // Оптимизация. Можно заменить MVI A+MOV M,A на MVI M
+        case pConst: case pConstStr: bc().ld_HL(bs); asm_pop(); return; // РћРїС‚РёРјРёР·Р°С†РёСЏ. РњРѕР¶РЅРѕ Р·Р°РјРµРЅРёС‚СЊ MVI A+MOV M,A РЅР° MVI M
       }
       break;
     case pB: popB(); return;
     case pC: popC(); return;
   }
  
-  // Стандантная операция
+  // РЎС‚Р°РЅРґР°РЅС‚РЅР°СЏ РѕРїРµСЂР°С†РёСЏ
   pushA();
   pokeA();
 }
@@ -58,7 +58,7 @@ void popB() {
   asm_pop();
 }
 
-// Поместить в регистр C
+// РџРѕРјРµСЃС‚РёС‚СЊ РІ СЂРµРіРёСЃС‚СЂ C
 void popC() {
   Stack& bs = stack.back();
   switch(bs.place) {

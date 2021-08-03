@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------
   VinLib  
-  Парсер
+  РџР°СЂСЃРµСЂ
  
   This Software is owned by Aleksey Morozov (vinxru) and is
   protected by copyright law and international copyright treaty.
@@ -61,14 +61,14 @@ Parser::Parser() {
 }
 
 void Parser::loadFromString(const char_t* s, const char_t* _fileName, bool dontCallNextToken) {
-  // Копирование в буфер
+  // РљРѕРїРёСЂРѕРІР°РЅРёРµ РІ Р±СѓС„РµСЂ
   source_  = s;
   fileName = _fileName;
   loadFromString_noBuf(source_.c_str(), dontCallNextToken);
 }
 
 void Parser::loadFromString_noBuf(const char_t* buf, bool dontCallNextToken) {
-  // Переменные
+  // РџРµСЂРµРјРµРЅРЅС‹Рµ
   //fastLine=1;
   line=1;
   //fastCol=1;
@@ -89,7 +89,7 @@ ParserLabel Parser::label() {
 }
 
 //---------------------------------------------------------------------------
-// Перейти на метку и установить breakMode
+// РџРµСЂРµР№С‚Рё РЅР° РјРµС‚РєСѓ Рё СѓСЃС‚Р°РЅРѕРІРёС‚СЊ breakMode
 
 void Parser::jump(ParserLabel& label, bool dontLoadNextToken) {
   prevCursor = label.cursor;
@@ -107,7 +107,7 @@ void Parser::syntaxError(int y, int x0, int x1, cstring str) {
     int c=col;
     if(prevCol<col) c--;
     throw ParserBreakException(breakLine,line==breakLine && sigCol<breakCol 
-        ? sigCol : breakCol, c, _T("Программная остановка"), _T("Программная остановка"));
+        ? sigCol : breakCol, c, _T("РџСЂРѕРіСЂР°РјРјРЅР°СЏ РѕСЃС‚Р°РЅРѕРІРєР°"), _T("РџСЂРѕРіСЂР°РјРјРЅР°СЏ РѕСЃС‚Р°РЅРѕРІРєР°"));
   }
 
   string s=fileName+_T("(")+i2s(y)+_T(",")+i2s(x0)+_T("): ")+str;
@@ -119,8 +119,8 @@ void Parser::syntaxError(cstring str) {
   string s = fileName + _T("(") + i2s(prevLine) + _T(",") + i2s(prevCol) + _T("): ") + str + _T(" (") + tokenText + _T(")");
   int c=col;
   if(prevCol<col) c--;
-  if(token==ttBreak) throw ParserBreakException(breakLine,line==breakLine && prevCol<breakCol ? prevCol : breakCol,c,(s+_T("Программная остановка")).c_str(), _T("Программная остановка"));
-                else throw ParserSyntaxException(line,prevCol,c,s.c_str(), (string)_T("Синтаксическая ошибка, ")+tokenText);
+  if(token==ttBreak) throw ParserBreakException(breakLine,line==breakLine && prevCol<breakCol ? prevCol : breakCol,c,(s+_T("РџСЂРѕРіСЂР°РјРјРЅР°СЏ РѕСЃС‚Р°РЅРѕРІРєР°")).c_str(), _T("РџСЂРѕРіСЂР°РјРјРЅР°СЏ РѕСЃС‚Р°РЅРѕРІРєР°"));
+                else throw ParserSyntaxException(line,prevCol,c,s.c_str(), (string)_T("РЎРёРЅС‚Р°РєСЃРёС‡РµСЃРєР°СЏ РѕС€РёР±РєР°, ")+tokenText);
 }
   
 string Parser::addr(int x0, int y) {
@@ -152,29 +152,29 @@ void Parser::error(cstring str) {
 }
 
 void Parser::nextToken() {
-  // Точка останова
+  // РўРѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР°
   if(functionHelpMode && breakMode && (line>breakLine || (line==breakLine && col>=breakCol))) {
-    // Справка по функциям
+    // РЎРїСЂР°РІРєР° РїРѕ С„СѓРЅРєС†РёСЏРј
 #ifndef NO_FUNCTION_ARGS
     if(functionHelp) {
       string x = methodDescr(functionHelp->name, *functionHelp->args, false);
-      if(functionHelp->help[0]!=0) x += _T("\n"), x += functionHelp->help; //! 3ий аргумент
+      if(functionHelp->help[0]!=0) x += _T("\n"), x += functionHelp->help; //! 3РёР№ Р°СЂРіСѓРјРµРЅС‚
       if(breakDetail.find(x)==0) breakDetail.push_back(x); 
-      throw ParserBreakException(functionHelp->y,functionHelp->x,functionHelp->x,_T("Парсинг остановлен по условию"),_T("Парсинг остановлен по условию"));
+      throw ParserBreakException(functionHelp->y,functionHelp->x,functionHelp->x,_T("РџР°СЂСЃРёРЅРі РѕСЃС‚Р°РЅРѕРІР»РµРЅ РїРѕ СѓСЃР»РѕРІРёСЋ"),_T("РџР°СЂСЃРёРЅРі РѕСЃС‚Р°РЅРѕРІР»РµРЅ РїРѕ СѓСЃР»РѕРІРёСЋ"));
     }
 #endif
-    throw ParserBreakException(line,col,col,_T("Парсинг остановлен по условию"),_T("Парсинг остановлен по условию"));
+    throw ParserBreakException(line,col,col,_T("РџР°СЂСЃРёРЅРі РѕСЃС‚Р°РЅРѕРІР»РµРЅ РїРѕ СѓСЃР»РѕРІРёСЋ"),_T("РџР°СЂСЃРёРЅРі РѕСЃС‚Р°РЅРѕРІР»РµРЅ РїРѕ СѓСЃР»РѕРІРёСЋ"));
   }
 
-  // Точка останова
+  // РўРѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР°
   if(token==ttBreak) {
     if(breakCol-col==1 && 0==strcmpi(tokenText, _T("."))) 
       goto ignoreBreak;
-    throw ParserBreakException(line,prevCol,col,_T("Парсинг остановлен по условию"),_T("Парсинг остановлен по условию"));
+    throw ParserBreakException(line,prevCol,col,_T("РџР°СЂСЃРёРЅРі РѕСЃС‚Р°РЅРѕРІР»РµРЅ РїРѕ СѓСЃР»РѕРІРёСЋ"),_T("РџР°СЂСЃРёРЅРі РѕСЃС‚Р°РЅРѕРІР»РµРЅ РїРѕ СѓСЃР»РѕРІРёСЋ"));
   }
 ignoreBreak:
 
-  // sig - это до пробелов
+  // sig - СЌС‚Рѕ РґРѕ РїСЂРѕР±РµР»РѕРІ
   sigCol=col-1;
   sigLine=line;
 
@@ -183,12 +183,12 @@ ignoreBreak:
       if(*cursor==10) { line++; col=1; } else
       if(*cursor!=13) col++;
 
-    // Парсим
+    // РџР°СЂСЃРёРј
     tokenText[0]=0;
 
-    // Пропускаем пробелы, обрабатываем выход из макроса
+    // РџСЂРѕРїСѓСЃРєР°РµРј РїСЂРѕР±РµР»С‹, РѕР±СЂР°Р±Р°С‚С‹РІР°РµРј РІС‹С…РѕРґ РёР· РјР°РєСЂРѕСЃР°
 retry:
-    // Пропускаем пробелы
+    // РџСЂРѕРїСѓСЃРєР°РµРј РїСЂРѕР±РµР»С‹
     prevLine=line;
     prevCol =col;
     prevCursor=cursor;
@@ -213,7 +213,7 @@ retry:
     const char_t* s=cursor;
     nextToken2();
 
-    // Увеличиваем курсор
+    // РЈРІРµР»РёС‡РёРІР°РµРј РєСѓСЂСЃРѕСЂ
     for(;s<cursor;s++)
       if(*s==10) { line++; col=1; } else
       if(*s!=13) col++;
@@ -226,15 +226,15 @@ retry:
     }
   } while(!anyChar && (token==ttComment || token==ttLongComment || token==ttLongCommentEof));
 
-  // Точка останова
+  // РўРѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР°
   if(breakMode && !functionHelpMode && (line>breakLine || (line==breakLine && (token==ttEof || col>=breakCol)))) {
     if(token==ttEof) prevCol=col=breakCol;
-    // Точка останова
+    // РўРѕС‡РєР° РѕСЃС‚Р°РЅРѕРІР°
     token=ttBreak;    
     return;
   }
 
-  // Обработка макросов, только для C++
+  // РћР±СЂР°Р±РѕС‚РєР° РјР°РєСЂРѕСЃРѕРІ, С‚РѕР»СЊРєРѕ РґР»СЏ C++
   if(token==ttWord  && !macroOff) {
     int i=0;
     for(std::list<Macro>::iterator m = macro.begin(); m != macro.end(); m++, i++) {
@@ -271,13 +271,13 @@ int findx(const char_t** a, const string& s, int si) {
 
 bool Parser::waitComment(const char_t* erem, char_t combineLine) {
   const char_t* s=cursor;
-  // Пропуск комментария
+  // РџСЂРѕРїСѓСЃРє РєРѕРјРјРµРЅС‚Р°СЂРёСЏ
   char_t c=0;
   bool eof;
   while(true) {
     char_t c1=c;
     c=*cursor;
-    if(c==0) { eof=true; break; } //syntaxError((string)T"Не найден конец комментария "+erem[j]);
+    if(c==0) { eof=true; break; } //syntaxError((string)T"РќРµ РЅР°Р№РґРµРЅ РєРѕРЅРµС† РєРѕРјРјРµРЅС‚Р°СЂРёСЏ "+erem[j]);
   //  if(c==10) line++;
     cursor++;
     if(c==combineLine && cursor[0]=='\r') {
@@ -291,7 +291,7 @@ bool Parser::waitComment(const char_t* erem, char_t combineLine) {
       if(c1==erem[0] && c==erem[1]) { eof=false; break; }
     }
   }
-  // Увеличиваем курсор
+  // РЈРІРµР»РёС‡РёРІР°РµРј РєСѓСЂСЃРѕСЂ
   for(;s<cursor;s++)
     if(*s==10) { line++; col=1; } else
     if(*s!=13) col++;
@@ -347,19 +347,19 @@ void Parser::nextToken2() {
   char_t c=*cursor++;
 
   if(!noIdent)
-  if(c=='_' || (c>='a' && c<='z') || (c>='A' && c<='Z') || (c>=_T('а') && c<=_T('я')) || (c>=_T('А') && c<=_T('Я'))) {
+  if(c=='_' || (c>='a' && c<='z') || (c>='A' && c<='Z') || (c>=_T('Р°') && c<=_T('СЏ')) || (c>=_T('Рђ') && c<=_T('РЇ'))) {
     while(true) {
-      if(tokenText_ptr==maxTokenText) error(_T("Слишком длинный идентификатор"));
+      if(tokenText_ptr==maxTokenText) error(_T("РЎР»РёС€РєРѕРј РґР»РёРЅРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ"));
       tokenText[tokenText_ptr++]=c;
       c=*cursor;
-      if(!(c=='_' || (c>='0' && c<='9') || (c>='a' && c<='z') || (c>='A' && c<='Z') || (c>=_T('а') && c<=_T('я')) || (c>=_T('А') && c<=_T('Я')))) break;
+      if(!(c=='_' || (c>='0' && c<='9') || (c>='a' && c<='z') || (c>='A' && c<='Z') || (c>=_T('Р°') && c<=_T('СЏ')) || (c>=_T('Рђ') && c<=_T('РЇ')))) break;
       cursor++;
     }
 
     //if(wordsInLower)
 //      for(int i=0; i<tokenText_ptr; i++) {
         //if(tokenText[i]>='A' && tokenText[i]<='Z') tokenText[i] -= 'A'-'a';
-        //if(tokenText[i]>='А' && tokenText[i]<='Я') tokenText[i] -= 'А'-'а';
+        //if(tokenText[i]>='Рђ' && tokenText[i]<='РЇ') tokenText[i] -= 'Рђ'-'Р°';
       //}
     tokenText[tokenText_ptr]=0;
     token=ttWord;
@@ -369,10 +369,10 @@ void Parser::nextToken2() {
   if(mysqlQuote && c=='`') {
     while(true) {
       c=*cursor;
-      if(c==0) error(_T("Незавершенная строковая константа"));
+      if(c==0) error(_T("РќРµР·Р°РІРµСЂС€РµРЅРЅР°СЏ СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°"));
       cursor++;
       if(c=='`') break;
-      if(tokenText_ptr==maxTokenText) error(_T("Слишком длинная строковая константа"));
+      if(tokenText_ptr==maxTokenText) error(_T("РЎР»РёС€РєРѕРј РґР»РёРЅРЅР°СЏ СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°"));
       tokenText[tokenText_ptr++]=c;
     }        
     tokenText[tokenText_ptr]=0;
@@ -384,7 +384,7 @@ void Parser::nextToken2() {
     char_t quoter=c;
     while(true) {
       c=*cursor;
-      if(c==0 || c==10) error(_T("Незавершенная строковая константа"));
+      if(c==0 || c==10) error(_T("РќРµР·Р°РІРµСЂС€РµРЅРЅР°СЏ СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°"));
       cursor++; 
       if(!cescape) {
         if(c==quoter) {
@@ -395,14 +395,14 @@ void Parser::nextToken2() {
       } else {
         if(c=='\\') { 
           if(dontUnquoteCEscape) {
-            if(tokenText_ptr==maxTokenText) error(_T("Слишком длинная строковая константа"));
+            if(tokenText_ptr==maxTokenText) error(_T("РЎР»РёС€РєРѕРј РґР»РёРЅРЅР°СЏ СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°"));
             tokenText[tokenText_ptr++]=c;
             c=*cursor++;
             if(c==0)
-              error(_T("Незавершенная строковая константа"));
+              error(_T("РќРµР·Р°РІРµСЂС€РµРЅРЅР°СЏ СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°"));
           } else {
             c=*cursor++;
-            if(c==0 || c==10) error(_T("Незавершенная строковая константа")); else
+            if(c==0 || c==10) error(_T("РќРµР·Р°РІРµСЂС€РµРЅРЅР°СЏ СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°")); else
             if(c=='n') c='\n'; else
             if(c=='r') c='\r'; else
             if(c=='\\') c='\\'; else
@@ -410,26 +410,26 @@ void Parser::nextToken2() {
             if(c=='"') c='"'; else
             if(c=='x') {
               char_t c1=*cursor++;
-              if(c1==0 || c1==10) error(_T("Незавершенная строковая константа"));
+              if(c1==0 || c1==10) error(_T("РќРµР·Р°РІРµСЂС€РµРЅРЅР°СЏ СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°"));
               if(c1>='0' && c1<='9') c1-='0'; else
               if(c1>='a' && c1<='f') c1-='a'-10; else
               if(c1>='A' && c1<='F') c1-='A'-10; else
-                error(_T("Неизвестная ESC-последовательность"));
+                error(_T("РќРµРёР·РІРµСЃС‚РЅР°СЏ ESC-РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ"));
               char_t c2=*cursor++;
-              if(c2==0 || c2==10) error(_T("Незавершенная строковая константа"));
+              if(c2==0 || c2==10) error(_T("РќРµР·Р°РІРµСЂС€РµРЅРЅР°СЏ СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°"));
               if(c2>='0' && c2<='9') c2-='0'; else
               if(c2>='a' && c2<='f') c2-='a'-10; else
               if(c2>='A' && c2<='F') c2-='A'-10; else
-                error(_T("Неизвестная ESC-последовательность"));
+                error(_T("РќРµРёР·РІРµСЃС‚РЅР°СЏ ESC-РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ"));
               c=(c1<<4)+c2;
             } else {
-              error((string)_T("Неизвестная ESC-последовательность '")+c+_T("'"));
+              error((string)_T("РќРµРёР·РІРµСЃС‚РЅР°СЏ ESC-РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ '")+c+_T("'"));
             }
           }
         } else 
         if(c==quoter) break;
       }
-      if(tokenText_ptr==maxTokenText) error(_T("Слишком длинная строковая константа"));
+      if(tokenText_ptr==maxTokenText) error(_T("РЎР»РёС€РєРѕРј РґР»РёРЅРЅР°СЏ СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°"));
       tokenText[tokenText_ptr++]=c;
     }        
     tokenText[tokenText_ptr]=0;
@@ -438,11 +438,11 @@ void Parser::nextToken2() {
   }
 
   if(c>='0' && c<='9') {
-    //! Недоработано, но пусть будет
+    //! РќРµРґРѕСЂР°Р±РѕС‚Р°РЅРѕ, РЅРѕ РїСѓСЃС‚СЊ Р±СѓРґРµС‚
     if(numbersAsString) {
       int tokenText_ptr =0;
       while(true) {
-        if(tokenText_ptr==maxTokenText) error(_T("Слишком длинная строковая константа"));
+        if(tokenText_ptr==maxTokenText) error(_T("РЎР»РёС€РєРѕРј РґР»РёРЅРЅР°СЏ СЃС‚СЂРѕРєРѕРІР°СЏ РєРѕРЅСЃС‚Р°РЅС‚Р°"));
         tokenText[tokenText_ptr++]=c;
         c=*cursor;
         bool isGoodChar=(c>='A' && c<='F') || (c>='a' && c<='f') || (c=='x') || (c=='.') || (c>='0' && c<='9');
@@ -454,9 +454,9 @@ void Parser::nextToken2() {
       return;
     }
 
-    // Если число начинается с 0x - то читаем 16-ричное
+    // Р•СЃР»Рё С‡РёСЃР»Рѕ РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ 0x - С‚Рѕ С‡РёС‚Р°РµРј 16-СЂРёС‡РЅРѕРµ
     if(c=='0' && (cursor[0]=='x' || cursor[0]=='X')) {
-      cursor++; // Пропускаем X
+      cursor++; // РџСЂРѕРїСѓСЃРєР°РµРј X
       int n=0;
       while(true) {        
         c=*cursor;      
@@ -464,16 +464,16 @@ void Parser::nextToken2() {
         if(c>='0' && c<='9') e=c-'0';    else
         if(c>='a' && c<='f') e=c-'a'+10; else
         if(c>='A' && c<='F') e=c-'A'+10; else break;
-        if(!tryMulAddI(n,16,e)) syntaxError(_T("Слишком длинное число")); 
+        if(!tryMulAddI(n,16,e)) syntaxError(_T("РЎР»РёС€РєРѕРј РґР»РёРЅРЅРѕРµ С‡РёСЃР»Рѕ")); 
         cursor++;
       }
       tokenInteger=n;
       token=ttInteger;
       return;
     }
-    // Читаем целое, плавающе и двоичное число 
-    bool   canBits=(c=='0' || c=='1'); // Удалось посчитать Bits (нет переполнения, алфавит)
-    bool   canInt =true; // Удалось посчитать Integer (нет переполнения)
+    // Р§РёС‚Р°РµРј С†РµР»РѕРµ, РїР»Р°РІР°СЋС‰Рµ Рё РґРІРѕРёС‡РЅРѕРµ С‡РёСЃР»Рѕ 
+    bool   canBits=(c=='0' || c=='1'); // РЈРґР°Р»РѕСЃСЊ РїРѕСЃС‡РёС‚Р°С‚СЊ Bits (РЅРµС‚ РїРµСЂРµРїРѕР»РЅРµРЅРёСЏ, Р°Р»С„Р°РІРёС‚)
+    bool   canInt =true; // РЈРґР°Р»РѕСЃСЊ РїРѕСЃС‡РёС‚Р°С‚СЊ Integer (РЅРµС‚ РїРµСЂРµРїРѕР»РЅРµРЅРёСЏ)
     bool   canCurrency=true;
     bool   needFloat=false; 
     int    b=(c-'0');
@@ -486,12 +486,12 @@ void Parser::nextToken2() {
       c-='0';
       if(canInt && !tryMulAddI(n,10,c)) canInt=false;      
 //      if(canCurrency && !tryMulAdd64(fc.val,10,int(c)*10000)) canCurrency=false;      
-      fn=fn*10 + c; // Плавающее
+      fn=fn*10 + c; // РџР»Р°РІР°СЋС‰РµРµ
       canBits &= (c=='0' || c=='1');
       if(canBits) { if(b&0x80000000) canBits=false; else { b<<=2; if(c=='1') b|=1; } }
       cursor++;
     }
-    // Здесь прочитано целое число (ну и дробное тоже)
+    // Р—РґРµСЃСЊ РїСЂРѕС‡РёС‚Р°РЅРѕ С†РµР»РѕРµ С‡РёСЃР»Рѕ (РЅСѓ Рё РґСЂРѕР±РЅРѕРµ С‚РѕР¶Рµ)
     if(!ignoreFloat) {
       if(c=='.') {
         int di=0;
@@ -500,10 +500,10 @@ void Parser::nextToken2() {
           cursor++;
           c=*cursor;
           if(c<'0' || c>'9') break;
-          // Расчет FLOAT 
+          // Р Р°СЃС‡РµС‚ FLOAT 
           fn=fn+(c-'0')*dx;
           dx=dx/10;
-          // Расчет CURRENCY
+          // Р Р°СЃС‡РµС‚ CURRENCY
 /*          if(canCurrency) {
             int v=(c-'0');
             if(di==0) v*=1000; else
@@ -518,64 +518,64 @@ void Parser::nextToken2() {
         canInt=false;
         canBits=false;
       }
-      // Режим floatAsCurrency
+      // Р РµР¶РёРј floatAsCurrency
 /*      if(floatAsCurrency) {
-        if(!canCurrency) error(_T("Это число не может быть CURRENCY"));
+        if(!canCurrency) error(_T("Р­С‚Рѕ С‡РёСЃР»Рѕ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ CURRENCY"));
         tokenCurrency=fc;
         token=ttCurrency;
         return;
       }
-      // Если идет постфикс C, то отправляем как CURRENCY
+      // Р•СЃР»Рё РёРґРµС‚ РїРѕСЃС‚С„РёРєСЃ C, С‚Рѕ РѕС‚РїСЂР°РІР»СЏРµРј РєР°Рє CURRENCY
       if(c=='c' || c=='C') {
-        if(!canCurrency) error(_T("Это число не может быть CURRENCY"));
-        cursor++; // Пропускаем C
+        if(!canCurrency) error(_T("Р­С‚Рѕ С‡РёСЃР»Рѕ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ CURRENCY"));
+        cursor++; // РџСЂРѕРїСѓСЃРєР°РµРј C
         tokenCurrency=fc;
         token=ttCurrency;
         return;
       }*/
-      // Если идет постфикс E, то парсим дальше как FLOAT
+      // Р•СЃР»Рё РёРґРµС‚ РїРѕСЃС‚С„РёРєСЃ E, С‚Рѕ РїР°СЂСЃРёРј РґР°Р»СЊС€Рµ РєР°Рє FLOAT
       if(c=='e' || c=='E') {  
-        cursor++; // Пропускаем E
+        cursor++; // РџСЂРѕРїСѓСЃРєР°РµРј E
         c=*cursor;
         bool neg=(c=='-');
         if(neg) { cursor++; c=*cursor; }
            else if(c=='+') { cursor++; c=*cursor; }
-        if(c<'0' || c>'9') error(_T("Ожидается число"));
+        if(c<'0' || c>'9') error(_T("РћР¶РёРґР°РµС‚СЃСЏ С‡РёСЃР»Рѕ"));
         int n=0;
         do {
           if(!tryMulAddI(n,10,c-'0')) canInt=false;      
           cursor++;
           c=*cursor;
         } while(c>='0' && c<='9');
-        if(neg) n=-n; //!!!! Переполнение
+        if(neg) n=-n; //!!!! РџРµСЂРµРїРѕР»РЅРµРЅРёРµ
         tokenFloat=fn*pow(10.0, double(n));
-        token=ttFloat; // В режиме floatAsCurrency выполнение сюда дойти не должно
+        token=ttFloat; // Р’ СЂРµР¶РёРјРµ floatAsCurrency РІС‹РїРѕР»РЅРµРЅРёРµ СЃСЋРґР° РґРѕР№С‚Рё РЅРµ РґРѕР»Р¶РЅРѕ
         return;
       }
       if(c=='b' || c=='B') { 
-        if(!canBits) syntaxError(_T("Слишком длинное число"));
+        if(!canBits) syntaxError(_T("РЎР»РёС€РєРѕРј РґР»РёРЅРЅРѕРµ С‡РёСЃР»Рѕ"));
         cursor++; tokenInteger=b; token=ttInteger; return; 
       }
       if(needFloat) {
         tokenFloat=fn;
-        token=ttFloat; // В режиме floatAsCurrency выполнение сюда дойти не должно
+        token=ttFloat; // Р’ СЂРµР¶РёРјРµ floatAsCurrency РІС‹РїРѕР»РЅРµРЅРёРµ СЃСЋРґР° РґРѕР№С‚Рё РЅРµ РґРѕР»Р¶РЅРѕ
         return;
       }
     }
-    if(!canInt) syntaxError(_T("Слишком длинное число"));
+    if(!canInt) syntaxError(_T("РЎР»РёС€РєРѕРј РґР»РёРЅРЅРѕРµ С‡РёСЃР»Рѕ"));
     tokenInteger=n; 
     token=ttInteger;    
     return;
   }
  
-  // Одиночный символ
+  // РћРґРёРЅРѕС‡РЅС‹Р№ СЃРёРјРІРѕР»
   token=ttOperator;
   tokenText[0]=c;
   tokenText[1]=0;
 
-  // Составной оператор
+  // РЎРѕСЃС‚Р°РІРЅРѕР№ РѕРїРµСЂР°С‚РѕСЂ
   if(operators) {
-    // Добавляем остальные символы
+    // Р”РѕР±Р°РІР»СЏРµРј РѕСЃС‚Р°Р»СЊРЅС‹Рµ СЃРёРјРІРѕР»С‹
     tokenText_ptr=1;
     while(true) {
       c=*cursor;
@@ -585,11 +585,11 @@ void Parser::nextToken2() {
       if(findx(operators, tokenText, tokenText_ptr+1)==-1) break;
       cursor++;
       tokenText_ptr++;
-      if(tokenText_ptr==maxTokenText) error(_T("Слишком длинный оператор"));
+      if(tokenText_ptr==maxTokenText) error(_T("РЎР»РёС€РєРѕРј РґР»РёРЅРЅС‹Р№ РѕРїРµСЂР°С‚РѕСЂ"));
     }
     tokenText[tokenText_ptr]=0;
   }
-  // Комментарии
+  // РљРѕРјРјРµРЅС‚Р°СЂРёРё
   if(brem) {
     for(int j=0; brem[j]; j++) 
       if(0==strcmpi(tokenText,brem[j])) {
@@ -608,7 +608,7 @@ void Parser::nextToken2() {
         return;
       }
   }
-  // Комментарии
+  // РљРѕРјРјРµРЅС‚Р°СЂРёРё
   if(rem)
     for(int j=0; rem[j]; j++)
       if(0==strcmpi(tokenText,rem[j])) {
@@ -678,14 +678,14 @@ bool Parser::ifToken(Token t) {
 /*
       const char* s;
       switch(t) {
-        case ttEof:      s=T"конец файла"; break;
-        case ttEol:      s=T"конец строки"; break;
-        case ttWord:     s=T"идентификатор"; break;
-        case ttInteger:  s=T"число"; break;
-        case ttOperator: s=T"оператор"; break;
-        case ttString1:  s=T"'строка'"; break;
-        case ttString2:  s=T"\"строка\""; break;
-        default: s=T"<другой токен>";
+        case ttEof:      s=T"РєРѕРЅРµС† С„Р°Р№Р»Р°"; break;
+        case ttEol:      s=T"РєРѕРЅРµС† СЃС‚СЂРѕРєРё"; break;
+        case ttWord:     s=T"РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ"; break;
+        case ttInteger:  s=T"С‡РёСЃР»Рѕ"; break;
+        case ttOperator: s=T"РѕРїРµСЂР°С‚РѕСЂ"; break;
+        case ttString1:  s=T"'СЃС‚СЂРѕРєР°'"; break;
+        case ttString2:  s=T"\"СЃС‚СЂРѕРєР°\""; break;
+        default: s=T"<РґСЂСѓРіРѕР№ С‚РѕРєРµРЅ>";
       }
       if(breakDetail.find(s)==0)
         breakDetail.push_back(s);
@@ -705,7 +705,7 @@ bool Parser::ifToken(Token t) {
 const char_t* Parser::needString2() {
   if(token!=ttString2) {
 //    if(token==ttBreak && breakMode) {
-//      string x=T"\"строка\"";
+//      string x=T"\"СЃС‚СЂРѕРєР°\"";
 //      if(breakDetail.find(x)==0) breakDetail.push_back(x);
 //    }
     syntaxError();
@@ -718,7 +718,7 @@ const char_t* Parser::needString2() {
 const char_t* Parser::needIdent() {
   if(token!=ttWord) {
 //    if(token==ttBreak && breakMode)
-//      if(breakDetail.find("идентификатор")==0) breakDetail.push_back(T"идентификатор");
+//      if(breakDetail.find("РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ")==0) breakDetail.push_back(T"РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ");
     syntaxError();
   }         
   _tcscpy_s(buf, sizeof(buf)/sizeof(char_t), tokenText);
@@ -743,7 +743,7 @@ bool Parser::ifToken(const char_t* t) {
     }    
   }
   if(token==ttBreak && breakMode) {
-    // Отмена
+    // РћС‚РјРµРЅР°
     if(0==strcmpi(t,_T(".")) && cursor-prevCursor==1) {
       breakDetail.clear();
       token=ttWord;
@@ -812,7 +812,7 @@ void Parser::readComment(string& out, const char_t* term, bool cppEolDisabler) {
 }
 
 //---------------------------------------------------------------------------
-// Зарегистрировать макрос
+// Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ РјР°РєСЂРѕСЃ
 
 void Parser::addMacro(cstring id, cstring body, const std::vector<string>& args) {
   Macro& m = add(macro);

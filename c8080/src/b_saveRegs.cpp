@@ -4,9 +4,9 @@
 
 State s;
 
-// В HL должно лежать корректное значение.
-//   tmp - значит, что значение корректное. Оно не связано с регистром. Но из него можно вычислить регистр.
-//   in  - значит, что значение не корректное и оно свзяно с регистром.
+// Р’ HL РґРѕР»Р¶РЅРѕ Р»РµР¶Р°С‚СЊ РєРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ.
+//   tmp - Р·РЅР°С‡РёС‚, С‡С‚Рѕ Р·РЅР°С‡РµРЅРёРµ РєРѕСЂСЂРµРєС‚РЅРѕРµ. РћРЅРѕ РЅРµ СЃРІСЏР·Р°РЅРѕ СЃ СЂРµРіРёСЃС‚СЂРѕРј. РќРѕ РёР· РЅРµРіРѕ РјРѕР¶РЅРѕ РІС‹С‡РёСЃР»РёС‚СЊ СЂРµРіРёСЃС‚СЂ.
+//   in  - Р·РЅР°С‡РёС‚, С‡С‚Рѕ Р·РЅР°С‡РµРЅРёРµ РЅРµ РєРѕСЂСЂРµРєС‚РЅРѕРµ Рё РѕРЅРѕ СЃРІР·СЏРЅРѕ СЃ СЂРµРіРёСЃС‚СЂРѕРј.
 
 void normalizeDeltaHL() {
   if(s.hl.in) {
@@ -72,7 +72,7 @@ inline void saveRegA() {
   s.a.tmp = 0;
   if(s.a.in) {
     if(s.a.changed) {
-      if(s.a.in->reg) { // Переменная закреплена за регистром
+      if(s.a.in->reg) { // РџРµСЂРµРјРµРЅРЅР°СЏ Р·Р°РєСЂРµРїР»РµРЅР° Р·Р° СЂРµРіРёСЃС‚СЂРѕРј
         out.mov(toAsmReg8(s.a.in->reg), Assembler::A);
       } else {
         out.sta(s.a.in->name.c_str());
@@ -103,8 +103,8 @@ inline void saveRegHL() {
 
 void normalizeDeltaDE() {
   if(s.de.in) {
-    for(;s.hl.delta>0; --s.hl.delta) out.dcx(Assembler::DE); //! Может быть много
-    for(;s.hl.delta<0; ++s.hl.delta) out.inx(Assembler::DE); //! Может быть много
+    for(;s.hl.delta>0; --s.hl.delta) out.dcx(Assembler::DE); //! РњРѕР¶РµС‚ Р±С‹С‚СЊ РјРЅРѕРіРѕ
+    for(;s.hl.delta<0; ++s.hl.delta) out.inx(Assembler::DE); //! РњРѕР¶РµС‚ Р±С‹С‚СЊ РјРЅРѕРіРѕ
   }
 }
 
@@ -118,7 +118,7 @@ inline void saveRegDE() {
         if(s.de.in->reg != regBC) throw Exception("saveRegs BC");
         out.mov(Assembler::B, Assembler::D).mov(Assembler::C, Assembler::E);
       } else {
-        out.xchg().shld(s.de.in->name.c_str()).xchg(); //! Надо сделать так, что бы Xвторой CHG получался автоматом
+        out.xchg().shld(s.de.in->name.c_str()).xchg(); //! РќР°РґРѕ СЃРґРµР»Р°С‚СЊ С‚Р°Рє, С‡С‚Рѕ Р±С‹ XРІС‚РѕСЂРѕР№ CHG РїРѕР»СѓС‡Р°Р»СЃСЏ Р°РІС‚РѕРјР°С‚РѕРј
       }
       s.de.changed = false;
     }

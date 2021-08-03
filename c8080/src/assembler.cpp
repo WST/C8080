@@ -86,8 +86,8 @@ void Assembler::build(FillBuffer& buf) {
       case cJMPL:  buf.str("  jmp l"); addr(buf, *i, i->a);  buf.str("\r\n"); break;
 
       case cMOV:   
-        // Çàìåíà mov a, m + ora a íà xra a, ora m
-        // Íàäî áóäåò ó÷åñòü ýòî â ñ÷åò÷èêå òàêòîâ
+        // Ð—Ð°Ð¼ÐµÐ½Ð° mov a, m + ora a Ð½Ð° xra a, ora m
+        // ÐÐ°Ð´Ð¾ Ð±ÑƒÐ´ÐµÑ‚ ÑƒÑ‡ÐµÑÑ‚ÑŒ ÑÑ‚Ð¾ Ð² ÑÑ‡ÐµÑ‚Ñ‡Ð¸ÐºÐµ Ñ‚Ð°ÐºÑ‚Ð¾Ð²
         if(i->a==A && i->b==M && (i+1) != ie && (i+1)->cmd==cALU && (i+1)->a==OR && (i+1)->b==A) { buf.str("  xra a\r\n  ora m\r\n"); ++i; break; }
         buf.str("  mov "); reg8(buf, i->a); buf.str(", "); reg8(buf, i->b); buf.str("\r\n"); break;
       case cMVI:   if(i->s) { buf.str("  mvi "); reg8(buf, i->a); buf.str(", (").str(i->s).str(") & 0FFh\r\n"); break; }
@@ -185,8 +185,8 @@ void Assembler::build_z80(FillBuffer& buf) {
       case cJMPL:  buf.str("  jp l"); addr(buf, *i, i->a);  buf.str("\r\n"); break;
 
       case cMOV:   
-        // Çàìåíà mov a, m + ora a íà xra a, ora m
-        // Íàäî áóäåò ó÷åñòü ýòî â ñ÷åò÷èêå òàêòîâ
+        // Ð—Ð°Ð¼ÐµÐ½Ð° mov a, m + ora a Ð½Ð° xra a, ora m
+        // ÐÐ°Ð´Ð¾ Ð±ÑƒÐ´ÐµÑ‚ ÑƒÑ‡ÐµÑÑ‚ÑŒ ÑÑ‚Ð¾ Ð² ÑÑ‡ÐµÑ‚Ñ‡Ð¸ÐºÐµ Ñ‚Ð°ÐºÑ‚Ð¾Ð²
         if(i->a==A && i->b==M && (i+1) != ie && (i+1)->cmd==cALU && (i+1)->a==OR && (i+1)->b==A) { buf.str("  xor a\r\n  or a, (hl)\r\n"); ++i; break; }
         buf.str("  ld "); reg8_z80(buf, i->a); buf.str(", "); reg8_z80(buf, i->b); buf.str("\r\n"); break;
       case cMVI:   if(i->s) { buf.str("  ld "); reg8_z80(buf, i->a); buf.str(", (").str(i->s).str(") & 0xFF\r\n"); break; }

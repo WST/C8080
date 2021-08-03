@@ -27,4 +27,3 @@ bool compileSetV2_swap(NodeVar* a, NodeVar* b, NodeOperator* no, const std::func
 bool compileOperatorV2_8(NodeOperator* o, bool swap, NodeVar* a, NodeVar* b, const std::function<bool(bool, int)>& result);
 bool compileOperatorV2_16_const(NodeOperator* o, bool swap, NodeConst* bc, const std::function<bool(bool, int)>& result);
 bool compileOperatorV2_16(NodeOperator* o, bool swap, NodeVar* a, NodeVar* b, const std::function<bool(bool, int)>& result);
-

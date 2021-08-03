@@ -1,10 +1,10 @@
-//! Заменить команды ld bc, hl - alu (hl)  на ld a, (bc) - ld d, a - alu d
+//! Р—Р°РјРµРЅРёС‚СЊ РєРѕРјР°РЅРґС‹ ld bc, hl - alu (hl)  РЅР° ld a, (bc) - ld d, a - alu d
 
 #include <stdafx.h>
 #include "stackLoadSave.h"
 #include "asm.h"
 
-// Стек можнт быть только вторым и только в паре с A или HL
+// РЎС‚РµРє РјРѕР¶РЅС‚ Р±С‹С‚СЊ С‚РѕР»СЊРєРѕ РІС‚РѕСЂС‹Рј Рё С‚РѕР»СЊРєРѕ РІ РїР°СЂРµ СЃ A РёР»Рё HL
 
 Place simpleArg8(Place p) {
   switch(p) {
@@ -141,10 +141,10 @@ void cmd_call_operator(const char* fn, bool self) {
         case  pBCRef8:          useHL(); w.ld_a_BC().ld_d_a()    .ld_hl_ref(a).ld_a_HL(); break;
         default: cmd_call_operator_raise(ap, bp);
       }
-      a.place = a.place==pConstStrRefRef8 ? pHLRef8 : pHLRef16; // Оптимизация
+      a.place = a.place==pConstStrRefRef8 ? pHLRef8 : pHLRef16; // РћРїС‚РёРјРёР·Р°С†РёСЏ
       lastHL = stack.size()-2;
       break;
-    case pHLRef8: // Если self, то HL изменять нельзя
+    case pHLRef8: // Р•СЃР»Рё self, С‚Рѕ HL РёР·РјРµРЅСЏС‚СЊ РЅРµР»СЊР·СЏ
       switch(bp) {
         case pA:                        w.ld_d_a()              .ld_a_HL(); break;
         case pB:                        w.ld_d_b()              .ld_a_HL(); break;
@@ -171,14 +171,14 @@ void cmd_call_operator(const char* fn, bool self) {
         default: cmd_call_operator_raise(ap, bp);
       }
       break;
-    //! Дописать стек
+    //! Р”РѕРїРёСЃР°С‚СЊ СЃС‚РµРє
     default: cmd_call_operator_raise(ap, bp);
   }
   needFile(fn);
   w.call(fn);
   if(self) {
     switch(a.place) {
-      //! Добавить все вараинты
+      //! Р”РѕР±Р°РІРёС‚СЊ РІСЃРµ РІР°СЂР°РёРЅС‚С‹
       case pB:           w.ld_b_a(); break;
       case pConstStrRef8:
       case pConstRef8: w.ld_ref_a(a); break;
@@ -210,7 +210,7 @@ void cmd_call_operator_swap(const char* fn1, const char* fn2, bool self, bool wo
  // Place ap = simpleArg8(a.place);
  // Place bp = simpleArg8(b.place);
 
-  //! Оптимизировать
+  //! РћРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ
   Writer& w = bc();
 
   bool swap = pushDA_swap(self);
@@ -284,7 +284,7 @@ void cmd_call_operator_swap(const char* fn1, const char* fn2, bool self, bool wo
         case pC:                          w.ld_d_c().ld_a_l(); break;
         case pConst:                      w.ld_d(b).ld_a_l(); break;
         case pConstRef8:                  w.ld_a_ref(b).ld_d_l(); swap=true; break;
-        case pConstStrRefRef8:            w.ld_a_l().ld_hl_ref(b).ld_d_HL(); break; // HL не будет сохранено
+        case pConstStrRefRef8:            w.ld_a_l().ld_hl_ref(b).ld_d_HL(); break; // HL РЅРµ Р±СѓРґРµС‚ СЃРѕС…СЂР°РЅРµРЅРѕ
         case pBCRef8:                     w.ld_a_BC().ld_d_l(); swap=true; break;
         default: cmd_call_operator_raise(ap, bp);
       }
@@ -329,10 +329,10 @@ void cmd_call_operator_swap(const char* fn1, const char* fn2, bool self, bool wo
         case  pBCRef8:          useHL(); w.ld_a_BC().ld_d_a()    .ld_hl_ref(a).ld_a_HL(); break;
         default: cmd_call_operator_raise(ap, bp);
       }
-      a.place = a.place==pConstStrRefRef8 ? pHLRef8 : pHLRef16; // Оптимизация
+      a.place = a.place==pConstStrRefRef8 ? pHLRef8 : pHLRef16; // РћРїС‚РёРјРёР·Р°С†РёСЏ
       lastHL = stack.size()-2;
       break;
-    case pHLRef8: // Если self, то HL изменять нельзя
+    case pHLRef8: // Р•СЃР»Рё self, С‚Рѕ HL РёР·РјРµРЅСЏС‚СЊ РЅРµР»СЊР·СЏ
       switch(bp) {
         case pA:                        w                       .ld_d_HL(); swap=true; break;
         case pB:                        w.ld_d_b()              .ld_a_HL(); break;
@@ -359,7 +359,7 @@ void cmd_call_operator_swap(const char* fn1, const char* fn2, bool self, bool wo
         default: cmd_call_operator_raise(ap, bp);
       }
       break;
-    //! Дописать стек
+    //! Р”РѕРїРёСЃР°С‚СЊ СЃС‚РµРє
     default: cmd_call_operator_raise(ap, bp);
   } 
   */
@@ -368,14 +368,14 @@ void cmd_call_operator_swap(const char* fn1, const char* fn2, bool self, bool wo
   w.call(fn);
 
   if(wordResult) {
-    if(self) p.logicError_("не поддерживается");
+    if(self) p.logicError_("РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ");
     popTmpHL();
   } else {
     popTmpPokeA(self);
   }
 /*  if(self) {
     switch(a.place) {
-      //! Добавить все варианты
+      //! Р”РѕР±Р°РІРёС‚СЊ РІСЃРµ РІР°СЂРёР°РЅС‚С‹
       case pB:         w.ld_b_a();    break;
       case pConstStrRef8:
       case pConstRef8: w.ld_ref_a(a); break;
@@ -384,7 +384,7 @@ void cmd_call_operator_swap(const char* fn1, const char* fn2, bool self, bool wo
       default: cmd_call_operator_self_raise(a.place, bp);
     }
     asm_pop();
-    if(!wordResult) p.logicError_("не поддерживается");
+    if(!wordResult) p.logicError_("РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ");
   } else {
     asm_pop();
     asm_pop();

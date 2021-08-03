@@ -1,12 +1,12 @@
-// Открытая, бесплатная, ASIS версия библиотеки VinLib. В процессе написания
-// (с) 5-12-2011 vinxru
+// РћС‚РєСЂС‹С‚Р°СЏ, Р±РµСЃРїР»Р°С‚РЅР°СЏ, ASIS РІРµСЂСЃРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё VinLib. Р’ РїСЂРѕС†РµСЃСЃРµ РЅР°РїРёСЃР°РЅРёСЏ
+// (СЃ) 5-12-2011 vinxru
 
 #ifndef VINLIB_FINDFILES_H
 #define VINLIB_FINDFILES_H
 
 #include "finlib/string.h"
 
-// Используется функцией findFiles
+// РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С„СѓРЅРєС†РёРµР№ findFiles
 struct FindData {
   string name;
   __int64 size, creationTime, accessTime, writeTime;
@@ -31,7 +31,7 @@ struct FindData {
   };
 };
 
-// Получение списка файлов в папке в массив (и поддержка типа данных std::string)
+// РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° С„Р°Р№Р»РѕРІ РІ РїР°РїРєРµ РІ РјР°СЃСЃРёРІ (Рё РїРѕРґРґРµСЂР¶РєР° С‚РёРїР° РґР°РЅРЅС‹С… std::string)
 void findFiles(std::vector<FindData>& out, const char* mask);
 inline void findFiles(std::vector<FindData>& out, cstring mask) { findFiles(out, mask.c_str()); }
 

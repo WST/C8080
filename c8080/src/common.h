@@ -3,7 +3,7 @@
 
 #include <finlib/std.h>
 #include "c_parser.h"
-#include "C80Type.h"
+#include "c80type.h"
 
 
 /*

@@ -3,17 +3,17 @@
 #include "b.h"
 
 bool compileOperator(NodeOperator* no, const std::function<bool(bool, int)>& result) {
-  // Èçìåíåíèå çíà÷åíèÿ ïåðåìåííîé, êîìïèëèðóåòñÿ îòäåëüíî
+  // Ð˜Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ð¾Ð¹, ÐºÐ¾Ð¼Ð¿Ð¸Ð»Ð¸Ñ€ÑƒÐµÑ‚ÑÑ Ð¾Ñ‚Ð´ÐµÐ»ÑŒÐ½Ð¾
   if(no->o == oSet || no->o == oSetVoid) {
     return compileSet(no, result);
   }
     
-  // Êîìïèëèðóåì îáà âàðàèíòà  
+  // ÐšÐ¾Ð¼Ð¿Ð¸Ð»Ð¸Ñ€ÑƒÐµÐ¼ Ð¾Ð±Ð° Ð²Ð°Ñ€Ð°Ð¸Ð½Ñ‚Ð°  
 
   if(no->a->dataType.is8()) {
     assert(no->b->dataType.is8());
 
-    // Àðãóìåíòû SUB íåëüçÿ ìåíÿòü ìåñòàìè
+    // ÐÑ€Ð³ÑƒÐ¼ÐµÐ½Ñ‚Ñ‹ SUB Ð½ÐµÐ»ÑŒÐ·Ñ Ð¼ÐµÐ½ÑÑ‚ÑŒ Ð¼ÐµÑÑ‚Ð°Ð¼Ð¸
     if(no->o==oSub) return compileOperatorV2_8(no, true,  no->b, no->a, result);  
 
     return fork(2, [&](int n) {

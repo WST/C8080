@@ -3,16 +3,16 @@
 #include "b.h"
 
 bool compileOperatorV2_16_const_add(NodeOperator* o, bool swap, NodeConst* bc, const std::function<bool(bool, int)>& result) {    
-  // Óñòðàíÿåì äåëüòó â HL è îòâÿçûâàåì ðåãèñòð îò ïåðåìåííîé â ïàìÿòè. HL ïðè ýòîì áóäåò ñîäåðæàòü êîððåêòíîå çíà÷åíèå
+  // Ð£ÑÑ‚Ñ€Ð°Ð½ÑÐµÐ¼ Ð´ÐµÐ»ÑŒÑ‚Ñƒ Ð² HL Ð¸ Ð¾Ñ‚Ð²ÑÐ·Ñ‹Ð²Ð°ÐµÐ¼ Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€ Ð¾Ñ‚ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ð¾Ð¹ Ð² Ð¿Ð°Ð¼ÑÑ‚Ð¸. HL Ð¿Ñ€Ð¸ ÑÑ‚Ð¾Ð¼ Ð±ÑƒÐ´ÐµÑ‚ ÑÐ¾Ð´ÐµÑ€Ð¶Ð°Ñ‚ÑŒ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ðµ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ
   auto a = s.hl.in;
   if(s.hl.in) {
     saveRegHLAndUsed();
-    // HL âñå åùå ñîäåðæèò êîïèþ ïåðåìåííîé!
+    // HL Ð²ÑÐµ ÐµÑ‰Ðµ ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ñ‚ ÐºÐ¾Ð¿Ð¸ÑŽ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ð¾Ð¹!
     s.hl.tmp = a;
     s.hl.delta = 0;
   }
   assert(s.hl.in==0);
-  short value = bc->value - s.hl.delta; // Òóò ñïåöèàëüíî short, ÷òî áû 65535 ïðèâåñòè ê -1
+  short value = bc->value - s.hl.delta; // Ð¢ÑƒÑ‚ ÑÐ¿ÐµÑ†Ð¸Ð°Ð»ÑŒÐ½Ð¾ short, Ñ‡Ñ‚Ð¾ Ð±Ñ‹ 65535 Ð¿Ñ€Ð¸Ð²ÐµÑÑ‚Ð¸ Ðº -1
   if(value > 0 && value <= 3) {
     for(int i=value; i; --i) out.inx(Assembler::HL);
   } else 
@@ -21,9 +21,9 @@ bool compileOperatorV2_16_const_add(NodeOperator* o, bool swap, NodeConst* bc, c
   } else 
   if(value !=0) {
     saveRegDEAndUsed();
-    out.lxi(Assembler::DE, value).dad(Assembler::DE); //! Ïîïðîáîâàòü BC
+    out.lxi(Assembler::DE, value).dad(Assembler::DE); //! ÐŸÐ¾Ð¿Ñ€Ð¾Ð±Ð¾Ð²Ð°Ñ‚ÑŒ BC
   }
-  // HL âñå åùå ñîäåðæèò êîïèþ ïåðåìåííîé! îòëè÷àþùååñÿ íà N îò çíà÷åíèÿ â ïàìÿòè
+  // HL Ð²ÑÐµ ÐµÑ‰Ðµ ÑÐ¾Ð´ÐµÑ€Ð¶Ð¸Ñ‚ ÐºÐ¾Ð¿Ð¸ÑŽ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ð¾Ð¹! Ð¾Ñ‚Ð»Ð¸Ñ‡Ð°ÑŽÑ‰ÐµÐµÑÑ Ð½Ð° N Ð¾Ñ‚ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð² Ð¿Ð°Ð¼ÑÑ‚Ð¸
   s.hl.delta = bc->value;
   return result(swap, regHL);           
 }

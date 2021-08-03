@@ -17,48 +17,48 @@ void incDecHL(int step1) {
   for(;step1<0; step1++) out.dcx(Assembler::HL);
 }
 
-// 7-8-2014 прибрал
+// 7-8-2014 РїСЂРёР±СЂР°Р»
 bool compileIncDecOperator(NodeMonoOperator* no, const std::function<bool(int)>& result) {
   bool inc = (no->o == moIncVoid || no->o == moPostInc || no->o == moInc);
 
-  // Поддерживаются только переменные!
+  // РџРѕРґРґРµСЂР¶РёРІР°СЋС‚СЃСЏ С‚РѕР»СЊРєРѕ РїРµСЂРµРјРµРЅРЅС‹Рµ!
   if(no->a->nodeType != ntDeaddr) raise("compileIncDecOperator");
   auto var = no->a->cast<NodeDeaddr>()->var;
 
-  // На сколько надо изменить 16 битную переменную?
+  // РќР° СЃРєРѕР»СЊРєРѕ РЅР°РґРѕ РёР·РјРµРЅРёС‚СЊ 16 Р±РёС‚РЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ?
   int step16 = 1;
   if(no->dataType.addr) step16 = no->dataType.sizeElement();
   if(!inc) step16 = -step16;
 
   // *************************************************************************
-  // * Смысл этой оптимизации в том, что мы можем выполнять команды INC, DEC *
-  // * над регистровыми переменными, без занесения их в аккумулятор.         *
+  // * РЎРјС‹СЃР» СЌС‚РѕР№ РѕРїС‚РёРјРёР·Р°С†РёРё РІ С‚РѕРј, С‡С‚Рѕ РјС‹ РјРѕР¶РµРј РІС‹РїРѕР»РЅСЏС‚СЊ РєРѕРјР°РЅРґС‹ INC, DEC *
+  // * РЅР°Рґ СЂРµРіРёСЃС‚СЂРѕРІС‹РјРё РїРµСЂРµРјРµРЅРЅС‹РјРё, Р±РµР· Р·Р°РЅРµСЃРµРЅРёСЏ РёС… РІ Р°РєРєСѓРјСѓР»СЏС‚РѕСЂ.         *
   // *************************************************************************
 
-  // Это регистровая переменная
+  // Р­С‚Рѕ СЂРµРіРёСЃС‚СЂРѕРІР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ
   if(var->nodeType == ntConstS && var->cast<NodeConst>()->var->reg) {
     auto nc = var->cast<NodeConst>();
-    // Это 8 битная переменная
+    // Р­С‚Рѕ 8 Р±РёС‚РЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ
     if(no->dataType.is8()) {
-      // Но если переменная уже находится в аккумуляторе, а нам  нужно её прошлое значение, 
-      // то не копиурем её обратно в B, C.
+      // РќРѕ РµСЃР»Рё РїРµСЂРµРјРµРЅРЅР°СЏ СѓР¶Рµ РЅР°С…РѕРґРёС‚СЃСЏ РІ Р°РєРєСѓРјСѓР»СЏС‚РѕСЂРµ, Р° РЅР°Рј  РЅСѓР¶РЅРѕ РµС‘ РїСЂРѕС€Р»РѕРµ Р·РЅР°С‡РµРЅРёРµ, 
+      // С‚Рѕ РЅРµ РєРѕРїРёСѓСЂРµРј РµС‘ РѕР±СЂР°С‚РЅРѕ РІ B, C.
       if(s.a.in == nc->var) {
-        // Проверка: i=5+j; i++; хоть i регистровая переменная, но она будет храниться в аккумуляторе
+        // РџСЂРѕРІРµСЂРєР°: i=5+j; i++; С…РѕС‚СЊ i СЂРµРіРёСЃС‚СЂРѕРІР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ, РЅРѕ РѕРЅР° Р±СѓРґРµС‚ С…СЂР°РЅРёС‚СЊСЃСЏ РІ Р°РєРєСѓРјСѓР»СЏС‚РѕСЂРµ
         if(no->o==moIncVoid || no->o==moDecVoid || no->o==moInc || no->o==moDec) goto stdPath;
         saveRegAAndUsed();
       }
-      // На всякий случай, переменная может быть (хотя не должна) в других регистрах
+      // РќР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№, РїРµСЂРµРјРµРЅРЅР°СЏ РјРѕР¶РµС‚ Р±С‹С‚СЊ (С…РѕС‚СЏ РЅРµ РґРѕР»Р¶РЅР°) РІ РґСЂСѓРіРёС… СЂРµРіРёСЃС‚СЂР°С…
       if(s.de.in == nc->var) saveRegDEAndUsed();
       if(s.hl.in == nc->var) saveRegHLAndUsed();
-      // Тут пеменная точно в B, C
+      // РўСѓС‚ РїРµРјРµРЅРЅР°СЏ С‚РѕС‡РЅРѕ РІ B, C
       auto reg = toAsmReg8(nc->var->reg);
       switch(no->o) {
         case moIncVoid: out.inr(reg); return result(0);
         case moDecVoid: out.dcr(reg); return result(0);
         case moInc:     saveRegAAndUsed(); out.inr(reg).mov(Assembler::A, reg); return result(regA);
         case moDec:     saveRegAAndUsed(); out.dcr(reg).mov(Assembler::A, reg); return result(regA);
-        // было бы быстрее case moInc:     out.inr(reg); return result(nc->var->reg);
-        // было бы быстрее case moDec:     out.dcr(reg); return result(nc->var->reg);
+        // Р±С‹Р»Рѕ Р±С‹ Р±С‹СЃС‚СЂРµРµ case moInc:     out.inr(reg); return result(nc->var->reg);
+        // Р±С‹Р»Рѕ Р±С‹ Р±С‹СЃС‚СЂРµРµ case moDec:     out.dcr(reg); return result(nc->var->reg);
         case moPostInc: saveRegAAndUsed(); out.mov(Assembler::A, reg).inr(reg); return result(regA);
         case moPostDec: saveRegAAndUsed(); out.mov(Assembler::A, reg).dcr(reg); return result(regA);
       }
@@ -67,23 +67,23 @@ bool compileIncDecOperator(NodeMonoOperator* no, const std::function<bool(int)>&
 
     if(no->dataType.is16()) {
       auto nc = var->cast<NodeConst>();
-      // Но если переменная уже находится в аккумуляторе, а нам  нужно её прошлое значение, 
-      // то не копиурем её обратно в BC.
+      // РќРѕ РµСЃР»Рё РїРµСЂРµРјРµРЅРЅР°СЏ СѓР¶Рµ РЅР°С…РѕРґРёС‚СЃСЏ РІ Р°РєРєСѓРјСѓР»СЏС‚РѕСЂРµ, Р° РЅР°Рј  РЅСѓР¶РЅРѕ РµС‘ РїСЂРѕС€Р»РѕРµ Р·РЅР°С‡РµРЅРёРµ, 
+      // С‚Рѕ РЅРµ РєРѕРїРёСѓСЂРµРј РµС‘ РѕР±СЂР°С‚РЅРѕ РІ BC.
       if(s.hl.in == nc->var) {
-        // Проверка: i=5+j; i++; хоть i регистровая переменная, но она будет храниться в аккумуляторе
+        // РџСЂРѕРІРµСЂРєР°: i=5+j; i++; С…РѕС‚СЊ i СЂРµРіРёСЃС‚СЂРѕРІР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ, РЅРѕ РѕРЅР° Р±СѓРґРµС‚ С…СЂР°РЅРёС‚СЊСЃСЏ РІ Р°РєРєСѓРјСѓР»СЏС‚РѕСЂРµ
         if(no->o==moIncVoid || no->o==moDecVoid || no->o==moInc || no->o==moDec) goto stdPath;
         saveRegHLAndUsed();
       }
-      // На всякий случай, переменная может быть (хотя не должна) в других регистрах
+      // РќР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№, РїРµСЂРµРјРµРЅРЅР°СЏ РјРѕР¶РµС‚ Р±С‹С‚СЊ (С…РѕС‚СЏ РЅРµ РґРѕР»Р¶РЅР°) РІ РґСЂСѓРіРёС… СЂРµРіРёСЃС‚СЂР°С…
       if(s.de.in == nc->var) saveRegDEAndUsed();
       if(s.a.in  == nc->var) saveRegAAndUsed();
-      // В этой реализации переменная может быть закреплена только за регистром BC
+      // Р’ СЌС‚РѕР№ СЂРµР°Р»РёР·Р°С†РёРё РїРµСЂРµРјРµРЅРЅР°СЏ РјРѕР¶РµС‚ Р±С‹С‚СЊ Р·Р°РєСЂРµРїР»РµРЅР° С‚РѕР»СЊРєРѕ Р·Р° СЂРµРіРёСЃС‚СЂРѕРј BC
       if(nc->var->reg != regBC) throw;          
-      // Действие
+      // Р”РµР№СЃС‚РІРёРµ
       switch(no->o) {
         case moIncVoid: case moDecVoid: incDecBC(step16); return result(0);        
-        case moInc:     case moDec:     saveRegHLAndUsed(); incDecBC(step16); out.mov(Assembler::H, Assembler::B).mov(Assembler::L, Assembler::C); return result(regHL); //! Тут можно вернуть BC
-        case moPostInc: case moPostDec: saveRegHLAndUsed(); out.mov(Assembler::H, Assembler::B).mov(Assembler::L, Assembler::C); incDecBC(step16); return result(regHL); //! Тут можно вернуть DE
+        case moInc:     case moDec:     saveRegHLAndUsed(); incDecBC(step16); out.mov(Assembler::H, Assembler::B).mov(Assembler::L, Assembler::C); return result(regHL); //! РўСѓС‚ РјРѕР¶РЅРѕ РІРµСЂРЅСѓС‚СЊ BC
+        case moPostInc: case moPostDec: saveRegHLAndUsed(); out.mov(Assembler::H, Assembler::B).mov(Assembler::L, Assembler::C); incDecBC(step16); return result(regHL); //! РўСѓС‚ РјРѕР¶РЅРѕ РІРµСЂРЅСѓС‚СЊ DE
       }
       throw;
     }
@@ -91,15 +91,15 @@ bool compileIncDecOperator(NodeMonoOperator* no, const std::function<bool(int)>&
 
 stdPath:
   // *************************************************************************
-  // * Далее мы заносим переменную в аккумулятор полюбому                    *
+  // * Р”Р°Р»РµРµ РјС‹ Р·Р°РЅРѕСЃРёРј РїРµСЂРµРјРµРЅРЅСѓСЋ РІ Р°РєРєСѓРјСѓР»СЏС‚РѕСЂ РїРѕР»СЋР±РѕРјСѓ                    *
   // *************************************************************************
 
-  // *** 8 битное значение ***
+  // *** 8 Р±РёС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ ***
 
   if(no->dataType.is8()) {    
-    // Адрес переменной задается числом, а они не кешируются.
-    if(var->nodeType == ntConstI) { //! Вилка lxi h + inc m
-      // Адрес переменной цифровой
+    // РђРґСЂРµСЃ РїРµСЂРµРјРµРЅРЅРѕР№ Р·Р°РґР°РµС‚СЃСЏ С‡РёСЃР»РѕРј, Р° РѕРЅРё РЅРµ РєРµС€РёСЂСѓСЋС‚СЃСЏ.
+    if(var->nodeType == ntConstI) { //! Р’РёР»РєР° lxi h + inc m
+      // РђРґСЂРµСЃ РїРµСЂРµРјРµРЅРЅРѕР№ С†РёС„СЂРѕРІРѕР№
       auto constAddr = var->cast<NodeConst>();
       saveRegAAndUsed();
       out.lda(constAddr->value);
@@ -109,31 +109,31 @@ stdPath:
       if(no->o==moPostDec || no->o==moPostInc) { if(inc) out.dcr(Assembler::A); else out.inr(Assembler::A); }
       return result(regA);
     }
-    // Адрес переменной задается строкой, такие кешируются
-    if(var->nodeType==ntConstS) { //! Вилка lxi h + inc m
-      // Адрес переменной цифровой
+    // РђРґСЂРµСЃ РїРµСЂРµРјРµРЅРЅРѕР№ Р·Р°РґР°РµС‚СЃСЏ СЃС‚СЂРѕРєРѕР№, С‚Р°РєРёРµ РєРµС€РёСЂСѓСЋС‚СЃСЏ
+    if(var->nodeType==ntConstS) { //! Р’РёР»РєР° lxi h + inc m
+      // РђРґСЂРµСЃ РїРµСЂРµРјРµРЅРЅРѕР№ С†РёС„СЂРѕРІРѕР№
       auto constAddr = var->cast<NodeConst>();
-      loadInAreal(constAddr->var); // Сохранит прошлый A и загрузит туда переменную
+      loadInAreal(constAddr->var); // РЎРѕС…СЂР°РЅРёС‚ РїСЂРѕС€Р»С‹Р№ A Рё Р·Р°РіСЂСѓР·РёС‚ С‚СѓРґР° РїРµСЂРµРјРµРЅРЅСѓСЋ
       if(inc) out.inr(Assembler::A); else out.dcr(Assembler::A);
-      s.a.changed = true; // Отложенное сохранение
+      s.a.changed = true; // РћС‚Р»РѕР¶РµРЅРЅРѕРµ СЃРѕС…СЂР°РЅРµРЅРёРµ
       if(no->o==moDecVoid || no->o==moIncVoid) return result(0);
       if(no->o==moPostDec || no->o==moPostInc) { saveRegAAndUsed(); if(inc) out.dcr(Assembler::A); else out.inr(Assembler::A); }
       return result(regA);
     }
-    // Адрес переменной вычисляемый
+    // РђРґСЂРµСЃ РїРµСЂРµРјРµРЅРЅРѕР№ РІС‹С‡РёСЃР»СЏРµРјС‹Р№
     return compileVar(var, regHL, [&](int reg){
       int outReg=0;
-      if(no->o==moPostDec || no->o==moPostInc) saveRegAAndUsed(), outReg=regA, out.mov(Assembler::A, Assembler::M); //! Другой регистр?
+      if(no->o==moPostDec || no->o==moPostInc) saveRegAAndUsed(), outReg=regA, out.mov(Assembler::A, Assembler::M); //! Р”СЂСѓРіРѕР№ СЂРµРіРёСЃС‚СЂ?
       if(inc) out.inr(Assembler::M); else out.dcr(Assembler::M);
-      if(no->o==moDec || no->o==moInc) saveRegAAndUsed(), outReg=regA, out.mov(Assembler::A, Assembler::M); //! Другой регистр?
+      if(no->o==moDec || no->o==moInc) saveRegAAndUsed(), outReg=regA, out.mov(Assembler::A, Assembler::M); //! Р”СЂСѓРіРѕР№ СЂРµРіРёСЃС‚СЂ?
       return result(outReg);
     });
   }
 
-  // *** 16 битное значение ***
+  // *** 16 Р±РёС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ ***
 
   if(no->dataType.is16()) {
-    // Адрес переменной задается числом, а они не кешируются.
+    // РђРґСЂРµСЃ РїРµСЂРµРјРµРЅРЅРѕР№ Р·Р°РґР°РµС‚СЃСЏ С‡РёСЃР»РѕРј, Р° РѕРЅРё РЅРµ РєРµС€РёСЂСѓСЋС‚СЃСЏ.
     if(var->nodeType==ntConstI) {
       auto constAddr = var->cast<NodeConst>();
       saveRegHLAndUsed();
@@ -142,30 +142,30 @@ stdPath:
       out.shld(constAddr->value);
       if(no->o==moDecVoid || no->o==moIncVoid) return result(0);
       if(no->o==moPostDec || no->o==moPostInc) incDecHL(-step16);
-      out.xchg(); //! Можно попробовать как DE вернуть!!!
+      out.xchg(); //! РњРѕР¶РЅРѕ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РєР°Рє DE РІРµСЂРЅСѓС‚СЊ!!!
       return result(regHL);
     }
-    // Адрес переменной задается строкой, такие кешируются
+    // РђРґСЂРµСЃ РїРµСЂРµРјРµРЅРЅРѕР№ Р·Р°РґР°РµС‚СЃСЏ СЃС‚СЂРѕРєРѕР№, С‚Р°РєРёРµ РєРµС€РёСЂСѓСЋС‚СЃСЏ
     if(var->nodeType==ntConstS) {      
       auto constAddr = var->cast<NodeConst>();
-      loadInHLreal(constAddr->var); // Сохранит прошлый HL и загрузит туда переменную
-      s.hl.delta = -step16; // Отложенное сохранение
-      s.hl.changed = true; // Отложенное сохранение
+      loadInHLreal(constAddr->var); // РЎРѕС…СЂР°РЅРёС‚ РїСЂРѕС€Р»С‹Р№ HL Рё Р·Р°РіСЂСѓР·РёС‚ С‚СѓРґР° РїРµСЂРµРјРµРЅРЅСѓСЋ
+      s.hl.delta = -step16; // РћС‚Р»РѕР¶РµРЅРЅРѕРµ СЃРѕС…СЂР°РЅРµРЅРёРµ
+      s.hl.changed = true; // РћС‚Р»РѕР¶РµРЅРЅРѕРµ СЃРѕС…СЂР°РЅРµРЅРёРµ
       if(no->o==moDecVoid || no->o==moIncVoid) return result(regNone);
-      //! Если мы отдаем regHL, то он должен быть корректным! хотя это не оптимально.
+      //! Р•СЃР»Рё РјС‹ РѕС‚РґР°РµРј regHL, С‚Рѕ РѕРЅ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ РєРѕСЂСЂРµРєС‚РЅС‹Рј! С…РѕС‚СЏ СЌС‚Рѕ РЅРµ РѕРїС‚РёРјР°Р»СЊРЅРѕ.
       incDecHL(step16); s.hl.delta=0; 
       if(no->o==moPostDec || no->o==moPostInc) { saveRegHLAndUsed(); incDecHL(-step16); }
       return result(regHL);
     }
-    // Адрес переменной вычисляемый, поэтому его надо сохранить
+    // РђРґСЂРµСЃ РїРµСЂРµРјРµРЅРЅРѕР№ РІС‹С‡РёСЃР»СЏРµРјС‹Р№, РїРѕСЌС‚РѕРјСѓ РµРіРѕ РЅР°РґРѕ СЃРѕС…СЂР°РЅРёС‚СЊ
     return compileVar(var, regHL, [&](int reg){
-      saveRegDEAndUsed(); // В теории можно и в BC
+      saveRegDEAndUsed(); // Р’ С‚РµРѕСЂРёРё РјРѕР¶РЅРѕ Рё РІ BC
       out.mov(Assembler::E, Assembler::M).inx(Assembler::HL).mov(Assembler::D, Assembler::M);
       incDecDE(step16);
       out.mov(Assembler::M, Assembler::D).dcx(Assembler::HL).mov(Assembler::M, Assembler::E);
       if(no->o==moDecVoid || no->o==moIncVoid) result(0);
       if(no->o==moPostDec || no->o==moPostInc) incDecDE(-step16);
-      out.xchg(); //! Можно попробовать как DE вернуть!!!
+      out.xchg(); //! РњРѕР¶РЅРѕ РїРѕРїСЂРѕР±РѕРІР°С‚СЊ РєР°Рє DE РІРµСЂРЅСѓС‚СЊ!!!
       return result(regHL);
     });
   }

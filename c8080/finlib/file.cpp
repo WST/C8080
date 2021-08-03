@@ -1,5 +1,5 @@
-// Открытая, бесплатная, ASIS версия библиотеки VinLib. В процессе написания
-// (с) 5-12-2011 vinxru
+// РћС‚РєСЂС‹С‚Р°СЏ, Р±РµСЃРїР»Р°С‚РЅР°СЏ, ASIS РІРµСЂСЃРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё VinLib. Р’ РїСЂРѕС†РµСЃСЃРµ РЅР°РїРёСЃР°РЅРёСЏ
+// (СЃ) 5-12-2011 vinxru
 
 #include <stdafx.h>
 #include "finlib/file.h"
@@ -12,54 +12,54 @@ File::File() throw() {
 }
 
 void File::raiseIfNotOpened() {
-  if(handle==INVALID_HANDLE_VALUE) raise("Файл не открыт");
+  if(handle==INVALID_HANDLE_VALUE) raise("Р¤Р°Р№Р» РЅРµ РѕС‚РєСЂС‹С‚");
 }
 
 int File::size32() {
   raiseIfNotOpened();
   DWORD h;
   int l = GetFileSize(handle, &h);
-  if(l<0 || h!=0) raise("Файл слишком большой");
+  if(l<0 || h!=0) raise("Р¤Р°Р№Р» СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№");
   return l;
 }
 
 void File::open(const char* fileName, int access, int share, int distr) {
   close();
   handle=CreateFile(fileName, access, share, 0, distr, 0, 0);
-  if(handle==INVALID_HANDLE_VALUE) raise_os((string)"Ошибка создания/открытия файла "+fileName+"\nCreateFile");
+  if(handle==INVALID_HANDLE_VALUE) raise_os((string)"РћС€РёР±РєР° СЃРѕР·РґР°РЅРёСЏ/РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р° "+fileName+"\nCreateFile");
 }
 
 void File::openR(const char* fileName) {
   close();
   handle=CreateFile(fileName, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
-  if(handle==INVALID_HANDLE_VALUE) raise_os((string)"Ошибка открытия файла "+fileName+"\nCreateFile");
+  if(handle==INVALID_HANDLE_VALUE) raise_os((string)"РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р° "+fileName+"\nCreateFile");
 }
 
 void File::openC(const char* fileName, FileCreateMode mode) {
   close();
   handle=CreateFile(fileName, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ, 0,mode, 0, 0);
-  if(handle==INVALID_HANDLE_VALUE) raise_os((string)"Ошибка открытия файла "+fileName+"\nCreateFile");
+  if(handle==INVALID_HANDLE_VALUE) raise_os((string)"РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р° "+fileName+"\nCreateFile");
 }
 
 void File::read(void* buf, int len0) {
   raiseIfNotOpened();
   if(len0==0) return;
   if(len0<0) raise_os("ReadFile"); 
-  unsigned long len=len0; // С уветом верхней проверки ошибок нет, а компилятор счаслив
+  unsigned long len=len0; // РЎ СѓРІРµС‚РѕРј РІРµСЂС…РЅРµР№ РїСЂРѕРІРµСЂРєРё РѕС€РёР±РѕРє РЅРµС‚, Р° РєРѕРјРїРёР»СЏС‚РѕСЂ СЃС‡Р°СЃР»РёРІ
   unsigned long res;
   if(!ReadFile(handle, buf, len, &res, 0)) raise_os("ReadFile");
-  if(res!=len) raise("Ошибка чтения файла");
+  if(res!=len) raise("РћС€РёР±РєР° С‡С‚РµРЅРёСЏ С„Р°Р№Р»Р°");
 }
 
 void File::write(const void* buf, int len0) {
   raiseIfNotOpened();
   if(len0==0) return;
   if(len0<0) raise_os("ReadFile"); 
-  unsigned long len=len0; // С уветом верхней проверки ошибок нет, а компилятор счаслив
+  unsigned long len=len0; // РЎ СѓРІРµС‚РѕРј РІРµСЂС…РЅРµР№ РїСЂРѕРІРµСЂРєРё РѕС€РёР±РѕРє РЅРµС‚, Р° РєРѕРјРїРёР»СЏС‚РѕСЂ СЃС‡Р°СЃР»РёРІ
   unsigned long res;
   if(!WriteFile(handle, buf, len, &res, 0))
     raise_os("WriteFile");
-  if(res!=len) raise("Ошибка записи в файл");
+  if(res!=len) raise("РћС€РёР±РєР° Р·Р°РїРёСЃРё РІ С„Р°Р№Р»");
 }
 
 void File::close() {
@@ -88,7 +88,7 @@ void loadFile(std::vector<byte_t>& out, cstring fileName) {
   if(len>0) f.read(&out[0], len);
 }
 
-// Только 8-битные файлы
+// РўРѕР»СЊРєРѕ 8-Р±РёС‚РЅС‹Рµ С„Р°Р№Р»С‹
 void loadStringFromFile(std::string& out, const string& fileName) {
   std::vector<byte_t> buf;
   loadFile(buf, fileName);

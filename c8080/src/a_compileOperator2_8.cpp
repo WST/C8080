@@ -19,25 +19,25 @@ bool compileOperator2_8_checkAnyReg(NodeOperator* no) {
     case oXor: 
     case oAnd: 
     case oOr: return true;
-    // oShr, oShl, oMul принимают второй аргумент только в D, потому что это подпрограммы
+    // oShr, oShl, oMul РїСЂРёРЅРёРјР°СЋС‚ РІС‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚ С‚РѕР»СЊРєРѕ РІ D, РїРѕС‚РѕРјСѓ С‡С‚Рѕ СЌС‚Рѕ РїРѕРґРїСЂРѕРіСЂР°РјРјС‹
   }
   return false;
 }
 
 bool compileOperator2_8(NodeOperator* no, bool swap, Assembler::Reg8 second, const std::function<bool(bool, int)>& result) {
-  // Результат сравнения в флагах
+  // Р РµР·СѓР»СЊС‚Р°С‚ СЃСЂР°РІРЅРµРЅРёСЏ РІ С„Р»Р°РіР°С…
   if(no->o==oE || no->o==oNE || no->o==oGE || no->o==oLE || no->o==oG || no->o==oL) {
     out.alu(Assembler::CMP, second);
     return result(swap, 0);      
   }
 
-  // Регистр A будет изменен, поэтому сохраняем переменную хранящуюся в нем
+  // Р РµРіРёСЃС‚СЂ A Р±СѓРґРµС‚ РёР·РјРµРЅРµРЅ, РїРѕСЌС‚РѕРјСѓ СЃРѕС…СЂР°РЅСЏРµРј РїРµСЂРµРјРµРЅРЅСѓСЋ С…СЂР°РЅСЏС‰СѓСЋСЃСЏ РІ РЅРµРј
   saveRegAAndUsed();
 
-  // Выполняем оператор
+  // Р’С‹РїРѕР»РЅСЏРµРј РѕРїРµСЂР°С‚РѕСЂ
   switch(no->o) {
     case oAdd: out.alu(Assembler::ADD, second); break;
-    case oSub: assert(swap); out.alu(Assembler::SUB, second); break; // При вызове этой функции, надо учесть этот assert
+    case oSub: assert(swap); out.alu(Assembler::SUB, second); break; // РџСЂРё РІС‹Р·РѕРІРµ СЌС‚РѕР№ С„СѓРЅРєС†РёРё, РЅР°РґРѕ СѓС‡РµСЃС‚СЊ СЌС‚РѕС‚ assert
     case oXor: out.alu(Assembler::XOR, second); break;
     case oAnd: out.alu(Assembler::AND, second); break;
     case oOr:  out.alu(Assembler::OR, second); break;        
@@ -47,6 +47,6 @@ bool compileOperator2_8(NodeOperator* no, bool swap, Assembler::Reg8 second, con
     default: raise("compileOperator2_8 " + i2s(no->o));
   }
 
-  // Продолжаем
+  // РџСЂРѕРґРѕР»Р¶Р°РµРј
   return result(swap, regA);    
 }

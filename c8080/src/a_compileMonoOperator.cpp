@@ -3,7 +3,7 @@
 #include "b.h"
 
 bool compileMonoOperator(NodeMonoOperator* no, const std::function<bool(int)>& result) {
-  // Åñëè óâåëè÷èòü èëè óìåíüøèòü ðåãèñòðîâóþ ïåðåìåííóþ íà åäèíèöó
+  // Ð•ÑÐ»Ð¸ ÑƒÐ²ÐµÐ»Ð¸Ñ‡Ð¸Ñ‚ÑŒ Ð¸Ð»Ð¸ ÑƒÐ¼ÐµÐ½ÑŒÑˆÐ¸Ñ‚ÑŒ Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð¾Ð²ÑƒÑŽ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½ÑƒÑŽ Ð½Ð° ÐµÐ´Ð¸Ð½Ð¸Ñ†Ñƒ
   if(no->o==moIncVoid || no->o==moPostInc || no->o==moInc || no->o==moDecVoid || no->o==moPostDec || no->o==moDec) {
     return compileIncDecOperator(no, result);
   }

@@ -3,60 +3,60 @@
 #include "b.h"
 
 bool compileConvert(NodeConvert* nc, int canRegs, const std::function<bool(int)>& result) {
-  // Ничего преобразовывать не надо
+  // РќРёС‡РµРіРѕ РїСЂРµРѕР±СЂР°Р·РѕРІС‹РІР°С‚СЊ РЅРµ РЅР°РґРѕ
   if(nc->var->dataType.getSize() == nc->dataType.getSize()) {
     return compileVar(nc->var, canRegs, result);
   }
 
-  // Упрощаем себе жизнь
+  // РЈРїСЂРѕС‰Р°РµРј СЃРµР±Рµ Р¶РёР·РЅСЊ
   bool to16 = nc->var->dataType.getSize()==8  && nc->dataType.getSize()==16;
   bool to8  = nc->var->dataType.getSize()==16 && nc->dataType.getSize()==8;
   assert(to16 || to8);
 
-  // Мы будем преобразовывать загруженное из памяти значение. Мы можем сразу не загружать
-  // из памяти лишние биты или обнулить их позже.
+  // РњС‹ Р±СѓРґРµРј РїСЂРµРѕР±СЂР°Р·РѕРІС‹РІР°С‚СЊ Р·Р°РіСЂСѓР¶РµРЅРЅРѕРµ РёР· РїР°РјСЏС‚Рё Р·РЅР°С‡РµРЅРёРµ. РњС‹ РјРѕР¶РµРј СЃСЂР°Р·Сѓ РЅРµ Р·Р°РіСЂСѓР¶Р°С‚СЊ
+  // РёР· РїР°РјСЏС‚Рё Р»РёС€РЅРёРµ Р±РёС‚С‹ РёР»Рё РѕР±РЅСѓР»РёС‚СЊ РёС… РїРѕР·Р¶Рµ.
   if(nc->var->nodeType == ntDeaddr) {
     auto nd = nc->var->cast<NodeDeaddr>();
 
-    // Если нужная переменная уже в регистре, то замена lda addr + mov l, a + mvi h, 0 на mov l, a + mvi h, 0
+    // Р•СЃР»Рё РЅСѓР¶РЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ СѓР¶Рµ РІ СЂРµРіРёСЃС‚СЂРµ, С‚Рѕ Р·Р°РјРµРЅР° lda addr + mov l, a + mvi h, 0 РЅР° mov l, a + mvi h, 0
     if(nd->var->nodeType == ntConstS) {
       auto nc = nd->var->cast<NodeConst>();
       if(to16 && nc->var == s.a.in) {
-        // Особый случай, когда можно оставить 16 битную переменную в 8 битном регистре.
-        if(canRegs & regA) return result(regA); //! Можно вилку            
-        // Переносим A в HL
+        // РћСЃРѕР±С‹Р№ СЃР»СѓС‡Р°Р№, РєРѕРіРґР° РјРѕР¶РЅРѕ РѕСЃС‚Р°РІРёС‚СЊ 16 Р±РёС‚РЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ РІ 8 Р±РёС‚РЅРѕРј СЂРµРіРёСЃС‚СЂРµ.
+        if(canRegs & regA) return result(regA); //! РњРѕР¶РЅРѕ РІРёР»РєСѓ            
+        // РџРµСЂРµРЅРѕСЃРёРј A РІ HL
         saveRegHLAndUsed();
-        out.mov(Assembler::L, Assembler::A); //! Для ускорения надо как то предусмотреть помещение в DE
+        out.mov(Assembler::L, Assembler::A); //! Р”Р»СЏ СѓСЃРєРѕСЂРµРЅРёСЏ РЅР°РґРѕ РєР°Рє С‚Рѕ РїСЂРµРґСѓСЃРјРѕС‚СЂРµС‚СЊ РїРѕРјРµС‰РµРЅРёРµ РІ DE
         out.mvi(Assembler::H, 0);            
         return result(regHL);
       }
       if(to8 && nc->var == s.hl.in) {
-        // Устраняем s.hl.delta. Регистр и так в HL, никаких других действий быть не должно.
+        // РЈСЃС‚СЂР°РЅСЏРµРј s.hl.delta. Р РµРіРёСЃС‚СЂ Рё С‚Р°Рє РІ HL, РЅРёРєР°РєРёС… РґСЂСѓРіРёС… РґРµР№СЃС‚РІРёР№ Р±С‹С‚СЊ РЅРµ РґРѕР»Р¶РЅРѕ.
         loadInHL(s.hl.in);
-        // Переносим HL в A
+        // РџРµСЂРµРЅРѕСЃРёРј HL РІ A
         saveRegAAndUsed();
-        out.mov(Assembler::A, Assembler::L); //! Для ускорения надо как то предусмотреть помещение в другие регистры, если они есть в canRegs
+        out.mov(Assembler::A, Assembler::L); //! Р”Р»СЏ СѓСЃРєРѕСЂРµРЅРёСЏ РЅР°РґРѕ РєР°Рє С‚Рѕ РїСЂРµРґСѓСЃРјРѕС‚СЂРµС‚СЊ РїРѕРјРµС‰РµРЅРёРµ РІ РґСЂСѓРіРёРµ СЂРµРіРёСЃС‚СЂС‹, РµСЃР»Рё РѕРЅРё РµСЃС‚СЊ РІ canRegs
         return result(regA);
       }
       if(to8 && nc->var == s.de.in) {
-        // Устраняем inDE_delta. Регистр и так в DE, никаких других действий быть не должно.
+        // РЈСЃС‚СЂР°РЅСЏРµРј inDE_delta. Р РµРіРёСЃС‚СЂ Рё С‚Р°Рє РІ DE, РЅРёРєР°РєРёС… РґСЂСѓРіРёС… РґРµР№СЃС‚РІРёР№ Р±С‹С‚СЊ РЅРµ РґРѕР»Р¶РЅРѕ.
         loadInDE(s.de.in);
-        // Переносим HL в A
+        // РџРµСЂРµРЅРѕСЃРёРј HL РІ A
         saveRegAAndUsed();
-        out.mov(Assembler::A, Assembler::E); //! Для ускорения надо как то предусмотреть помещение в другие регистры, если они есть в canRegs
+        out.mov(Assembler::A, Assembler::E); //! Р”Р»СЏ СѓСЃРєРѕСЂРµРЅРёСЏ РЅР°РґРѕ РєР°Рє С‚Рѕ РїСЂРµРґСѓСЃРјРѕС‚СЂРµС‚СЊ РїРѕРјРµС‰РµРЅРёРµ РІ РґСЂСѓРіРёРµ СЂРµРіРёСЃС‚СЂС‹, РµСЃР»Рё РѕРЅРё РµСЃС‚СЊ РІ canRegs
         return result(regA);
       }
     }
 
-    if(nd->var->nodeType==ntConstS && (!nd->var->cast<NodeConst>()->var || !nd->var->cast<NodeConst>()->var->reg)) { //! А что если значения в каком то регистре?
-      Set<CType> s(nc->var->dataType, nc->dataType);
+    if(nd->var->nodeType==ntConstS && (!nd->var->cast<NodeConst>()->var || !nd->var->cast<NodeConst>()->var->reg)) { //! Рђ С‡С‚Рѕ РµСЃР»Рё Р·РЅР°С‡РµРЅРёСЏ РІ РєР°РєРѕРј С‚Рѕ СЂРµРіРёСЃС‚СЂРµ?
+      Set<C80Type> s(nc->var->dataType, nc->dataType);
       if(to8) {
-        // Меняем LHLD на LDA
+        // РњРµРЅСЏРµРј LHLD РЅР° LDA
         return compileVar(nc->var, regA, [&](int) {
           return result(regA);
         });
       } else {
-        // Меняем LDA на LHLD + MVI H, 0
+        // РњРµРЅСЏРµРј LDA РЅР° LHLD + MVI H, 0
         return compileVar(nc->var, regHL, [&](int) {
           out.mvi(Assembler::H, 0);
           return result(regHL);
@@ -65,13 +65,13 @@ bool compileConvert(NodeConvert* nc, int canRegs, const std::function<bool(int)>
     }
   }
 
-  // Это вычисляемое значение (не значение загруженное из памяти)
+  // Р­С‚Рѕ РІС‹С‡РёСЃР»СЏРµРјРѕРµ Р·РЅР°С‡РµРЅРёРµ (РЅРµ Р·РЅР°С‡РµРЅРёРµ Р·Р°РіСЂСѓР¶РµРЅРЅРѕРµ РёР· РїР°РјСЏС‚Рё)
   if(to16) {
-    // Считаем в любой 8 битный регистр
+    // РЎС‡РёС‚Р°РµРј РІ Р»СЋР±РѕР№ 8 Р±РёС‚РЅС‹Р№ СЂРµРіРёСЃС‚СЂ
     return compileVar(nc->var, regA|regB|regC|regD|regE|regH|regL, [&](int inReg) {
-      // Если результат лежит в допустимом регистре, сразу выходим
-      if(inReg & canRegs) return result(inReg); //! Можно вилку            
-      // Будет использован регистр HL //! В другие пары?
+      // Р•СЃР»Рё СЂРµР·СѓР»СЊС‚Р°С‚ Р»РµР¶РёС‚ РІ РґРѕРїСѓСЃС‚РёРјРѕРј СЂРµРіРёСЃС‚СЂРµ, СЃСЂР°Р·Сѓ РІС‹С…РѕРґРёРј
+      if(inReg & canRegs) return result(inReg); //! РњРѕР¶РЅРѕ РІРёР»РєСѓ            
+      // Р‘СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°РЅ СЂРµРіРёСЃС‚СЂ HL //! Р’ РґСЂСѓРіРёРµ РїР°СЂС‹?
       saveRegHLAndUsed();
       switch(inReg) {
         case regA: out.mov(Assembler::L, Assembler::A); break;
@@ -83,15 +83,15 @@ bool compileConvert(NodeConvert* nc, int canRegs, const std::function<bool(int)>
         case regL: break;
         default: raise("compileNodeConvert 1");
       }      
-      out.mvi(Assembler::H, 0); //! mvi(Assembler::H, 0) можно поменять на MOV A, R где R=0
+      out.mvi(Assembler::H, 0); //! mvi(Assembler::H, 0) РјРѕР¶РЅРѕ РїРѕРјРµРЅСЏС‚СЊ РЅР° MOV A, R РіРґРµ R=0
       return result(regHL);
     });
   } else {
-    // Считаем в любой 16 битный регистр
+    // РЎС‡РёС‚Р°РµРј РІ Р»СЋР±РѕР№ 16 Р±РёС‚РЅС‹Р№ СЂРµРіРёСЃС‚СЂ
     return compileVar(nc->var, regBC|regDE|regHL, [&](int inReg) {
-      // Если результат лежит в допустимом регистре, сразу выходим
-      if(inReg & canRegs)  return result(inReg); //! Можно вилку            
-      // Будет использован регистр A //! В другие регистры?
+      // Р•СЃР»Рё СЂРµР·СѓР»СЊС‚Р°С‚ Р»РµР¶РёС‚ РІ РґРѕРїСѓСЃС‚РёРјРѕРј СЂРµРіРёСЃС‚СЂРµ, СЃСЂР°Р·Сѓ РІС‹С…РѕРґРёРј
+      if(inReg & canRegs)  return result(inReg); //! РњРѕР¶РЅРѕ РІРёР»РєСѓ            
+      // Р‘СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°РЅ СЂРµРіРёСЃС‚СЂ A //! Р’ РґСЂСѓРіРёРµ СЂРµРіРёСЃС‚СЂС‹?
       saveRegAAndUsed();
       switch(inReg) {
         case regBC: out.mov(Assembler::A, Assembler::C); break;

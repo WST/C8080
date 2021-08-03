@@ -2,14 +2,14 @@
 #include "stackLoadSave.h"
 #include "asm.h"
 
-// Сложение 16-битных чисел
+// РЎР»РѕР¶РµРЅРёРµ 16-Р±РёС‚РЅС‹С… С‡РёСЃРµР»
 
 void add16(int size_of, bool self) {
-  // Аргументы
+  // РђСЂРіСѓРјРµРЅС‚С‹
   Stack& as = stack[stack.size()-2];
   Stack& bs = stack[stack.size()-1];
 
-  // Умножение второго аргумента
+  // РЈРјРЅРѕР¶РµРЅРёРµ РІС‚РѕСЂРѕРіРѕ Р°СЂРіСѓРјРµРЅС‚Р°
   if(size_of != 1) {
     switch(bs.place) {
       case pConst:    bs.value *= size_of; break; 
@@ -18,14 +18,14 @@ void add16(int size_of, bool self) {
     }
   }
 
-  // Сложение двух констант
+  // РЎР»РѕР¶РµРЅРёРµ РґРІСѓС… РєРѕРЅСЃС‚Р°РЅС‚
   if(as.place==pConst && bs.place==pConst) {
     as.value += bs.value;
     asm_pop();
     return;
   }
 
-  // Сложение двух констант (вычисляется компилятором)
+  // РЎР»РѕР¶РµРЅРёРµ РґРІСѓС… РєРѕРЅСЃС‚Р°РЅС‚ (РІС‹С‡РёСЃР»СЏРµС‚СЃСЏ РєРѕРјРїРёР»СЏС‚РѕСЂРѕРј)
   if((as.place==pConstStr || as.place==pConst) && (bs.place==pConstStr || bs.place==pConst)) {
     string av = as.place==pConstStr ? as.name : i2s(as.value);
     string bv = bs.place==pConstStr ? bs.name : i2s(bs.value);
@@ -35,60 +35,60 @@ void add16(int size_of, bool self) {
     return;
   }
 
-  // Константа+Переменная. Подстановка INC, DEC
+  // РљРѕРЅСЃС‚Р°РЅС‚Р°+РџРµСЂРµРјРµРЅРЅР°СЏ. РџРѕРґСЃС‚Р°РЅРѕРІРєР° INC, DEC
   if(!self && as.place==pConst && as.value>=-4 && as.value<=4) {
     int v = as.value;
-    //bc().remark("Сложение с константой "+i2s(v));
+    //bc().remark("РЎР»РѕР¶РµРЅРёРµ СЃ РєРѕРЅСЃС‚Р°РЅС‚РѕР№ "+i2s(v));
     pushHL();
-    asm_pop(); // Тут была константа
+    asm_pop(); // РўСѓС‚ Р±С‹Р»Р° РєРѕРЅСЃС‚Р°РЅС‚Р°
     for(;v<0; v++) bc().dec_hl(); for(;v>0; v--) bc().inc_hl();
     popTmpHL();
     return;
   }
 
-  // Переменная+Константа. Подстановка INC, DEC
+  // РџРµСЂРµРјРµРЅРЅР°СЏ+РљРѕРЅСЃС‚Р°РЅС‚Р°. РџРѕРґСЃС‚Р°РЅРѕРІРєР° INC, DEC
   if(bs.place==pConst && bs.value>=-4 && bs.value<=4) {
     int v = bs.value;
-    asm_pop(); // Тут была константа
+    asm_pop(); // РўСѓС‚ Р±С‹Р»Р° РєРѕРЅСЃС‚Р°РЅС‚Р°
 
-    // Оптимизация BC
+    // РћРїС‚РёРјРёР·Р°С†РёСЏ BC
     if(self && as.place==pBC) {
-      bc().remark("Сложение BC с константой "+i2s(v));
+      bc().remark("РЎР»РѕР¶РµРЅРёРµ BC СЃ РєРѕРЅСЃС‚Р°РЅС‚РѕР№ "+i2s(v));
       for(;v<0; v++) bc().dec_bc(); for(;v>0; v--) bc().inc_bc();
       return;
     }
 
-    // Копируем в HL и работаем с ним  
-    bc().remark("Сложение с константой "+i2s(v));
+    // РљРѕРїРёСЂСѓРµРј РІ HL Рё СЂР°Р±РѕС‚Р°РµРј СЃ РЅРёРј  
+    bc().remark("РЎР»РѕР¶РµРЅРёРµ СЃ РєРѕРЅСЃС‚Р°РЅС‚РѕР№ "+i2s(v));
     pushPeekHL(self);
     for(;v<0; v++) bc().dec_hl(); for(;v>0; v--) bc().inc_hl();
     popTmpPokeHL(self);
     return;
   }
 
-  // Оптимизация BC
+  // РћРїС‚РёРјРёР·Р°С†РёСЏ BC
   if(as.place == pBC) {
-    bc().remark("Сложение с BC");
+    bc().remark("РЎР»РѕР¶РµРЅРёРµ СЃ BC");
     pushHL();
-    if(!self) asm_pop(); // Если это изменение BC, то он в виртуальном стеке и останется
+    if(!self) asm_pop(); // Р•СЃР»Рё СЌС‚Рѕ РёР·РјРµРЅРµРЅРёРµ BC, С‚Рѕ РѕРЅ РІ РІРёСЂС‚СѓР°Р»СЊРЅРѕРј СЃС‚РµРєРµ Рё РѕСЃС‚Р°РЅРµС‚СЃСЏ
     bc().add_hl_bc();
-    popTmpPokeHL(self); // Поместить в BC или оставить в HL
+    popTmpPokeHL(self); // РџРѕРјРµСЃС‚РёС‚СЊ РІ BC РёР»Рё РѕСЃС‚Р°РІРёС‚СЊ РІ HL
     return;
   }
 
-  // Оптимизация BC
+  // РћРїС‚РёРјРёР·Р°С†РёСЏ BC
   if(bs.place == pBC) {
-    bc().remark("Сложение с BC");
-    asm_pop(); // В виртуальном стеке был BC
+    bc().remark("РЎР»РѕР¶РµРЅРёРµ СЃ BC");
+    asm_pop(); // Р’ РІРёСЂС‚СѓР°Р»СЊРЅРѕРј СЃС‚РµРєРµ Р±С‹Р» BC
     pushPeekHL(self);
     bc().add_hl_bc();
     popTmpPokeHL(self);
     return;
   }
 
-  // Стандартный способ
-  bc().remark("Сложение");
-  pushHLDE(/*Порядок HL DE не важен*/true, /*Стек освобождать не надо*/self);
+  // РЎС‚Р°РЅРґР°СЂС‚РЅС‹Р№ СЃРїРѕСЃРѕР±
+  bc().remark("РЎР»РѕР¶РµРЅРёРµ");
+  pushHLDE(/*РџРѕСЂСЏРґРѕРє HL DE РЅРµ РІР°Р¶РµРЅ*/true, /*РЎС‚РµРє РѕСЃРІРѕР±РѕР¶РґР°С‚СЊ РЅРµ РЅР°РґРѕ*/self);
   bc().add_hl_de();
   popTmpPokeHL(self);
 }

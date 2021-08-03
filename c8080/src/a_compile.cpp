@@ -12,14 +12,14 @@ bool asmLastCmdRetOrJmp() {
 }
 
 bool compile(Node* n, const std::function<bool()>& result) {
-  // Конец ветки или ограничение рекурсии
+  // РљРѕРЅРµС† РІРµС‚РєРё РёР»Рё РѕРіСЂР°РЅРёС‡РµРЅРёРµ СЂРµРєСѓСЂСЃРёРё
   if(n==0) {
     return result();
   };
 
   DEEPCMD
 
-  // Добавляем в файл комментарий
+  // Р”РѕР±Р°РІР»СЏРµРј РІ С„Р°Р№Р» РєРѕРјРјРµРЅС‚Р°СЂРёР№
   if(!n->remark.empty()) {
     out.remark(n->remark.c_str());
   }
@@ -31,16 +31,16 @@ bool compile(Node* n, const std::function<bool()>& result) {
       auto ni = (NodeIf*)n;
       int falseLabel = intLabels++;
       
-      // При первом проходе мы не сохраняем регистры. Елси на выходе из условия, переменные останутся в тех же реистрах, то и сохранять не надо.
+      // РџСЂРё РїРµСЂРІРѕРј РїСЂРѕС…РѕРґРµ РјС‹ РЅРµ СЃРѕС…СЂР°РЅСЏРµРј СЂРµРіРёСЃС‚СЂС‹. Р•Р»СЃРё РЅР° РІС‹С…РѕРґРµ РёР· СѓСЃР»РѕРІРёСЏ, РїРµСЂРµРјРµРЅРЅС‹Рµ РѕСЃС‚Р°РЅСѓС‚СЃСЏ РІ С‚РµС… Р¶Рµ СЂРµРёСЃС‚СЂР°С…, С‚Рѕ Рё СЃРѕС…СЂР°РЅСЏС‚СЊ РЅРµ РЅР°РґРѕ.
       return fork(2, [&](int forkNumber) {                                      
         //SaveInt si(out.incorrectFork);
         if(forkNumber==0) out.incorrectFork++;
         return compileCondOperator(falseLabel, false, ni->cond, /*dontSaveRegsBeforeJmp*/forkNumber==0, [&](){
           SaveState s1;
-          return compile(ni->t, [&]() { // Сюда можно передать флаг noExec, то есть код дальше не выполняется. И в этом случае не учитывать состояние вообще.
-            // Без ELSE
+          return compile(ni->t, [&]() { // РЎСЋРґР° РјРѕР¶РЅРѕ РїРµСЂРµРґР°С‚СЊ С„Р»Р°Рі noExec, С‚Рѕ РµСЃС‚СЊ РєРѕРґ РґР°Р»СЊС€Рµ РЅРµ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ. Р РІ СЌС‚РѕРј СЃР»СѓС‡Р°Рµ РЅРµ СѓС‡РёС‚С‹РІР°С‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РІРѕРѕР±С‰Рµ.
+            // Р‘РµР· ELSE
             if(ni->f == 0) {
-              //! Заменить прыжок через RET или CALL на RETCC или CALLCC
+              //! Р—Р°РјРµРЅРёС‚СЊ РїСЂС‹Р¶РѕРє С‡РµСЂРµР· RET РёР»Рё CALL РЅР° RETCC РёР»Рё CALLCC
               if(out.items[out.ptr-1].cmd==Assembler::cRET) {
                 auto* x = &out.items[out.ptr-2];
                 while(x->cmd==Assembler::cREMARK) x--;
@@ -53,23 +53,23 @@ bool compile(Node* n, const std::function<bool()>& result) {
                 }
               }
 
-              // Программа в условии оканчивается на RET, то есть можно учитывать лишь регистры основной ветки
+              // РџСЂРѕРіСЂР°РјРјР° РІ СѓСЃР»РѕРІРёРё РѕРєР°РЅС‡РёРІР°РµС‚СЃСЏ РЅР° RET, С‚Рѕ РµСЃС‚СЊ РјРѕР¶РЅРѕ СѓС‡РёС‚С‹РІР°С‚СЊ Р»РёС€СЊ СЂРµРіРёСЃС‚СЂС‹ РѕСЃРЅРѕРІРЅРѕР№ РІРµС‚РєРё
               //SaveInt si(out.incorrectFork);
               if(asmLastCmdRetOrJmp()) {
                 s1.restoreRegs();
-                if(forkNumber==0) out.incorrectFork--; // Получилось обьединить
+                if(forkNumber==0) out.incorrectFork--; // РџРѕР»СѓС‡РёР»РѕСЃСЊ РѕР±СЊРµРґРёРЅРёС‚СЊ
               } else {
-                // Обьединяем ветки
+                // РћР±СЊРµРґРёРЅСЏРµРј РІРµС‚РєРё
                 if(combineState_(s1.saved)) {
-                  if(forkNumber==0) out.incorrectFork--; // Получилось обьединить
+                  if(forkNumber==0) out.incorrectFork--; // РџРѕР»СѓС‡РёР»РѕСЃСЊ РѕР±СЊРµРґРёРЅРёС‚СЊ
                 } else {
-                  if(forkNumber!=0) raise("compileIf"); // Неудачная ветка                  
+                  if(forkNumber!=0) raise("compileIf"); // РќРµСѓРґР°С‡РЅР°СЏ РІРµС‚РєР°                  
                 }
               }              
               out.label2(falseLabel);              
               return compile(n->next, result);       
             }
-            // Неудачная ветка, мы не трогаем incorrectFork. //! Потом дописать!
+            // РќРµСѓРґР°С‡РЅР°СЏ РІРµС‚РєР°, РјС‹ РЅРµ С‚СЂРѕРіР°РµРј incorrectFork. //! РџРѕС‚РѕРј РґРѕРїРёСЃР°С‚СЊ!
 
             // C ELSE
             int elseLabel = intLabels++;      
@@ -77,7 +77,7 @@ bool compile(Node* n, const std::function<bool()>& result) {
             out.jmpl(elseLabel);
             out.label2(falseLabel);
             return compile(ni->f, [&]() {
-              saveRegs(); //! Надо бы восстановить состояние при входе сюда
+              saveRegs(); //! РќР°РґРѕ Р±С‹ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ РїСЂРё РІС…РѕРґРµ СЃСЋРґР°
               out.label1(elseLabel);
               return compile(n->next, result);
             });          
@@ -92,7 +92,7 @@ bool compile(Node* n, const std::function<bool()>& result) {
 	        return compileVar(((NodeReturn*)n)->var, regA, [&](int){
             saveGlobalRegs();
             if(retWithBC) out.pop(Assembler::BC);
-            out.ret(); //! Пропустить код до первой метки
+            out.ret(); //! РџСЂРѕРїСѓСЃС‚РёС‚СЊ РєРѕРґ РґРѕ РїРµСЂРІРѕР№ РјРµС‚РєРё
             return compile(n->next, result);
           });
         }
@@ -100,7 +100,7 @@ bool compile(Node* n, const std::function<bool()>& result) {
 	        return compileVar(((NodeReturn*)n)->var, regHL, [&](int){
             saveGlobalRegs();
             if(retWithBC) out.pop(Assembler::BC);
-            out.ret(); //! Пропустить код до первой метки
+            out.ret(); //! РџСЂРѕРїСѓСЃС‚РёС‚СЊ РєРѕРґ РґРѕ РїРµСЂРІРѕР№ РјРµС‚РєРё
             return compile(n->next, result);
           });
         }
@@ -108,7 +108,7 @@ bool compile(Node* n, const std::function<bool()>& result) {
       }
       saveGlobalRegs();
       if(retWithBC) out.pop(Assembler::BC);
-      out.ret(); //! Пропустить код до первой метки      
+      out.ret(); //! РџСЂРѕРїСѓСЃС‚РёС‚СЊ РєРѕРґ РґРѕ РїРµСЂРІРѕР№ РјРµС‚РєРё      
       return compile(n->next, result);      
     }
     case ntLabel: {
@@ -118,51 +118,51 @@ bool compile(Node* n, const std::function<bool()>& result) {
     }
     case ntJmp: {
       auto nj = (NodeJmp*)n;
-      // Поиск конечной точки перехода
+      // РџРѕРёСЃРє РєРѕРЅРµС‡РЅРѕР№ С‚РѕС‡РєРё РїРµСЂРµС…РѕРґР°
       auto l = nj->label;
       if(nj->cond) {
         assert(l);
-        while(l->next && l->next->nodeType == ntJmp) { // Может быть еще rz, rnz и т.п.
+        while(l->next && l->next->nodeType == ntJmp) { // РњРѕР¶РµС‚ Р±С‹С‚СЊ РµС‰Рµ rz, rnz Рё С‚.Рї.
           if(l == ((NodeJmp*)l->next)->label)
             break;
           l = ((NodeJmp*)l->next)->label;
         }
       }
       int ln = l->cast<NodeLabel>()->n;
-      // Сохранение всех регистров перед переходом
+      // РЎРѕС…СЂР°РЅРµРЅРёРµ РІСЃРµС… СЂРµРіРёСЃС‚СЂРѕРІ РїРµСЂРµРґ РїРµСЂРµС…РѕРґРѕРј
       saveRegs(-1, true);
-      // Беусловный переход
+      // Р‘РµСѓСЃР»РѕРІРЅС‹Р№ РїРµСЂРµС…РѕРґ
       if(nj->cond == 0) {
         out.jmpl(ln);
-        // Пропускаем всё, что не может выполниться
+        // РџСЂРѕРїСѓСЃРєР°РµРј РІСЃС‘, С‡С‚Рѕ РЅРµ РјРѕР¶РµС‚ РІС‹РїРѕР»РЅРёС‚СЊСЃСЏ
         n = n->next;
         while(n && n->nodeType!=ntLabel) n=n->next; 
-        // Продолжение программы
+        // РџСЂРѕРґРѕР»Р¶РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
         return compile(n, result);        
       } 
-      // Компилируем условие
+      // РљРѕРјРїРёР»РёСЂСѓРµРј СѓСЃР»РѕРІРёРµ
       return compileCondOperator(ln, !nj->ifZero, nj->cond, false, [&](){
-        // Продолжение программы
+        // РџСЂРѕРґРѕР»Р¶РµРЅРёРµ РїСЂРѕРіСЂР°РјРјС‹
         return compile(n->next, result);
       });
     }
     case ntSwitch: {
       auto ns = (NodeSwitch*)n;
-      return compileVar(ns->var, regA, [&](int){ //! Если значения идут подряд, то можно и остальные регистры
+      return compileVar(ns->var, regA, [&](int){ //! Р•СЃР»Рё Р·РЅР°С‡РµРЅРёСЏ РёРґСѓС‚ РїРѕРґСЂСЏРґ, С‚Рѕ РјРѕР¶РЅРѕ Рё РѕСЃС‚Р°Р»СЊРЅС‹Рµ СЂРµРіРёСЃС‚СЂС‹
         saveRegs();
         s.a.used = true;        
         assert(ns->var->dataType.is8());
         int initValue = 0;
-        //! Двоичный поиск как вараинт
-        //! JMP-таблица как вараинт
+        //! Р”РІРѕРёС‡РЅС‹Р№ РїРѕРёСЃРє РєР°Рє РІР°СЂР°РёРЅС‚
+        //! JMP-С‚Р°Р±Р»РёС†Р° РєР°Рє РІР°СЂР°РёРЅС‚
         for(auto i=ns->cases.begin(); i!=ns->cases.end(); ++i) {
-          if(i->first >= 256) break; //! Вывести предупреждение
+          if(i->first >= 256) break; //! Р’С‹РІРµСЃС‚Рё РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ
           int d = i->first - initValue;
           if(d == 0) {
             if(!zFlagForA()) out.alu(Assembler::OR, Assembler::A);
           } else
           if(d == 1) {
-            out.dcr(Assembler::A); //! case уже есть!
+            out.dcr(Assembler::A); //! case СѓР¶Рµ РµСЃС‚СЊ!
           } else {
             out.alui(Assembler::SUB, i->first - initValue);
           }

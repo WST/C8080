@@ -1,6 +1,6 @@
 #pragma once
 
-#include <finlib/strings.h>
+#include <finlib/string.h>
 #include <finlib/exception.h>
 #include <map>
 #include "c80type.h"
@@ -86,7 +86,7 @@ public:
   void setDefault(Node* label) { defaultLabel = label; }
 
   void addCase(int value, Node* label) { 
-    if(cases.find(value) != cases.end()) raise("case ˜˜˜ ˜˜˜");
+    if(cases.find(value) != cases.end()) raise("case ÑƒÐ¶Ðµ Ð±Ñ‹Ð»");
     cases[value] = label;
   }
 };
@@ -135,7 +135,7 @@ public:
       //f->dataType.addr--;
       f->name = _name;
     } else {
-      //! ˜˜ ˜˜˜˜˜˜˜˜! assert(f->dataType.baseType == dataType.baseType && f->dataType.addr == dataType.addr);
+      //! Ð½Ðµ Ð¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ñ‚! assert(f->dataType.baseType == dataType.baseType && f->dataType.addr == dataType.addr);
     }
     var = f;
   }
@@ -190,7 +190,7 @@ public:
     nodeType = ntDeaddr;
     var = _var; 
     if(var->dataType.addr==0) 
-      raise("˜˜˜˜˜˜˜˜ ˜˜˜˜˜˜ ˜˜˜˜ ˜˜˜˜˜˜˜˜˜˜");
+      raise("ÐÑ€Ð³ÑƒÐ¼ÐµÐ½Ñ‚ Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±Ñ‹Ñ‚ÑŒ ÑƒÐºÐ°Ð·Ð°Ñ‚ÐµÐ»ÐµÐ¼");
     dataType = var->dataType;
     dataType.addr--;
   } 
@@ -224,7 +224,7 @@ public:
     label = _label; 
     ifZero = _ifZero; 
 
-    // ˜˜˜˜˜˜˜˜˜˜˜ while(const) ˜ ˜˜˜˜˜˜˜˜
+    // ÐžÐ¿Ñ‚Ð¸Ð¼Ð¸Ð·Ð°Ñ†Ð¸Ñ while(const) Ð¸ Ð¿Ð¾Ð´Ð¾Ð±Ð½Ñ‹Ñ…
     if(_cond && _cond->nodeType == ntConstI) {
       auto nc = _cond->cast<NodeConst>();
       bool check = nc->value != 0;

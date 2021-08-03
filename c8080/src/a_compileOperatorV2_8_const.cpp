@@ -4,39 +4,39 @@
 
 bool compileOperatorV2_8_const(NodeOperator* o, bool swap, NodeConst* bc, const std::function<bool(bool, int)>& result) {  
   switch(o->o) {
-    case oE: case oNE: // Сравнение с нулем, результат в флагах
+    case oE: case oNE: // РЎСЂР°РІРЅРµРЅРёРµ СЃ РЅСѓР»РµРј, СЂРµР·СѓР»СЊС‚Р°С‚ РІ С„Р»Р°РіР°С…
 
-      // Если надо сравнить с нулем 
+      // Р•СЃР»Рё РЅР°РґРѕ СЃСЂР°РІРЅРёС‚СЊ СЃ РЅСѓР»РµРј 
       if(bc->nodeType==ntConstI && (bc->value&0xFF) == 0) {
-        // Если прошлая команда изменила флаг в соответстсвии с A, то OR A не добавляем
+        // Р•СЃР»Рё РїСЂРѕС€Р»Р°СЏ РєРѕРјР°РЅРґР° РёР·РјРµРЅРёР»Р° С„Р»Р°Рі РІ СЃРѕРѕС‚РІРµС‚СЃС‚СЃРІРёРё СЃ A, С‚Рѕ OR A РЅРµ РґРѕР±Р°РІР»СЏРµРј
         if(!zFlagForA()) out.alu(Assembler::OR, Assembler::A);
         return result(swap, 0);      
       }     
 
-      // Если надо сравнить с единицей. //! Портить регистр A может быть не выгодно
+      // Р•СЃР»Рё РЅР°РґРѕ СЃСЂР°РІРЅРёС‚СЊ СЃ РµРґРёРЅРёС†РµР№. //! РџРѕСЂС‚РёС‚СЊ СЂРµРіРёСЃС‚СЂ A РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµ РІС‹РіРѕРґРЅРѕ
       if(bc->nodeType==ntConstI && (bc->value&0xFF) == 1) {
         saveRegAAndUsed();
-        out.dcr(Assembler::A); //! Надо оформить как вилку!
+        out.dcr(Assembler::A); //! РќР°РґРѕ РѕС„РѕСЂРјРёС‚СЊ РєР°Рє РІРёР»РєСѓ!
         return result(swap, 0);      
       }     
 
-      // Если надо сравнить с нулем. //! Портить регистр A может быть не выгодно
+      // Р•СЃР»Рё РЅР°РґРѕ СЃСЂР°РІРЅРёС‚СЊ СЃ РЅСѓР»РµРј. //! РџРѕСЂС‚РёС‚СЊ СЂРµРіРёСЃС‚СЂ A РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµ РІС‹РіРѕРґРЅРѕ
       if(bc->nodeType==ntConstI && (bc->value&0xFF) == 255) {
         saveRegAAndUsed();
-        out.inr(Assembler::A); //! Надо оформить как вилку!
+        out.inr(Assembler::A); //! РќР°РґРѕ РѕС„РѕСЂРјРёС‚СЊ РєР°Рє РІРёР»РєСѓ!
         return result(swap, 0);      
       }     
 
-      // Продолжаем c командой CPIn
+      // РџСЂРѕРґРѕР»Р¶Р°РµРј c РєРѕРјР°РЅРґРѕР№ CPIn
     case oGE: case oLE: case oG: case oL:
       out.alui(Assembler::CMP, bc);
       return result(!swap, 0);
     case oXor: { saveRegAAndUsed(); out.alui(Assembler::XOR, bc); return result(swap, regA); }
     case oAnd: { saveRegAAndUsed(); out.alui(Assembler::AND, bc); return result(swap, regA); }
     case oOr:  { saveRegAAndUsed(); out.alui(Assembler::OR,  bc); return result(swap, regA); }
-    // oSub не используется, так как заменяется на oAdd        
+    // oSub РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ, С‚Р°Рє РєР°Рє Р·Р°РјРµРЅСЏРµС‚СЃСЏ РЅР° oAdd        
     case oSub:
-      raise("Не должно быть SUB!");
+      raise("РќРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ SUB!");
     case oAdd: { 
       saveRegAAndUsed();
       if(bc->nodeType==ntConstI && (bc->value & 0xFF)==1) out.inr(Assembler::A); 
@@ -60,7 +60,7 @@ bool compileOperatorV2_8_const(NodeOperator* o, bool swap, NodeConst* bc, const 
       out.alui(Assembler::AND, mask);
       return result(false, regA); 
     }
-    //! Добавить деление на 1,2,4,8,16,32,64,128
+    //! Р”РѕР±Р°РІРёС‚СЊ РґРµР»РµРЅРёРµ РЅР° 1,2,4,8,16,32,64,128
     case oMul: {
       if(((unsigned char)bc->value) > 1) {
         saveRegAAndUsed();
@@ -72,9 +72,9 @@ bool compileOperatorV2_8_const(NodeOperator* o, bool swap, NodeConst* bc, const 
           if(*m++ = (d & 1))
             needSaveD = true;
 
-        // Нужен D
+        // РќСѓР¶РµРЅ D
         if(needSaveD) {
-          saveRegDEAndUsed(); // Как вариант, можно и в стек. А можно пометить, что A теперь в D!
+          saveRegDEAndUsed(); // РљР°Рє РІР°СЂРёР°РЅС‚, РјРѕР¶РЅРѕ Рё РІ СЃС‚РµРє. Рђ РјРѕР¶РЅРѕ РїРѕРјРµС‚РёС‚СЊ, С‡С‚Рѕ A С‚РµРїРµСЂСЊ РІ D!
           out.mov(Assembler::D, Assembler::A);
         }
 
@@ -89,8 +89,8 @@ bool compileOperatorV2_8_const(NodeOperator* o, bool swap, NodeConst* bc, const 
     }
   }
 
-  // Поместить константу сразу в D или DE.
-  //! Попробовать еще в B,C,D,E,H,L
+  // РџРѕРјРµСЃС‚РёС‚СЊ РєРѕРЅСЃС‚Р°РЅС‚Сѓ СЃСЂР°Р·Сѓ РІ D РёР»Рё DE.
+  //! РџРѕРїСЂРѕР±РѕРІР°С‚СЊ РµС‰Рµ РІ B,C,D,E,H,L
   return loadInDE(bc, false, [&](){
     return compileOperator2_8(o, !swap, Assembler::D, result);
   });

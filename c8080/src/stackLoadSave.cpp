@@ -8,7 +8,7 @@ void peekA() {
   if(bs.place==pA) return;
 
   //if(lastA!=-1) 
-    //raise("Ошибка, рекурсия стека");
+    //raise("РћС€РёР±РєР°, СЂРµРєСѓСЂСЃРёСЏ СЃС‚РµРєР°");
 
   useA();
 
@@ -64,7 +64,7 @@ void chkHL() {
   if(lastHL!=-1) raise("chkHL");
 }
 
-// Изменить байт в виртуальном стеке
+// РР·РјРµРЅРёС‚СЊ Р±Р°Р№С‚ РІ РІРёСЂС‚СѓР°Р»СЊРЅРѕРј СЃС‚РµРєРµ
 void pokeA() {
   Stack& bs = stack[stack.size()-1];
   switch(bs.place) {
@@ -81,8 +81,8 @@ void pokeA() {
   }
 }
 
-// Загрузить адрес байта из виртуального стека в регистр HL
-// Регистр HL не сохраняется.
+// Р—Р°РіСЂСѓР·РёС‚СЊ Р°РґСЂРµСЃ Р±Р°Р№С‚Р° РёР· РІРёСЂС‚СѓР°Р»СЊРЅРѕРіРѕ СЃС‚РµРєР° РІ СЂРµРіРёСЃС‚СЂ HL
+// Р РµРіРёСЃС‚СЂ HL РЅРµ СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ.
 void peekAasHL_() {
   Stack& bs = stack[stack.size()-1];
   switch(bs.place) {
@@ -100,8 +100,8 @@ void pushAasHL_(/*bool de*/) {
   asm_pop();
 }
 
-// Загрузить слово из виртуального стека в регистр HL или DE. 
-// Регистры A, HL не сохраняются.
+// Р—Р°РіСЂСѓР·РёС‚СЊ СЃР»РѕРІРѕ РёР· РІРёСЂС‚СѓР°Р»СЊРЅРѕРіРѕ СЃС‚РµРєР° РІ СЂРµРіРёСЃС‚СЂ HL РёР»Рё DE. 
+// Р РµРіРёСЃС‚СЂС‹ A, HL РЅРµ СЃРѕС…СЂР°РЅСЏСЋС‚СЃСЏ.
 void peekHL(bool saveDE) {
   Stack& bs = stack[stack.size()-1];
 
@@ -172,7 +172,7 @@ void peekBC() {
   }
 }
 
-// Загрузить слово из виртуального стека в регистр DE. 
+// Р—Р°РіСЂСѓР·РёС‚СЊ СЃР»РѕРІРѕ РёР· РІРёСЂС‚СѓР°Р»СЊРЅРѕРіРѕ СЃС‚РµРєР° РІ СЂРµРіРёСЃС‚СЂ DE. 
 void peekDE(bool canSwap, bool saveHL) {
   if(!saveHL && canSwap) raise("peedDE saveHL");
 
@@ -221,20 +221,20 @@ void pushDE(bool canSwap, bool saveHL) {
   asm_pop();
 }
 
-// Сначала DE, потом HL
+// РЎРЅР°С‡Р°Р»Р° DE, РїРѕС‚РѕРј HL
 bool pushHLDE(bool canSwap, bool self) {
-  // Второй аргумент
+  // Р’С‚РѕСЂРѕР№ Р°СЂРіСѓРјРµРЅС‚
   Place p = stack[stack.size()-2].place;
 
-  // Оптимизация последовательности lxi h + xchg + lhld
+  // РћРїС‚РёРјРёР·Р°С†РёСЏ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё lxi h + xchg + lhld
   if(canSwap && (p==pConst || p==pStack8 || p==pStack16 || p==pConstStr || p==pBC)) {
     pushHL();
     peekDE(/*canSwap=*/true, /*saveHL=*/true); if(!self) asm_pop();
     return true;
   }
 
-  // Если команда загрузки DE оканчивается кодом XCHG, то выгоднее DE поместить в стек последним.
-  // DE выгоднее класть в стек последним, так как для загрузки HL освобождается регистр DE.
+  // Р•СЃР»Рё РєРѕРјР°РЅРґР° Р·Р°РіСЂСѓР·РєРё DE РѕРєР°РЅС‡РёРІР°РµС‚СЃСЏ РєРѕРґРѕРј XCHG, С‚Рѕ РІС‹РіРѕРґРЅРµРµ DE РїРѕРјРµСЃС‚РёС‚СЊ РІ СЃС‚РµРє РїРѕСЃР»РµРґРЅРёРј.
+  // DE РІС‹РіРѕРґРЅРµРµ РєР»Р°СЃС‚СЊ РІ СЃС‚РµРє РїРѕСЃР»РµРґРЅРёРј, С‚Р°Рє РєР°Рє РґР»СЏ Р·Р°РіСЂСѓР·РєРё HL РѕСЃРІРѕР±РѕР¶РґР°РµС‚СЃСЏ СЂРµРіРёСЃС‚СЂ DE.
   if(!self && canSwap && lastHL!=stack.size()-1 && lastA!=stack.size()-1) {
     Stack x = stack.back(); stack.pop_back();
     peekHL(/*saveDE=*/false); if(!self) asm_pop();
@@ -243,7 +243,7 @@ bool pushHLDE(bool canSwap, bool self) {
     return true;
   }
 
-  // peekDE поместит значение HL в DE. Или оставит на месте.
+  // peekDE РїРѕРјРµСЃС‚РёС‚ Р·РЅР°С‡РµРЅРёРµ HL РІ DE. РР»Рё РѕСЃС‚Р°РІРёС‚ РЅР° РјРµСЃС‚Рµ.
   if(p==pHL && !self && canSwap) {
     peekDE(/*canSwap=*/true, /*saveHL=*/true); asm_pop();
     asm_pop();
@@ -255,7 +255,7 @@ bool pushHLDE(bool canSwap, bool self) {
   return false;
 }
 
-// Сохранить регистр HL в указанное место
+// РЎРѕС…СЂР°РЅРёС‚СЊ СЂРµРіРёСЃС‚СЂ HL РІ СѓРєР°Р·Р°РЅРЅРѕРµ РјРµСЃС‚Рѕ
 
 void pokeHL() {
   Stack& bs = stack[stack.size()-1];
@@ -264,9 +264,9 @@ void pokeHL() {
     case pConstRef16:       bc().ld_ref_hl(bs.value); break;
     case pConstStrRef16:    bc().ld_ref_hl(bs.name); break;
     case pConstStrRefRef16: bc().ex_hl_de().ld_hl_ref(bs.name).ld_HL_d().inc_hl().ld_HL_e(); break;
-    case pStackRef16:       bc().pop_de().ex_hl_de().ld_HL_d().inc_hl().ld_HL_e().dec_hl(); bs.place = pHLRef16; break; //+ //! Убрать последнюю, если это POKE
-    case pHLRef16:          bc().ld_de_hl().ld_HL_d().inc_hl().ld_HL_e().dec_hl(); break; //! Очень странная команда
-    case pStack8:           p.syntaxError("Нельзя записывать в 8 битную переменную");
+    case pStackRef16:       bc().pop_de().ex_hl_de().ld_HL_d().inc_hl().ld_HL_e().dec_hl(); bs.place = pHLRef16; break; //+ //! РЈР±СЂР°С‚СЊ РїРѕСЃР»РµРґРЅСЋСЋ, РµСЃР»Рё СЌС‚Рѕ POKE
+    case pHLRef16:          bc().ld_de_hl().ld_HL_d().inc_hl().ld_HL_e().dec_hl(); break; //! РћС‡РµРЅСЊ СЃС‚СЂР°РЅРЅР°СЏ РєРѕРјР°РЅРґР°
+    case pStack8:           p.syntaxError("РќРµР»СЊР·СЏ Р·Р°РїРёСЃС‹РІР°С‚СЊ РІ 8 Р±РёС‚РЅСѓСЋ РїРµСЂРµРјРµРЅРЅСѓСЋ");
     default:                raise("pokeHL "+i2s(bs.place));
   }
 }
@@ -284,7 +284,7 @@ bool pokeHL_checkDE() {
   }
 }
 
-// Вызывается, когда нужен регистр HL
+// Р’С‹Р·С‹РІР°РµС‚СЃСЏ, РєРѕРіРґР° РЅСѓР¶РµРЅ СЂРµРіРёСЃС‚СЂ HL
 void useA() {
   if(lastA==-1) return;
   if(lastHL!=-1 && lastHL<lastA)
@@ -294,7 +294,7 @@ void useA() {
   lastA = -1;
 }
 
-// Вызывается, когда нужен регистр HL
+// Р’С‹Р·С‹РІР°РµС‚СЃСЏ, РєРѕРіРґР° РЅСѓР¶РµРЅ СЂРµРіРёСЃС‚СЂ HL
 void useHL() {
   if(lastHL==-1) return;
   if(lastA!=-1 && lastA<lastHL)

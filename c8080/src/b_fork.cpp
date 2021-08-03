@@ -47,7 +47,7 @@ bool fork(int n, const std::function<bool(int)>& variant) {
 
     if(variant(bi)) return true;
 
-    // Ìû ìîãëè íå äîáðàòüñÿ äî îáðûâà!    
+    // ÐœÑ‹ Ð¼Ð¾Ð³Ð»Ð¸ Ð½Ðµ Ð´Ð¾Ð±Ñ€Ð°Ñ‚ÑŒÑÑ Ð´Ð¾ Ð¾Ð±Ñ€Ñ‹Ð²Ð°!    
 /*    for(int i=n-1; i>=0; i--) {
       ss.restore();
       if(variant(i))

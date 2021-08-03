@@ -3,11 +3,11 @@
 #include "asm.h"
 
 void set16() {
-  // Аргументы
+  // РђСЂРіСѓРјРµРЅС‚С‹
   Stack& as = stack[stack.size()-2];
   Stack& bs = stack[stack.size()-1];
 
-  // Если as==pHLRef16, то лучше pushHL не использовать
+  // Р•СЃР»Рё as==pHLRef16, С‚Рѕ Р»СѓС‡С€Рµ pushHL РЅРµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ
 
   if(as.place==pHLRef16 && bs.place==pBC) { 
     bc().ld_HL_c().inc_hl().ld_HL_b().dec_hl(); 
@@ -16,7 +16,7 @@ void set16() {
   }
 
   switch(as.place) {
-    case pBC: pushBC(); return; // ld_bc_hl  //! Разобратся
+    case pBC: pushBC(); return; // ld_bc_hl  //! Р Р°Р·РѕР±СЂР°С‚СЃСЏ
     default: pushHL(); pokeHL(); return;
   }
 }

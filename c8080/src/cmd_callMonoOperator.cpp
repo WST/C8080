@@ -2,10 +2,10 @@
 #include "stackLoadSave.h"
 #include "asm.h"
 
-void doDeaddr(CType type);
+void doDeaddr(C80Type type);
 
-// Выполнить монооператор
-void asm_callMonoOperator(MonoOperator mo, CType& type) {
+// Р’С‹РїРѕР»РЅРёС‚СЊ РјРѕРЅРѕРѕРїРµСЂР°С‚РѕСЂ
+void asm_callMonoOperator(MonoOperator mo, C80Type& type) {
   Stack& s = stack.back();
 
   if(mo==moDeaddr && type.addr>0) {    
@@ -65,7 +65,7 @@ void asm_callMonoOperator(MonoOperator mo, CType& type) {
     if(type.isStackType()) {
       useA();
       if(s.place==pBC) {
-        useHL(); //! Надо ли?
+        useHL(); //! РќР°РґРѕ Р»Рё?
         asm_pop();
         bc().ld_a_c().cpl().ld_l_a().ld_a_b().cpl().ld_h_a();
         popTmpHL();
@@ -92,7 +92,7 @@ void asm_callMonoOperator(MonoOperator mo, CType& type) {
   raise("asm_callMonoOperator");
 }
 
-void asm_struct(int offset, CType& type, CType& toType) {
+void asm_struct(int offset, C80Type& type, C80Type& toType) {
 /*  if(stack.last()->place==pConstStr||stack.last()->place==pConst) {
     asm_pushInteger(offset);
     add16(1, false);
@@ -108,8 +108,8 @@ void asm_struct(int offset, CType& type, CType& toType) {
     doDeaddr(toType);
 }
 
-void asm_index(CType idxType, CType& arrType) {
-  if(arrType.addr==0) raise("Оператор [] можно пременять только к указателю или массиву"); 
+void asm_index(C80Type idxType, C80Type& arrType) {
+  if(arrType.addr==0) raise("РћРїРµСЂР°С‚РѕСЂ [] РјРѕР¶РЅРѕ РїСЂРµРјРµРЅСЏС‚СЊ С‚РѕР»СЊРєРѕ Рє СѓРєР°Р·Р°С‚РµР»СЋ РёР»Рё РјР°СЃСЃРёРІСѓ"); 
   if(idxType.addr!=0) raise("asm_index"); 
   if(idxType.baseType==cbtChar || idxType.baseType==cbtUChar) asm_convert(0, idxType, cbtUShort); 
 
@@ -142,7 +142,7 @@ void asm_index(CType idxType, CType& arrType) {
   arrType.addr--;
   //if(arrType.arr==0) doDeaddr(arrType);
 
-  // Мы должны изменять элекмент массива, а не адрес массива
+  // РњС‹ РґРѕР»Р¶РЅС‹ РёР·РјРµРЅСЏС‚СЊ СЌР»РµРєРјРµРЅС‚ РјР°СЃСЃРёРІР°, Р° РЅРµ Р°РґСЂРµСЃ РјР°СЃСЃРёРІР°
   doDeaddr(arrType); 
 
   //arrType.arr = 0;
@@ -159,14 +159,14 @@ void doAddr() {
     case pHLRef16:       case pHLRef8:       s.place = pHL; break;
     case pBCRef16:       case pBCRef8:       s.place = pBC; break;
  
-    case pA: case pHL: case pStack8: case pStack16: p.logicError_("Нельзя получить адрес временного значения"); break;
-    case pB: case pC: case pBC: p.logicError_("Нельзя получить адрес регистровой переменной"); break;
-    case pConstStr: case pConst: p.logicError_("Нельзя получить адрес константы"); break;
+    case pA: case pHL: case pStack8: case pStack16: p.logicError_("РќРµР»СЊР·СЏ РїРѕР»СѓС‡РёС‚СЊ Р°РґСЂРµСЃ РІСЂРµРјРµРЅРЅРѕРіРѕ Р·РЅР°С‡РµРЅРёСЏ"); break;
+    case pB: case pC: case pBC: p.logicError_("РќРµР»СЊР·СЏ РїРѕР»СѓС‡РёС‚СЊ Р°РґСЂРµСЃ СЂРµРіРёСЃС‚СЂРѕРІРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№"); break;
+    case pConstStr: case pConst: p.logicError_("РќРµР»СЊР·СЏ РїРѕР»СѓС‡РёС‚СЊ Р°РґСЂРµСЃ РєРѕРЅСЃС‚Р°РЅС‚С‹"); break;
     default: raise("asm_callMonoOperator moFddr");
   }
 }
 
-void doDeaddr(CType type) {
+void doDeaddr(C80Type type) {
   Stack& s = stack.back();
   switch(s.place) {
     case pConstStrRef16: s.place = type.is8() ? pConstStrRefRef8 : pConstStrRefRef16; break;
@@ -175,7 +175,7 @@ void doDeaddr(CType type) {
     case pBC:            s.place = type.is8() ? pBCRef8          : pBCRef16;          break;
     case pHL:            s.place = type.is8() ? pHLRef8          : pHLRef16;          break;
 
-    // Требуется программа
+    // РўСЂРµР±СѓРµС‚СЃСЏ РїСЂРѕРіСЂР°РјРјР°
     case pHLRef16:  
     case pBCRef16: 
     case pConstRef16:
@@ -188,10 +188,9 @@ void doDeaddr(CType type) {
     case pConstRef8:
     case pConstStrRef8:
     case pConstStrRefRef8:
-      p.logicError_("8 битная переменная не может выступать в качестве адреса");
+      p.logicError_("8 Р±РёС‚РЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ РЅРµ РјРѕР¶РµС‚ РІС‹СЃС‚СѓРїР°С‚СЊ РІ РєР°С‡РµСЃС‚РІРµ Р°РґСЂРµСЃР°");
 
     default: raise("asm_callMonoOperator moDeaddr "+i2s(s.place));
-    // Адрес не может быть в pVar8, pA, pB, pC, 
+    // РђРґСЂРµСЃ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІ pVar8, pA, pB, pC, 
   }
 }
-

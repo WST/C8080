@@ -7,13 +7,13 @@ bool loadInA(NodeVariable* var) {
     return false;
   }
 
-  //! Сначала сохраняем нашу переменную
+  //! РЎРЅР°С‡Р°Р»Р° СЃРѕС…СЂР°РЅСЏРµРј РЅР°С€Сѓ РїРµСЂРµРјРµРЅРЅСѓСЋ
   if(var == s.hl.in) saveRegHLAndUsed();
   
-  // Затем освобождаем A
+  // Р—Р°С‚РµРј РѕСЃРІРѕР±РѕР¶РґР°РµРј A
   saveRegAAndUsed();
 
-  // Закрепляем регистр за переменной  
+  // Р—Р°РєСЂРµРїР»СЏРµРј СЂРµРіРёСЃС‚СЂ Р·Р° РїРµСЂРµРјРµРЅРЅРѕР№  
   s.a.in= var;
   s.a.const_ = false;
   s.a.changed = false;
@@ -22,24 +22,24 @@ bool loadInA(NodeVariable* var) {
 
 void loadInAreal(NodeVariable* var) {
   if(loadInA(var)) {
-    if(var->reg) out.mov(Assembler::A, toAsmReg8(var->reg)); //! Можно загружать не в A, а в B,C,D,E,H,L
-            else out.lda(var->name.c_str());//! Можно загружать не в A, а в B,C,D,E,H,L
+    if(var->reg) out.mov(Assembler::A, toAsmReg8(var->reg)); //! РњРѕР¶РЅРѕ Р·Р°РіСЂСѓР¶Р°С‚СЊ РЅРµ РІ A, Р° РІ B,C,D,E,H,L
+            else out.lda(var->name.c_str());//! РњРѕР¶РЅРѕ Р·Р°РіСЂСѓР¶Р°С‚СЊ РЅРµ РІ A, Р° РІ B,C,D,E,H,L
   }
   s.a.used = true;
 }
 
 bool loadInHL(NodeVariable* var) {
   if(s.hl.in == var) { 
-    // тут s.hl.tmp == 0;   
+    // С‚СѓС‚ s.hl.tmp == 0;   
     normalizeDeltaHL();
     return false; 
   }  
-  // Сначала сохраняем наш регистр
+  // РЎРЅР°С‡Р°Р»Р° СЃРѕС…СЂР°РЅСЏРµРј РЅР°С€ СЂРµРіРёСЃС‚СЂ
   if(var == s.a.in) saveRegs(regA);
   if(var == s.de.in) saveRegs(regDE);
-  // Затем освобождаем HL
+  // Р—Р°С‚РµРј РѕСЃРІРѕР±РѕР¶РґР°РµРј HL
   saveRegHLAndUsed();
-  // Закрепляем регистр за переменной
+  // Р—Р°РєСЂРµРїР»СЏРµРј СЂРµРіРёСЃС‚СЂ Р·Р° РїРµСЂРµРјРµРЅРЅРѕР№
   s.hl.in = var;
   s.hl.tmp = 0;
   s.hl.delta = 0;
@@ -66,12 +66,12 @@ bool loadInDE(NodeVariable* var) {
     normalizeDeltaDE();
     return false; 
   }  
-  // Сначала сохраняем нашу переменную, если она лежит в других регистрах.  //! А может просто её XCHG минуя память???
+  // РЎРЅР°С‡Р°Р»Р° СЃРѕС…СЂР°РЅСЏРµРј РЅР°С€Сѓ РїРµСЂРµРјРµРЅРЅСѓСЋ, РµСЃР»Рё РѕРЅР° Р»РµР¶РёС‚ РІ РґСЂСѓРіРёС… СЂРµРіРёСЃС‚СЂР°С….  //! Рђ РјРѕР¶РµС‚ РїСЂРѕСЃС‚Рѕ РµС‘ XCHG РјРёРЅСѓСЏ РїР°РјСЏС‚СЊ???
   if(var == s.a.in  ) saveRegAAndUsed();
   if(var == s.hl.in ) saveRegHLAndUsed();
-  // Затем освобождаем DE
+  // Р—Р°С‚РµРј РѕСЃРІРѕР±РѕР¶РґР°РµРј DE
   saveRegDEAndUsed();
-  // Закрепляем регистр за переменной
+  // Р—Р°РєСЂРµРїР»СЏРµРј СЂРµРіРёСЃС‚СЂ Р·Р° РїРµСЂРµРјРµРЅРЅРѕР№
   s.de.in = var;
   s.de.delta = 0;
   s.de.changed = false;  

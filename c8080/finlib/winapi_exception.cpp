@@ -1,12 +1,12 @@
-// Открытая, бесплатная, ASIS версия библиотеки VinLib. В процессе написания
-// (с) 5-12-2011 vinxru
+// РћС‚РєСЂС‹С‚Р°СЏ, Р±РµСЃРїР»Р°С‚РЅР°СЏ, ASIS РІРµСЂСЃРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё VinLib. Р’ РїСЂРѕС†РµСЃСЃРµ РЅР°РїРёСЃР°РЅРёСЏ
+// (СЃ) 5-12-2011 vinxru
 
 #include <stdafx.h>
 #include "finlib/winapi_exception.h"
 #include "finlib/exception.h"
 #include <windows.h>
 
-// Получение текста ошибки Windows 
+// РџРѕР»СѓС‡РµРЅРёРµ С‚РµРєСЃС‚Р° РѕС€РёР±РєРё Windows 
 void getOsErrorMessage(const char* prefix, string& error) {
   if(prefix || prefix[0]!=0) error=prefix, error+=": ";
                         else error = "";
@@ -20,24 +20,24 @@ void getOsErrorMessage(const char* prefix, string& error) {
       return;
     }
   }
-  error += "Неизвестная ошибка";
+  error += "РќРµРёР·РІРµСЃС‚РЅР°СЏ РѕС€РёР±РєР°";
 }
 
-// Генерация исключения с добавлением текста ошибки Windows
+// Р“РµРЅРµСЂР°С†РёСЏ РёСЃРєР»СЋС‡РµРЅРёСЏ СЃ РґРѕР±Р°РІР»РµРЅРёРµРј С‚РµРєСЃС‚Р° РѕС€РёР±РєРё Windows
 void raise_os(const char* preFix) {
   string text;
   getOsErrorMessage(preFix, text);
   raise(text);
 }
 
-// Предупреждение с добавлением текста ошибки Windows
+// РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ СЃ РґРѕР±Р°РІР»РµРЅРёРµРј С‚РµРєСЃС‚Р° РѕС€РёР±РєРё Windows
 void warning_os(const char* preFix) {
   string text;
   getOsErrorMessage(preFix, text);
   warning(text);
 }
 
-// Обработка исключений
+// РћР±СЂР°Р±РѕС‚РєР° РёСЃРєР»СЋС‡РµРЅРёР№
 #ifndef _CONSOLE
 int __stdcall WinMain(HINSTANCE,HINSTANCE,LPSTR cmdLine,int) {
   try {
@@ -51,7 +51,7 @@ int main(int argc, const char** argv) {
     MessageBox(0, e.what(), 0, MB_ICONEXCLAMATION);
     return 1;
   } catch(...) {
-    MessageBox(0, "Неопределенная ошибка", 0, MB_ICONEXCLAMATION);
+    MessageBox(0, "РќРµРѕРїСЂРµРґРµР»РµРЅРЅР°СЏ РѕС€РёР±РєР°", 0, MB_ICONEXCLAMATION);
     return 1;
   } 
 }

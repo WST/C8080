@@ -3,13 +3,13 @@
 #include "b.h"
 
 bool compileCondOperator(int falseLabel, bool neg, NodeVar* cond_, bool dontSaveRegsBeforeJmp, const std::function<bool()>& result) {  
-  // Îáÿçàíî áûòü óñëîâèå
+  // ÐžÐ±ÑÐ·Ð°Ð½Ð¾ Ð±Ñ‹Ñ‚ÑŒ ÑƒÑÐ»Ð¾Ð²Ð¸Ðµ
   if(cond_->nodeType != ntOperator || cond_->dataType.baseType != cbtFlags) 
     raise("ntIf !");
   auto no = cond_->cast<NodeOperator>();
   
   if(no->o == oLAnd) {
-    if(dontSaveRegsBeforeJmp) return false; // íåóäà÷íàÿ âåòêà
+    if(dontSaveRegsBeforeJmp) return false; // Ð½ÐµÑƒÐ´Ð°Ñ‡Ð½Ð°Ñ Ð²ÐµÑ‚ÐºÐ°
     assert(no->a->nodeType == ntOperator);
     assert(no->b->nodeType == ntOperator);
     if(!neg) {
@@ -19,7 +19,7 @@ bool compileCondOperator(int falseLabel, bool neg, NodeVar* cond_, bool dontSave
         });
       });
     } else {
-      // Êîìèëèðóåì !A || !B
+      // ÐšÐ¾Ð¼Ð¸Ð»Ð¸Ñ€ÑƒÐµÐ¼ !A || !B
       int trueLabel = intLabels++;
       return compileCondOperator(trueLabel, false, no->a, false, [&](){        
         return compileCondOperator(falseLabel, true, no->b, false, [&](){          
@@ -30,7 +30,7 @@ bool compileCondOperator(int falseLabel, bool neg, NodeVar* cond_, bool dontSave
     }
   }
   if(no->o == oLOr) {
-    if(dontSaveRegsBeforeJmp) return false; // íåóäà÷íàÿ âåòêà
+    if(dontSaveRegsBeforeJmp) return false; // Ð½ÐµÑƒÐ´Ð°Ñ‡Ð½Ð°Ñ Ð²ÐµÑ‚ÐºÐ°
     assert(no->a->nodeType == ntOperator);
     assert(no->b->nodeType == ntOperator);
     if(!neg) {
@@ -42,7 +42,7 @@ bool compileCondOperator(int falseLabel, bool neg, NodeVar* cond_, bool dontSave
         });
       });     
     } else {
-      // Êîìïèëèðóåì !A && !B
+      // ÐšÐ¾Ð¼Ð¿Ð¸Ð»Ð¸Ñ€ÑƒÐµÐ¼ !A && !B
       return compileCondOperator(falseLabel, true, no->a, false, [&](){        
         return compileCondOperator(falseLabel, true, no->b, false, [&](){          
           return result();

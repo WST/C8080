@@ -6,7 +6,7 @@
 bool compileVar(NodeVar* n, int canRegs, const std::function<bool(int)>& result) {
   switch(n->nodeType) {
     case ntDeaddr: return compileDeaddr((NodeDeaddr*)n, canRegs, result);
-    // Компиляция условия
+    // РљРѕРјРїРёР»СЏС†РёСЏ СѓСЃР»РѕРІРёСЏ
     case ntCond: {      
       auto nc = n->cast<NodeCond>();
       int falseLabel = intLabels++, trueLabel = intLabels++;
@@ -25,7 +25,7 @@ bool compileVar(NodeVar* n, int canRegs, const std::function<bool(int)>& result)
         int trueLabel = intLabels++, falseLabel = intLabels++;
         auto myReg = no->dataType.is8() ? regA : regHL;
         return compileCondOperator(falseLabel, false, no->cond, false, [&](){
-          return compileVar(no->a, myReg, [&](int reg) { //! Можно то же вилку сделать
+          return compileVar(no->a, myReg, [&](int reg) { //! РњРѕР¶РЅРѕ С‚Рѕ Р¶Рµ РІРёР»РєСѓ СЃРґРµР»Р°С‚СЊ
             assert(reg==myReg);
             out.jmpl(trueLabel);
             out.label1(falseLabel);
@@ -47,7 +47,7 @@ bool compileVar(NodeVar* n, int canRegs, const std::function<bool(int)>& result)
     case ntCallI: {
       auto nc = (NodeCall*)n;
 
-      // Порядок загрузки аргументов
+      // РџРѕСЂСЏРґРѕРє Р·Р°РіСЂСѓР·РєРё Р°СЂРіСѓРјРµРЅС‚РѕРІ
       std::vector<int> argOrder;
       if(nc->args.size()>0) {
         std::vector<std::pair<int,int>> constArgs;
@@ -62,7 +62,7 @@ bool compileVar(NodeVar* n, int canRegs, const std::function<bool(int)>& result)
         for(unsigned int i=0; i<constArgs.size(); i++)
           argOrder.push_back(constArgs[i].first);
         argOrder.push_back(nc->args.size()-1);
-      } //! перенести в конструктор NodeCall
+      } //! РїРµСЂРµРЅРµСЃС‚Рё РІ РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ NodeCall
 
       std::function<bool(int)> compileArg;      
       compileArg = [&](unsigned int nn){
@@ -84,7 +84,7 @@ bool compileVar(NodeVar* n, int canRegs, const std::function<bool(int)>& result)
           throw Exception("compileArg big");
         }        
 
-        // Все регистры будут испорчены функцией
+        // Р’СЃРµ СЂРµРіРёСЃС‚СЂС‹ Р±СѓРґСѓС‚ РёСЃРїРѕСЂС‡РµРЅС‹ С„СѓРЅРєС†РёРµР№
         saveAllRegsAndUsed();
 //        setDeUsed(true);
 //        setHlUsed(true);

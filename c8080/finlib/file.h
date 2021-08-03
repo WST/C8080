@@ -1,5 +1,5 @@
-// Открытая, бесплатная, ASIS версия библиотеки VinLib. В процессе написания
-// (с) 5-12-2011 vinxru
+// РћС‚РєСЂС‹С‚Р°СЏ, Р±РµСЃРїР»Р°С‚РЅР°СЏ, ASIS РІРµСЂСЃРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё VinLib. Р’ РїСЂРѕС†РµСЃСЃРµ РЅР°РїРёСЃР°РЅРёСЏ
+// (СЃ) 5-12-2011 vinxru
 
 #ifndef VINLIB_FILE_H
 #define VINLIB_FILE_H
@@ -7,11 +7,11 @@
 //#include <windows.h>
 #include "finlib/string.h"
 
-// Режимы создания файла
+// Р РµР¶РёРјС‹ СЃРѕР·РґР°РЅРёСЏ С„Р°Р№Р»Р°
 enum FileCreateMode {
-  fcmCreateNew     = 1, // Если файл уже существует, то произойдет ошибка.
-  fcmCreateAlways  = 2, // Если файл уже существует, то он будет очищен.
-  fcmOpenExisting  = 3, // Если файл не существует, то произойдет ошибка. Существующий файл будет очищен.
+  fcmCreateNew     = 1, // Р•СЃР»Рё С„Р°Р№Р» СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, С‚Рѕ РїСЂРѕРёР·РѕР№РґРµС‚ РѕС€РёР±РєР°.
+  fcmCreateAlways  = 2, // Р•СЃР»Рё С„Р°Р№Р» СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, С‚Рѕ РѕРЅ Р±СѓРґРµС‚ РѕС‡РёС‰РµРЅ.
+  fcmOpenExisting  = 3, // Р•СЃР»Рё С„Р°Р№Р» РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, С‚Рѕ РїСЂРѕРёР·РѕР№РґРµС‚ РѕС€РёР±РєР°. РЎСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ С„Р°Р№Р» Р±СѓРґРµС‚ РѕС‡РёС‰РµРЅ.
 };
 
 class File {
@@ -21,86 +21,86 @@ public:
   File();
   ~File();
 
-  // Исключение, если файл не открыт
+  // РСЃРєР»СЋС‡РµРЅРёРµ, РµСЃР»Рё С„Р°Р№Р» РЅРµ РѕС‚РєСЂС‹С‚
   void raiseIfNotOpened();
 
-  // Открыть файл
-  //   access = любая комбинация GENERIC_READ, GENERIC_WRITE
-  //   share  = любая комбинация FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE	
-  //   distr  = один из CREATE_NEW, CREATE_ALWAYS, OPEN_EXISTING, OPEN_ALWAYS, TRUNCATE_EXISTING
+  // РћС‚РєСЂС‹С‚СЊ С„Р°Р№Р»
+  //   access = Р»СЋР±Р°СЏ РєРѕРјР±РёРЅР°С†РёСЏ GENERIC_READ, GENERIC_WRITE
+  //   share  = Р»СЋР±Р°СЏ РєРѕРјР±РёРЅР°С†РёСЏ FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE	
+  //   distr  = РѕРґРёРЅ РёР· CREATE_NEW, CREATE_ALWAYS, OPEN_EXISTING, OPEN_ALWAYS, TRUNCATE_EXISTING
   void open(const char* fileName, int access, int share, int distr);
 
-  // Открыть файл для чтения
+  // РћС‚РєСЂС‹С‚СЊ С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ
   void openR(const char* fileName); 
 
-  // Открыть файл для чтения/записи
+  // РћС‚РєСЂС‹С‚СЊ С„Р°Р№Р» РґР»СЏ С‡С‚РµРЅРёСЏ/Р·Р°РїРёСЃРё
   void openW(const char* fileName);
 
-  // Создать новый файл
+  // РЎРѕР·РґР°С‚СЊ РЅРѕРІС‹Р№ С„Р°Р№Р»
   void openC(const char* fileName, FileCreateMode mode=fcmCreateAlways);
 
-  // Читать из файла
+  // Р§РёС‚Р°С‚СЊ РёР· С„Р°Р№Р»Р°
   void read(void* buf, int len);
 
-  // Записать в файл
+  // Р—Р°РїРёСЃР°С‚СЊ РІ С„Р°Р№Р»
   void write(const void* buf, int len);
 
-  // Узнать размер файла
+  // РЈР·РЅР°С‚СЊ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р°
   __int64 size64();
 
-  // Узнать размер файла. Если размер больше 2^31 байт, то произойдет ошибка.
+  // РЈР·РЅР°С‚СЊ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р°. Р•СЃР»Рё СЂР°Р·РјРµСЂ Р±РѕР»СЊС€Рµ 2^31 Р±Р°Р№С‚, С‚Рѕ РїСЂРѕРёР·РѕР№РґРµС‚ РѕС€РёР±РєР°.
   int size32();
 
-  // Достигнут конец файла
+  // Р”РѕСЃС‚РёРіРЅСѓС‚ РєРѕРЅРµС† С„Р°Р№Р»Р°
   bool eof();
 
-  // Установить размер файла
+  // РЈСЃС‚Р°РЅРѕРІРёС‚СЊ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р°
   void setSize(__int64 size);
 
-  // Установить позицию чтения/записи файла
+  // РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕР·РёС†РёСЋ С‡С‚РµРЅРёСЏ/Р·Р°РїРёСЃРё С„Р°Р№Р»Р°
   void setPosition(__int64 pos);
 
-  // Получить позицию чтения/записи файла
+  // РџРѕР»СѓС‡РёС‚СЊ РїРѕР·РёС†РёСЋ С‡С‚РµРЅРёСЏ/Р·Р°РїРёСЃРё С„Р°Р№Р»Р°
   __int64 getPosition64();
 
-  // Получить позицию чтения/записи файла. Если позиция больше 2^31 байт, то произойдет ошибка.
+  // РџРѕР»СѓС‡РёС‚СЊ РїРѕР·РёС†РёСЋ С‡С‚РµРЅРёСЏ/Р·Р°РїРёСЃРё С„Р°Р№Р»Р°. Р•СЃР»Рё РїРѕР·РёС†РёСЏ Р±РѕР»СЊС€Рµ 2^31 Р±Р°Р№С‚, С‚Рѕ РїСЂРѕРёР·РѕР№РґРµС‚ РѕС€РёР±РєР°.
   int getPosition32();
 
-  // Закрыть файл
+  // Р—Р°РєСЂС‹С‚СЊ С„Р°Р№Р»
   void close();
 
-  // Файл открыт?
+  // Р¤Р°Р№Р» РѕС‚РєСЂС‹С‚?
   bool opened();
 
-  // Поддержка типа данных std::string
+  // РџРѕРґРґРµСЂР¶РєР° С‚РёРїР° РґР°РЅРЅС‹С… std::string
   inline void open(cstring fileName, int access, int share, int distr) { open(fileName.c_str(), access, share, distr); }
   inline void openR(cstring fileName) { openR(fileName.c_str()); }
   inline void openC(cstring fileName, FileCreateMode createAlways=fcmCreateAlways) { openC(fileName.c_str(), createAlways); }
   inline void openW(cstring fileName) { openW(fileName.c_str()); }
 };
 
-// Сохранить область памяти в файл (и поддержка типа данных std::string)
+// РЎРѕС…СЂР°РЅРёС‚СЊ РѕР±Р»Р°СЃС‚СЊ РїР°РјСЏС‚Рё РІ С„Р°Р№Р» (Рё РїРѕРґРґРµСЂР¶РєР° С‚РёРїР° РґР°РЅРЅС‹С… std::string)
 void saveFile(const char* fileName, FileCreateMode mode, const void* buf, int len);
 inline void saveFile(cstring     fileName, FileCreateMode mode, const void* d, int l    ) { saveFile(fileName.c_str(), mode, d, l);                }
 
-// Сохранить массив в файл (и поддержка типа данных std::string)
+// РЎРѕС…СЂР°РЅРёС‚СЊ РјР°СЃСЃРёРІ РІ С„Р°Р№Р» (Рё РїРѕРґРґРµСЂР¶РєР° С‚РёРїР° РґР°РЅРЅС‹С… std::string)
 inline void saveFile(const char* fileName, FileCreateMode mode, const std::vector<char>& d) { saveFile(fileName,         mode, &d[0], d.size()); }
 inline void saveFile(cstring     fileName, FileCreateMode mode, const std::vector<char>& d) { saveFile(fileName.c_str(), mode, &d[0], d.size()); }
 
-// Сохранить строку в файл
+// РЎРѕС…СЂР°РЅРёС‚СЊ СЃС‚СЂРѕРєСѓ РІ С„Р°Р№Р»
 inline void saveFile(const char* fileName, FileCreateMode mode, cstring     d) { saveFile(fileName,         mode, d.c_str(), d.size()); }
 inline void saveFile(cstring     fileName, FileCreateMode mode, cstring     d) { saveFile(fileName.c_str(), mode, d.c_str(), d.size()); }
 inline void saveFile(const char* fileName, FileCreateMode mode, const char* d) { saveFile(fileName,         mode, d, strlen(d));        } 
 inline void saveFile(cstring     fileName, FileCreateMode mode, const char* d) { saveFile(fileName.c_str(), mode, d, strlen(d));        }
 
-// Загрузить файл в массив
+// Р—Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р» РІ РјР°СЃСЃРёРІ
 void loadFile(std::vector<char>& out, cstring fileName);
 
-// Загрузить файл в строку
+// Р—Р°РіСЂСѓР·РёС‚СЊ С„Р°Р№Р» РІ СЃС‚СЂРѕРєСѓ
 void loadStringFromFile(std::string& out, const std::string& fileName);
 
-// Загрузить строку из файла.
-// Более медленная (так как строка возращается в результате), но удобная функция.
+// Р—Р°РіСЂСѓР·РёС‚СЊ СЃС‚СЂРѕРєСѓ РёР· С„Р°Р№Р»Р°.
+// Р‘РѕР»РµРµ РјРµРґР»РµРЅРЅР°СЏ (С‚Р°Рє РєР°Рє СЃС‚СЂРѕРєР° РІРѕР·СЂР°С‰Р°РµС‚СЃСЏ РІ СЂРµР·СѓР»СЊС‚Р°С‚Рµ), РЅРѕ СѓРґРѕР±РЅР°СЏ С„СѓРЅРєС†РёСЏ.
 inline std::string loadStringFromFile(cstring fileName) {
   std::string str;
   loadStringFromFile(str, fileName);

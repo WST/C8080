@@ -468,13 +468,13 @@ retry:
     Opcode1* o1 = &this->l[i];
     if(!o->disabled)
     switch(o->o) {
-      case c_ld_r_r:      //! Удалить
-                          s.r[o->reg]  = s.r[o->reg2];  s.v[o->reg]   = s.v[o->reg2];   // Копирование константы
-                          s.rn[o->reg] = s.rn[o->reg2]; s.rnv[o->reg] = s.rnv[o->reg2]; // Копирование значения переменной
-                          if(o->reg==5 || o->reg==6) s.hlnv=false, s.hlav=false; // При изменении HL сбрасываем HL
+      case c_ld_r_r:      //! РЈРґР°Р»РёС‚СЊ
+                          s.r[o->reg]  = s.r[o->reg2];  s.v[o->reg]   = s.v[o->reg2];   // РљРѕРїРёСЂРѕРІР°РЅРёРµ РєРѕРЅСЃС‚Р°РЅС‚С‹
+                          s.rn[o->reg] = s.rn[o->reg2]; s.rnv[o->reg] = s.rnv[o->reg2]; // РљРѕРїРёСЂРѕРІР°РЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅРѕР№
+                          if(o->reg==5 || o->reg==6) s.hlnv=false, s.hlav=false; // РџСЂРё РёР·РјРµРЅРµРЅРёРё HL СЃР±СЂР°СЃС‹РІР°РµРј HL
                           break; 
 
-      case c_ld_r_HL:     // Замена MOV A, M + ORA A на XOR A + OR M
+      case c_ld_r_HL:     // Р—Р°РјРµРЅР° MOV A, M + ORA A РЅР° XOR A + OR M
                           if(optimizationOff==0 && o->reg==0 && o[1].o==c_or_r && o[1].reg==0) {
                             string x = s.hla; if(s.hlai) x += ".", x += i2s(s.hlai);
                             if(!(s.hlav && s.rnv[o->reg] && s.rn[o->reg]==x)) {
@@ -483,30 +483,30 @@ retry:
                               goto retry;
                             }
                           }
-                          s.v[o->reg] = false; // В регистре не константа
-                          if(s.hlav) { // HL содержит адрес переменной 
+                          s.v[o->reg] = false; // Р’ СЂРµРіРёСЃС‚СЂРµ РЅРµ РєРѕРЅСЃС‚Р°РЅС‚Р°
+                          if(s.hlav) { // HL СЃРѕРґРµСЂР¶РёС‚ Р°РґСЂРµСЃ РїРµСЂРµРјРµРЅРЅРѕР№ 
                             string x = s.hla; if(s.hlai) x += ".", x += i2s(s.hlai);
-                            // Удаление MOV R, HL                          
-                            if(optimizationOff==0 && s.rnv[o->reg] && s.rn[o->reg]==x) { o1->disabled=true; break; } // Регистр содержит ту же переменную
-                            s.rn[o->reg]=x, s.rnv[o->reg]=true; // Регистр теперь содержит ту же переменную
+                            // РЈРґР°Р»РµРЅРёРµ MOV R, HL                          
+                            if(optimizationOff==0 && s.rnv[o->reg] && s.rn[o->reg]==x) { o1->disabled=true; break; } // Р РµРіРёСЃС‚СЂ СЃРѕРґРµСЂР¶РёС‚ С‚Сѓ Р¶Рµ РїРµСЂРµРјРµРЅРЅСѓСЋ
+                            s.rn[o->reg]=x, s.rnv[o->reg]=true; // Р РµРіРёСЃС‚СЂ С‚РµРїРµСЂСЊ СЃРѕРґРµСЂР¶РёС‚ С‚Сѓ Р¶Рµ РїРµСЂРµРјРµРЅРЅСѓСЋ
                           } else {
-                            s.rnv[o->reg] = false; // HL содержал неизвестно что
+                            s.rnv[o->reg] = false; // HL СЃРѕРґРµСЂР¶Р°Р» РЅРµРёР·РІРµСЃС‚РЅРѕ С‡С‚Рѕ
                           }
-                          if(o->reg==5 || o->reg==6) s.hlnv=false, s.hlav=false; // При изменении HL сбрасываем HL
+                          if(o->reg==5 || o->reg==6) s.hlnv=false, s.hlav=false; // РџСЂРё РёР·РјРµРЅРµРЅРёРё HL СЃР±СЂР°СЃС‹РІР°РµРј HL
 
                           break; 
 
-      case c_ld_bc_hl:    s.changed("*bc"); // BC изменилось, удалить её из регистров
-                          s.hla="*bc", s.hlai=0, s.hlav=true; // HL теперь содержит значение BC
-                          s.b=s.h; s.bv=s.hv; s.c=s.l; s.cv=s.lv; // Копируем константы
+      case c_ld_bc_hl:    s.changed("*bc"); // BC РёР·РјРµРЅРёР»РѕСЃСЊ, СѓРґР°Р»РёС‚СЊ РµС‘ РёР· СЂРµРіРёСЃС‚СЂРѕРІ
+                          s.hla="*bc", s.hlai=0, s.hlav=true; // HL С‚РµРїРµСЂСЊ СЃРѕРґРµСЂР¶РёС‚ Р·РЅР°С‡РµРЅРёРµ BC
+                          s.b=s.h; s.bv=s.hv; s.c=s.l; s.cv=s.lv; // РљРѕРїРёСЂСѓРµРј РєРѕРЅСЃС‚Р°РЅС‚С‹
                           s.hlnv=false; // s.hlav=false; 
-                          // Знетаменить команду на ld_b_h или ld_c_l
-                          // Хранить состояние BC-HL
+                          // Р—РЅРµС‚Р°РјРµРЅРёС‚СЊ РєРѕРјР°РЅРґСѓ РЅР° ld_b_h РёР»Рё ld_c_l
+                          // РҐСЂР°РЅРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ BC-HL
                           break; 
 
       case c_ld_hl_bc:    s.hlnv = false;
                           if(optimizationOff==0 && s.hlav && s.hla=="*bc") {
-                            // Замена ..
+                            // Р—Р°РјРµРЅР° ..
                             if(s.hlai==2) { 
                               if(o[1].o != c_inc_hl) { o1->o=c_dec_hl; o=&insertir(l, i); o1->disabled=false; o1->o=c_dec_hl; goto retry; }
                               if(o[2].o != c_inc_hl) { o1[1].disabled=true; o1->o=c_dec_hl; goto retry; }
@@ -517,8 +517,8 @@ retry:
                           }
                           s.h=s.b; s.hv=s.bv; s.l=s.c; s.lv=s.cv;                          
                           s.hla="*bc", s.hlai=0, s.hlav=true; 
-                          // Заменить команду на ld_b_h или ld_c_l
-                          // Хранить состояние BC-HL
+                          // Р—Р°РјРµРЅРёС‚СЊ РєРѕРјР°РЅРґСѓ РЅР° ld_b_h РёР»Рё ld_c_l
+                          // РҐСЂР°РЅРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ BC-HL
                           break;
 
 
@@ -528,29 +528,29 @@ retry:
                           if(o->reg==5 || o->reg==6) s.hlav=s.hlnv=false;
                           if(o->m!=1) { s.v[o->reg] = false; break; }
                           if(optimizationOff==0) {
-                            // Удаление MVI R, N
+                            // РЈРґР°Р»РµРЅРёРµ MVI R, N
                             if(s.v[o->reg] && s.r[o->reg]==o->i) { o1->disabled=true; break; }
                             if(o->reg==0) { 
-                              // Удаление MVI R, N
+                              // РЈРґР°Р»РµРЅРёРµ MVI R, N
                               if(s.av && s.a==o->i) { o1->disabled = true; break; }
-                              // Замена MVI A, N на XOR A
+                              // Р—Р°РјРµРЅР° MVI A, N РЅР° XOR A
                               if(o->i==0) { s.a=o->i; s.av=true; o1->o = c_xor_r; goto retry; }
                               if(s.av) {
-                                // Замена MVI A, N на CPL
+                                // Р—Р°РјРµРЅР° MVI A, N РЅР° CPL
                                 if((s.a^0xFF)     ==o->i) { o1->o = c_cpl; goto retry; }
-                                // Замена MVI A, N на ADD A
+                                // Р—Р°РјРµРЅР° MVI A, N РЅР° ADD A
                                 if(((s.a<<1)&0xFF)==o->i) { o1->o = c_add_r; goto retry; }
                               }
                             }
                             if(s.v[o->reg]) {
-                              // Удаление MVI R, N
+                              // РЈРґР°Р»РµРЅРёРµ MVI R, N
                               if(s.r[o->reg]==o->i) { o1->disabled=true; break; }
-                              // Замена MVI R, N на INC R
+                              // Р—Р°РјРµРЅР° MVI R, N РЅР° INC R
                               if(((s.r[o->reg]+1)&0xFF) == o->i) { o1->o = c_inc_r; goto retry; }
-                              // Замена MVI R, N на DEC R
+                              // Р—Р°РјРµРЅР° MVI R, N РЅР° DEC R
                               if(((s.r[o->reg]-1)&0xFF) == o->i) { o1->o = c_dec_r; goto retry; }
                             }
-                            // Замена MVI R, N на MOV R, R
+                            // Р—Р°РјРµРЅР° MVI R, N РЅР° MOV R, R
                             for(int j=0; j<7; j++)
                               if(j!=o->reg)
                                 if(s.v[j] && s.r[j]==o->i) { 
@@ -559,7 +559,7 @@ retry:
                           }
                           s.r[o->reg]=o->i; s.v[o->reg]=true;
                           break; 
-      case c_ld_HL:       // Замена MVI M, N + LD A, N на LD A, N + MVI M, A
+      case c_ld_HL:       // Р—Р°РјРµРЅР° MVI M, N + LD A, N РЅР° LD A, N + MVI M, A
                           if(optimizationOff==0 && o->m==1 && o[1].o==c_ld_r && o[1].reg==0 && o[1].i==o->i) {
                             std::swap(o1[0], o1[1]);
                             o1->o = c_ld_r;
@@ -572,33 +572,33 @@ retry:
       case c_ld_a_DE:     
       case c_ld_a_BC:     s.av=false; s.anv=false; break;
 
-      case c_ld_a_ref:    s.av = false; // Не числовое значение
-                          if(o->m==2) { // Переменная
-                            // Удаление LDA 
-                            if(optimizationOff==0 && s.anv && s.an()==o->s) { o1->disabled = true; break; } // Уже загружено
-                            // Замена LDA на MOV A, M 
+      case c_ld_a_ref:    s.av = false; // РќРµ С‡РёСЃР»РѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ
+                          if(o->m==2) { // РџРµСЂРµРјРµРЅРЅР°СЏ
+                            // РЈРґР°Р»РµРЅРёРµ LDA 
+                            if(optimizationOff==0 && s.anv && s.an()==o->s) { o1->disabled = true; break; } // РЈР¶Рµ Р·Р°РіСЂСѓР¶РµРЅРѕ
+                            // Р—Р°РјРµРЅР° LDA РЅР° MOV A, M 
                             if(optimizationOff==0 && s.hlav && s.hlai==0 && s.hla==o->s) { o1->o = c_ld_r_HL; o1->reg=0; goto retry; }
                             s.anv=true; s.an()=o->s; 
-                          } else { // Константа
+                          } else { // РљРѕРЅСЃС‚Р°РЅС‚Р°
                             s.anv=false; 
                           }
                           break;
 
-      case c_ld_ref_a:    if(o->m==2) { // Переменная
-                            s.changed(o->s); // Изменили переменную в памяти, теперь только в регистре A содержится эта переменная
+      case c_ld_ref_a:    if(o->m==2) { // РџРµСЂРµРјРµРЅРЅР°СЏ
+                            s.changed(o->s); // РР·РјРµРЅРёР»Рё РїРµСЂРµРјРµРЅРЅСѓСЋ РІ РїР°РјСЏС‚Рё, С‚РµРїРµСЂСЊ С‚РѕР»СЊРєРѕ РІ СЂРµРіРёСЃС‚СЂРµ A СЃРѕРґРµСЂР¶РёС‚СЃСЏ СЌС‚Р° РїРµСЂРµРјРµРЅРЅР°СЏ
                             s.anv = true; s.an() = o->s; 
-                            // Замена STA на MOV M, A 
-                            if(optimizationOff==0 && s.hlav && s.hla==o->s && s.hlai==0) o1->o=c_ld_HL_r, o1->reg=0; // Более оптимальная команда
-                          } else { // Константа
+                            // Р—Р°РјРµРЅР° STA РЅР° MOV M, A 
+                            if(optimizationOff==0 && s.hlav && s.hla==o->s && s.hlai==0) o1->o=c_ld_HL_r, o1->reg=0; // Р‘РѕР»РµРµ РѕРїС‚РёРјР°Р»СЊРЅР°СЏ РєРѕРјР°РЅРґР°
+                          } else { // РљРѕРЅСЃС‚Р°РЅС‚Р°
                             s.changedAll();
                           }
                           break;
 
-      case c_ld_HL_r:     if(s.hlav && s.hlai==0) { s.changed(s.hla); s.rn[o->reg]=s.hla; s.rnv[o->reg]=true; }  // Изменили переменную в памяти, теперь только в регистре A содержится эта переменная
-                                             else s.changedAll();    // Мы не знаем, что изменили, поэтому помечаем все переменные как измененные
+      case c_ld_HL_r:     if(s.hlav && s.hlai==0) { s.changed(s.hla); s.rn[o->reg]=s.hla; s.rnv[o->reg]=true; }  // РР·РјРµРЅРёР»Рё РїРµСЂРµРјРµРЅРЅСѓСЋ РІ РїР°РјСЏС‚Рё, С‚РµРїРµСЂСЊ С‚РѕР»СЊРєРѕ РІ СЂРµРіРёСЃС‚СЂРµ A СЃРѕРґРµСЂР¶РёС‚СЃСЏ СЌС‚Р° РїРµСЂРµРјРµРЅРЅР°СЏ
+                                             else s.changedAll();    // РњС‹ РЅРµ Р·РЅР°РµРј, С‡С‚Рѕ РёР·РјРµРЅРёР»Рё, РїРѕСЌС‚РѕРјСѓ РїРѕРјРµС‡Р°РµРј РІСЃРµ РїРµСЂРµРјРµРЅРЅС‹Рµ РєР°Рє РёР·РјРµРЅРµРЅРЅС‹Рµ
 
       case c_inc_HL:      
-      case c_dec_HL:      // Удаление середины из DCX H + MOV A, M + ORA A + JP CCC 
+      case c_dec_HL:      // РЈРґР°Р»РµРЅРёРµ СЃРµСЂРµРґРёРЅС‹ РёР· DCX H + MOV A, M + ORA A + JP CCC 
                           if(optimizationOff==0 
                           && ((o[1].o==c_ld_r_HL && o[1].reg==0) || (s.hlav && o[1].o==c_ld_a_ref && o[1].m==2 && o[1].s==s.hla))
                           && o[2].o==c_or_r && o[2].reg==0 
@@ -606,39 +606,39 @@ retry:
                             o1[1].disabled = true;  
                             o1[2].disabled = true;                            
                           }
-                          if(s.hlav && s.hlai==0) s.changed(s.hla);  // Изменили переменную в памяти, в регистрах теперь содержится не эта переменная
-                                             else s.changedAll();    // Мы не знаем, что изменили, поэтому помечаем все переменные как измененные
+                          if(s.hlav && s.hlai==0) s.changed(s.hla);  // РР·РјРµРЅРёР»Рё РїРµСЂРµРјРµРЅРЅСѓСЋ РІ РїР°РјСЏС‚Рё, РІ СЂРµРіРёСЃС‚СЂР°С… С‚РµРїРµСЂСЊ СЃРѕРґРµСЂР¶РёС‚СЃСЏ РЅРµ СЌС‚Р° РїРµСЂРµРјРµРЅРЅР°СЏ
+                                             else s.changedAll();    // РњС‹ РЅРµ Р·РЅР°РµРј, С‡С‚Рѕ РёР·РјРµРЅРёР»Рё, РїРѕСЌС‚РѕРјСѓ РїРѕРјРµС‡Р°РµРј РІСЃРµ РїРµСЂРµРјРµРЅРЅС‹Рµ РєР°Рє РёР·РјРµРЅРµРЅРЅС‹Рµ
                           break;
 
       case c_inc_r:       s.rnv[o->reg] = false; s.r[o->reg] = (s.r[o->reg] + 1) & 0xFF; break;
       case c_dec_r:       
                           s.rnv[o->reg] = false; s.r[o->reg] = (s.r[o->reg] - 1) & 0xFF; break;
 
-      // *** Арифметика ***
+      // *** РђСЂРёС„РјРµС‚РёРєР° ***
 
-      case c_or_HL:       s.anv = false; s.av = false; break; //! Заменить на регистр
-      case c_or:          s.anv = false; if(o->m==1) s.a |= o->i&0xFF; else s.av=false; break; //! Заменить на регистр
+      case c_or_HL:       s.anv = false; s.av = false; break; //! Р—Р°РјРµРЅРёС‚СЊ РЅР° СЂРµРіРёСЃС‚СЂ
+      case c_or:          s.anv = false; if(o->m==1) s.a |= o->i&0xFF; else s.av=false; break; //! Р—Р°РјРµРЅРёС‚СЊ РЅР° СЂРµРіРёСЃС‚СЂ
       case c_or_r:        if(optimizationOff==0 && o->reg==0) {
-                            // Удаление OR A
-                            if(returnFlagsOfA(o[-1])) { o1->disabled = true; break; } // Убираем лишний OR_A
-                            // Удаление середины из DEC R/INC R + LD A, R + OR A + JP CCC
+                            // РЈРґР°Р»РµРЅРёРµ OR A
+                            if(returnFlagsOfA(o[-1])) { o1->disabled = true; break; } // РЈР±РёСЂР°РµРј Р»РёС€РЅРёР№ OR_A
+                            // РЈРґР°Р»РµРЅРёРµ СЃРµСЂРµРґРёРЅС‹ РёР· DEC R/INC R + LD A, R + OR A + JP CCC
                             if(o[-1].o==c_ld_r_r && o[-1].reg==0 && o[-1].reg2==o[-2].reg && (o[-2].o==c_dec_r || o[-2].o==c_inc_r) && (o[1].o==c_jp_z || o[1].o==c_jp_nz || o[1].o==c_jp_z_loop || o[1].o==c_jp_nz_loop || o[1].o==c_jp_z_forw || o[1].o==c_jp_nz_forw)) { o1->disabled = true; o1[-1].disabled = true; }
                           }
                           s.anv = false; 
                           s.a |= s.r[o->reg]; s.av = s.av && s.v[o->reg]; break;
 
-      case c_and_HL:      s.anv = false; s.av = false; break; //! Заменить на регистр
-      case c_and_r:       if(o->reg==0) break; // and a ничего не делает
+      case c_and_HL:      s.anv = false; s.av = false; break; //! Р—Р°РјРµРЅРёС‚СЊ РЅР° СЂРµРіРёСЃС‚СЂ
+      case c_and_r:       if(o->reg==0) break; // and a РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°РµС‚
                           s.anv = false; s.a &= s.r[o->reg2]; s.av = s.av && s.v[o->reg]; break;
       case c_and:         s.anv = false;
                           if(o->m==1) s.a &= o->i&0xFF; else s.av=false;
-                          // Объединение двух подряд идущих ANI
+                          // РћР±СЉРµРґРёРЅРµРЅРёРµ РґРІСѓС… РїРѕРґСЂСЏРґ РёРґСѓС‰РёС… ANI
                           if(optimizationOff==0 && o[-1].o==c_and) { 
                             if(o->m==1 && o[-1].m==1) o1[-1].i &= o->i;
                                                  else o1[-1].s = "("+o1[-1].get()+")&("+o1->get()+")";
                             o1->disabled = true;
                           } 
-                          break;  //! Заменить на регистр
+                          break;  //! Р—Р°РјРµРЅРёС‚СЊ РЅР° СЂРµРіРёСЃС‚СЂ
       case c_xor_r:       s.anv=false;
                           if(o->reg==0) { s.a = 0; s.av = true; break; }
                           s.a ^= s.r[o->reg2]; s.av = s.av && s.v[o->reg]; break;
@@ -650,35 +650,35 @@ retry:
       case c_add_HL:      s.anv=false; s.av = false; break;
       case c_add:         s.anv=false; if(o->m==1) s.a = (s.a + o->i) & 0xFF; else s.av=false; break;
 
-      case c_sub_r:       s.anv = false; // Константа
-                          if(o->reg==0) { s.a = 0; s.av = true; break; } // Значение SUB A всегда известно
+      case c_sub_r:       s.anv = false; // РљРѕРЅСЃС‚Р°РЅС‚Р°
+                          if(o->reg==0) { s.a = 0; s.av = true; break; } // Р—РЅР°С‡РµРЅРёРµ SUB A РІСЃРµРіРґР° РёР·РІРµСЃС‚РЅРѕ
                           s.a = (s.a - s.r[o->reg]) & 0xFF; s.av = s.av && s.v[o->reg];
                           break;
-      case c_sub_HL:      s.anv = false; // Константа
+      case c_sub_HL:      s.anv = false; // РљРѕРЅСЃС‚Р°РЅС‚Р°
                           s.av = false;
                           break;
-      case c_sub:         s.anv=false; // Константа
+      case c_sub:         s.anv=false; // РљРѕРЅСЃС‚Р°РЅС‚Р°
                           if(o->m==1) s.a = (s.a - o->i) & 0xFF; 
                                  else s.av = false; 
                           break;
 
-      case c_adc_r:       s.av = false; s.anv=false; break; // Мы не рассчитываем флаг C
-      case c_adc_HL:      s.av = false; s.anv=false; break; // Мы не рассчитываем флаг C
-      case c_adc:         s.av = false; s.anv=false; break; // Мы не рассчитываем флаг C
-      case c_sbc_r:       s.av = false; s.anv=false; break; // Мы не рассчитываем флаг C
-      case c_sbc_HL:      s.av = false; s.anv=false; break; // Мы не рассчитываем флаг C
-      case c_sbc:         s.av = false; s.anv=false; break; // Мы не рассчитываем флаг C
+      case c_adc_r:       s.av = false; s.anv=false; break; // РњС‹ РЅРµ СЂР°СЃСЃС‡РёС‚С‹РІР°РµРј С„Р»Р°Рі C
+      case c_adc_HL:      s.av = false; s.anv=false; break; // РњС‹ РЅРµ СЂР°СЃСЃС‡РёС‚С‹РІР°РµРј С„Р»Р°Рі C
+      case c_adc:         s.av = false; s.anv=false; break; // РњС‹ РЅРµ СЂР°СЃСЃС‡РёС‚С‹РІР°РµРј С„Р»Р°Рі C
+      case c_sbc_r:       s.av = false; s.anv=false; break; // РњС‹ РЅРµ СЂР°СЃСЃС‡РёС‚С‹РІР°РµРј С„Р»Р°Рі C
+      case c_sbc_HL:      s.av = false; s.anv=false; break; // РњС‹ РЅРµ СЂР°СЃСЃС‡РёС‚С‹РІР°РµРј С„Р»Р°Рі C
+      case c_sbc:         s.av = false; s.anv=false; break; // РњС‹ РЅРµ СЂР°СЃСЃС‡РёС‚С‹РІР°РµРј С„Р»Р°Рі C
 
       case c_cp_r:        break;
       case c_cp_HL:       break;
       case c_cp:          break;
 
 
-      // Нам треубется только флаг Z
+      // РќР°Рј С‚СЂРµСѓР±РµС‚СЃСЏ С‚РѕР»СЊРєРѕ С„Р»Р°Рі Z
 
       case c_cpz_r:       break;
       case c_cpz_HL:      break;
-      case c_cpz:         // Замена CP 0 на OR A
+      case c_cpz:         // Р—Р°РјРµРЅР° CP 0 РЅР° OR A
                           if(optimizationOff==0 && o->m==1 && o->i==0) 
                             { o1->o = c_or_r; o1->reg=0; goto retry; } 
                           break;
@@ -686,7 +686,7 @@ retry:
       case c_clcf:        break;
       case c_cpl:         s.anv=false; s.a ^= 0xFF; break;
       case c_rra:         s.anv=false;
-                          // Замена RRA+RRA+AND+ADD A+ADD A на AND
+                          // Р—Р°РјРµРЅР° RRA+RRA+AND+ADD A+ADD A РЅР° AND
                           if(optimizationOff==0 && o[1].o==c_rra && o[2].o==c_and && o[2].i==63 && o[3].o==c_add_r && o[3].reg==0 && o[4].o==c_add_r && o[4].reg==0) {
                             o1[0].disabled = true;
                             o1[1].disabled = true;
@@ -695,9 +695,9 @@ retry:
                             o1[4].disabled = true;
                           }
                           s.a = false; s.av=false; break;
-      case c_push_af:     break; //! Рассчитать стек
-      case c_push_bc:     break; //! Рассчитать стек
-      case c_push_hl:     break; //! Рассчитать стек
+      case c_push_af:     break; //! Р Р°СЃСЃС‡РёС‚Р°С‚СЊ СЃС‚РµРє
+      case c_push_bc:     break; //! Р Р°СЃСЃС‡РёС‚Р°С‚СЊ СЃС‚РµРє
+      case c_push_hl:     break; //! Р Р°СЃСЃС‡РёС‚Р°С‚СЊ СЃС‚РµРє
       case c_pop_af:      s.av = false; s.anv = false; break;
       case c_pop_bc:      s.bv = false; s.cv = false; s.bnv=false; s.cnv=false; break;
       case c_pop_hl:      s.hv = false; s.lv = false; s.hnv=false; s.lnv=false; s.hlav=false; s.hlnv=false; break;
@@ -712,28 +712,28 @@ retry:
       case c_ld_de:       if(o->m==1) s.e=(o->i&0xFF), s.d=((o->i>>8)&0xFF), s.ev=true, s.dv=true; 
                                  else s.ev=false, s.dv=false; break;
 
-      case c_ld_hl:       if(o->m==1) { // Константа
+      case c_ld_hl:       if(o->m==1) { // РљРѕРЅСЃС‚Р°РЅС‚Р°
                             s.hlnv = s.hlav = false;
                             if(optimizationOff==0) {
                               bool la = (s.lv && s.l==(o->i&0xFF));
                               bool ha = (s.hv && s.h==((o->i>>8)&0xFF));
-                              // Удаление LXI H
+                              // РЈРґР°Р»РµРЅРёРµ LXI H
                               if(la && ha) { o1->disabled = true; break; }
-                              // Замена LXI H на LDI H
+                              // Р—Р°РјРµРЅР° LXI H РЅР° LDI H
                               if(la) { o1->o = c_ld_r, o1->reg=5, o1->i = o->i>>8; goto retry; } // h
-                              // Замена LXI H на LDI L
+                              // Р—Р°РјРµРЅР° LXI H РЅР° LDI L
                               if(ha) { o1->o = c_ld_r, o1->reg=6, o1->i = o->i&0xFF; goto retry; } // l
                             }
                             s.l=(o->i&0xFF), s.h=((o->i>>8)&0xFF), s.lv=true, s.hv=true;
-                          } else { // Адрес переменной
+                          } else { // РђРґСЂРµСЃ РїРµСЂРµРјРµРЅРЅРѕР№
                             s.lv=false, s.hv=false; 
                             s.hlnv = false;
                             if(optimizationOff==0 && s.hlav && s.hla==o1->get()) {
-                              // Удаление LXI H
+                              // РЈРґР°Р»РµРЅРёРµ LXI H
                               if(s.hlai==0) o1->disabled = true; else
-                              // Замена LXI H на DCX H
+                              // Р—Р°РјРµРЅР° LXI H РЅР° DCX H
                               if(s.hlai==1) o1->o = c_dec_hl; else
-                              // Замена LXI H на INX H
+                              // Р—Р°РјРµРЅР° LXI H РЅР° INX H
                               if(s.hlai==-1) o1->o = c_inc_hl;
                             }
                             s.hla=o->get(), s.hlai=0, s.hlav=true; 
@@ -745,10 +745,10 @@ retry:
       case c_ld_ref_hl:   if(o->m==2) s.hlnv=true, s.hln=o->s, s.hlni=0; break;
       case c_ld_hl_ref:   s.hv=false; s.lv=false; 
                           if(o->m==2) { 
-                            // Замена LHLD + MVI H, 0 на MOV H, A + MVI H, 0
+                            // Р—Р°РјРµРЅР° LHLD + MVI H, 0 РЅР° MOV H, A + MVI H, 0
                             if(optimizationOff==0 && s.anv && s.an()==o->s && o[1].o==c_ld_r && o[1].reg==5 && o[1].m==1 && o[1].i==0) 
                               { o1->o = c_ld_r_r; o1->reg=6; o1->reg2=0; i++; break; }
-                            // Удаление LHLD
+                            // РЈРґР°Р»РµРЅРёРµ LHLD
                             if(optimizationOff==0 && s.hlnv && s.hln==o->s && s.hlni==0) { o1->disabled = true; break; }
                             s.hlnv=true; s.hln=o->s; s.hlni=0; 
                           } else {
@@ -756,37 +756,37 @@ retry:
                           }
                           break;
       case c_add_hl_bc:   s.hv=false; s.lv=false; s.hlnv=s.hlav=false; 
-                          //! Оптимизировать LD HL, N + LD DE, X + ADD HL, DE + LD HL, N + LD DE, Y + ADD HL, DE на LD HL, N + LD DE, X + ADD HL, DE + LD DE, Y-X + ADD HL, DE
+                          //! РћРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ LD HL, N + LD DE, X + ADD HL, DE + LD HL, N + LD DE, Y + ADD HL, DE РЅР° LD HL, N + LD DE, X + ADD HL, DE + LD DE, Y-X + ADD HL, DE
                           break;
       case c_add_hl_de:   s.hv=false; s.lv=false; s.hlnv=s.hlav=false;
-                          //! Оптимизировать LD HL, N + LD DE, X + ADD HL, DE + LD HL, N + LD DE, Y + ADD HL, DE на LD HL, N + LD DE, X + ADD HL, DE + LD DE, Y-X + ADD HL, DE
+                          //! РћРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ LD HL, N + LD DE, X + ADD HL, DE + LD HL, N + LD DE, Y + ADD HL, DE РЅР° LD HL, N + LD DE, X + ADD HL, DE + LD DE, Y-X + ADD HL, DE
                           break;
       case c_add_hl_hl:   s.hv=false; s.lv=false; s.hlnv=s.hlav=false;
-                          //! Оптимизировать LD HL, N + LD DE, X + ADD HL, DE + LD HL, N + LD DE, Y + ADD HL, DE на LD HL, N + LD DE, X + ADD HL, DE + LD DE, Y-X + ADD HL, DE
+                          //! РћРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ LD HL, N + LD DE, X + ADD HL, DE + LD HL, N + LD DE, Y + ADD HL, DE РЅР° LD HL, N + LD DE, X + ADD HL, DE + LD DE, Y-X + ADD HL, DE
                           break;
 
       case c_ex_hl_de:    if(optimizationOff==0) {
                             if(o[1].o==c_ex_hl_de) { o1[1].disabled=true; o1->disabled = true; break; }
-                            if(o[1].o==c_add_hl_de || o[1].o==c_add_hl_bc || o[1].o==c_add_hl_hl) { o1->disabled=true; break; } //! Такого быть не должно. Но оптимизируем на всякий случай
+                            if(o[1].o==c_add_hl_de || o[1].o==c_add_hl_bc || o[1].o==c_add_hl_hl) { o1->disabled=true; break; } //! РўР°РєРѕРіРѕ Р±С‹С‚СЊ РЅРµ РґРѕР»Р¶РЅРѕ. РќРѕ РѕРїС‚РёРјРёР·РёСЂСѓРµРј РЅР° РІСЃСЏРєРёР№ СЃР»СѓС‡Р°Р№
                           }
-                          std::swap(s.h,s.d); std::swap(s.l,s.e); std::swap(s.hv,s.dv); std::swap(s.lv,s.ev); // Меняем константы местами
+                          std::swap(s.h,s.d); std::swap(s.l,s.e); std::swap(s.hv,s.dv); std::swap(s.lv,s.ev); // РњРµРЅСЏРµРј РєРѕРЅСЃС‚Р°РЅС‚С‹ РјРµСЃС‚Р°РјРё
                           s.hlnv = s.hlav = false;
-//                          std::swap(s.hln,s.den); std::swap(s.hlnv,s.denv); std::swap(s.hliv,s.deiv); // Меняем значения переменных местами
-//                          std::swap(s.hla,s.dea); std::swap(s.hlav,s.deav); std::swap(s.hlav,s.deav); // Меняем значения переменных местами
+//                          std::swap(s.hln,s.den); std::swap(s.hlnv,s.denv); std::swap(s.hliv,s.deiv); // РњРµРЅСЏРµРј Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С… РјРµСЃС‚Р°РјРё
+//                          std::swap(s.hla,s.dea); std::swap(s.hlav,s.deav); std::swap(s.hlav,s.deav); // РњРµРЅСЏРµРј Р·РЅР°С‡РµРЅРёСЏ РїРµСЂРµРјРµРЅРЅС‹С… РјРµСЃС‚Р°РјРё
                           break;
 
-      //*** Оптимизация CALL, RET, JP ***
+      //*** РћРїС‚РёРјРёР·Р°С†РёСЏ CALL, RET, JP ***
 
       case c_jp_loop: break;
       case c_jp_c_loop: break;
       case c_jp_nc_loop: break;
       case c_jp_z_loop: break;
-      case c_jp_nz_loop: break; // При удалении надо убрать метку
+      case c_jp_nz_loop: break; // РџСЂРё СѓРґР°Р»РµРЅРёРё РЅР°РґРѕ СѓР±СЂР°С‚СЊ РјРµС‚РєСѓ
 
       case c_retPopBC:    if(optimizationOff==0 && o[1].o==c_retPopBC) o1->disabled=true; break;
 
-                          // Удаление бесполезных переходов
-                          // Замена JC + CALL на CALL NC
+                          // РЈРґР°Р»РµРЅРёРµ Р±РµСЃРїРѕР»РµР·РЅС‹С… РїРµСЂРµС…РѕРґРѕРІ
+                          // Р—Р°РјРµРЅР° JC + CALL РЅР° CALL NC
 
       case c_jp_c_forw:   if(optimizationOff==0) {
                             if(o[1].o==c_label_forw && o->i==o[1].i) { o1->disabled=true, o1[1].disabled=true; break; }
@@ -854,12 +854,12 @@ retry:
       case c_jp:          if(optimizationOff==0 && o[1].o==c_label && o->i==o[1].i) o1->disabled=true; 
                           break;
 
-      //*** Комманды сбрасывающие состояние ***
+      //*** РљРѕРјРјР°РЅРґС‹ СЃР±СЂР°СЃС‹РІР°СЋС‰РёРµ СЃРѕСЃС‚РѕСЏРЅРёРµ ***
 
       case c_labelProc: s.reset(); break;
 
       case c_call:        s.reset();
-                          // Замена CALL + RET на JMP
+                          // Р—Р°РјРµРЅР° CALL + RET РЅР° JMP
                           if(optimizationOff==0 && o[1].o==c_retPopBC && o[1].i==0) {
                             o1->o = c_jp_long;
                             o1[1].disabled = true;
@@ -874,17 +874,17 @@ retry:
       case c_call_c:
       case c_call_nc:     s.reset(); break;
 
-      // *** Переход вперед ***
+      // *** РџРµСЂРµС…РѕРґ РІРїРµСЂРµРґ ***
       case c_label_forw:  s.combine(forwardState.back()); erasei(forwardState, forwardState.size()-1); break;
 
-      // *** Переход назад ***
+      // *** РџРµСЂРµС…РѕРґ РЅР°Р·Р°Рґ ***
       case c_label_loop:  { optimizationOff++; State& ss = add(loopState); ss=s; ss.cursor=i; ss.label=o->i; break; }
 
       default: raise("make "+i2s(o->o));
     }
     if(!o->disabled)
     switch(o->o) {
-      //*** Переход вперед ***
+      //*** РџРµСЂРµС…РѕРґ РІРїРµСЂРµРґ ***
 
       case c_jp_forw: 
       case c_jp_c_forw: 
@@ -892,23 +892,23 @@ retry:
       case c_jp_z_forw:
       case c_jp_nz_forw:  forwardState.push_back(s); break;
 
-      //*** Переход назад ***
+      //*** РџРµСЂРµС…РѕРґ РЅР°Р·Р°Рґ ***
 
       case c_jp_loop: 
       case c_jp_c_loop: 
       case c_jp_nc_loop:
       case c_jp_z_loop: 
       case c_jp_nz_loop:
-        if(loopState.size()>0 && loopState.back().label==o->i) { // Первый проход
+        if(loopState.size()>0 && loopState.back().label==o->i) { // РџРµСЂРІС‹Р№ РїСЂРѕС…РѕРґ
           i = loopState.back().cursor+1; 
           s.combine(loopState.back()); 
           erasei(loopState, loopState.size()-1);
           optimizationOff--;
           goto retry; 
-        } // Во время второго прохода ничего не делаем
+        } // Р’Рѕ РІСЂРµРјСЏ РІС‚РѕСЂРѕРіРѕ РїСЂРѕС…РѕРґР° РЅРёС‡РµРіРѕ РЅРµ РґРµР»Р°РµРј
         break;
 
-      //*** Ветвление ***
+      //*** Р’РµС‚РІР»РµРЅРёРµ ***
 
       
     }

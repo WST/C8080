@@ -1,10 +1,10 @@
-//! Заменить команды ld bc, hl - alu (hl)  на ld a, (bc) - ld d, a - alu d
+//! Р—Р°РјРµРЅРёС‚СЊ РєРѕРјР°РЅРґС‹ ld bc, hl - alu (hl)  РЅР° ld a, (bc) - ld d, a - alu d
 
 #include <stdafx.h>
 #include "stackLoadSave.h"
 #include "asm.h"
 
-// Стек можнт быть только вторым и только в паре с A или HL
+// РЎС‚РµРє РјРѕР¶РЅС‚ Р±С‹С‚СЊ С‚РѕР»СЊРєРѕ РІС‚РѕСЂС‹Рј Рё С‚РѕР»СЊРєРѕ РІ РїР°СЂРµ СЃ A РёР»Рё HL
 
 Place simpleArg8(Place p);
 
@@ -23,7 +23,7 @@ void cmd_alu(Opcode op, bool self, bool flags) {
   Place ap = simpleArg8(a.place);
   Place bp = simpleArg8(b.place);
 
-  bc().remark("Арифметика "+i2s(ap)+"/"+i2s(bp));
+  bc().remark("РђСЂРёС„РјРµС‚РёРєР° "+i2s(ap)+"/"+i2s(bp));
 
   Writer& w = bc();
 
@@ -98,7 +98,7 @@ void cmd_alu(Opcode op, bool self, bool flags) {
                                           w.ld_a_ref(b).ld_d_a().ld_a(a).alu_d(op); break; // 13+5+7+7=32
         case pConstStrRefRef8:   useHL(); w.ld_hl_ref(b).ld_a(a).alu_HL(op); break;
         case pHLRef8:                     w.ld_a(a).alu_HL(op); break;
-        case pBCRef8:                     w.ld_a_BC().ld_d_a().ld_a(a).alu_d(op); break; // это 7+5+7+4=23, против ld_hl_bc().ld_a(a).alu_HL(op), которым еще нужен HL
+        case pBCRef8:                     w.ld_a_BC().ld_d_a().ld_a(a).alu_d(op); break; // СЌС‚Рѕ 7+5+7+4=23, РїСЂРѕС‚РёРІ ld_hl_bc().ld_a(a).alu_HL(op), РєРѕС‚РѕСЂС‹Рј РµС‰Рµ РЅСѓР¶РµРЅ HL
         default: cmd_alu_raise(ap, bp);
       }
       break;
@@ -132,10 +132,10 @@ void cmd_alu(Opcode op, bool self, bool flags) {
         case  pBCRef8:          useHL(); w.ld_a_BC().ld_d_a()               .ld_hl_ref(a).ld_a_HL().alu_d(op); break;
         default: cmd_alu_raise(ap, bp);
       }
-      a.place = a.place==pConstStrRefRef8 ? pHLRef8 : pHLRef16; // Оптимизация
+      a.place = a.place==pConstStrRefRef8 ? pHLRef8 : pHLRef16; // РћРїС‚РёРјРёР·Р°С†РёСЏ
       lastHL = stack.size()-2;
       break;
-    case pHLRef8: // Если self, то HL изменять нельзя
+    case pHLRef8: // Р•СЃР»Рё self, С‚Рѕ HL РёР·РјРµРЅСЏС‚СЊ РЅРµР»СЊР·СЏ
       switch(bp) {
         case pA:                        w.ld_d_a()              .ld_a_HL().alu_d(op); break;
         case pB:                        w                       .ld_a_HL().alu_b(op); break;
@@ -173,7 +173,7 @@ void cmd_alu(Opcode op, bool self, bool flags) {
         case pConstRef8:         chkHL(); w.pop_af().ld_hl(b).alu_HL(op); break;
         case pConstStrRefRef8:   chkHL(); w.pop_af().ld_hl_ref(b).alu_HL(op); break;
         case pHLRef8:                     w.pop_af().alu_HL(op); break;
-        case pBCRef8:                     w.ld_a_BC().ld_d_a().pop_af().alu_d(op); break; // 7+5+5 = 17, против 10+7 у pop_af().ld_hl_bc().alu_HL(op)
+        case pBCRef8:                     w.ld_a_BC().ld_d_a().pop_af().alu_d(op); break; // 7+5+5 = 17, РїСЂРѕС‚РёРІ 10+7 Сѓ pop_af().ld_hl_bc().alu_HL(op)
         default: cmd_alu_raise(ap, bp);
       }
       break;
@@ -217,7 +217,7 @@ bool cmd_alu_swap(Opcode op, bool self, bool flags) {
 //  bool swap = false;
 
   switch(ap) {
-    // A-A не бывает
+    // A-A РЅРµ Р±С‹РІР°РµС‚
     case pB:
       switch(bp) {
         case pA:                          w.alu_b(op); sw1=!sw1; break;
@@ -238,7 +238,7 @@ bool cmd_alu_swap(Opcode op, bool self, bool flags) {
         case pA:                          w.alu_l(op); sw1=!sw1; break;
         case pB:                          w.ld_a_l().alu_b(op); break;
         case pC:                          w.ld_a_l().alu_c(op); break;
-        // HL-HL не бывает
+        // HL-HL РЅРµ Р±С‹РІР°РµС‚
         default: cmd_alu_raise(ap, bp);
       }
       break;
@@ -252,7 +252,7 @@ bool cmd_alu_swap(Opcode op, bool self, bool flags) {
         case pB:                          w.ld_a(a).alu_b(op); break;
         case pC:                          w.ld_a(a).alu_c(op); break;
         case pHL:                         w.ld_a(a).alu_l(op); break;
-        // CONST-CONST не бывает
+        // CONST-CONST РЅРµ Р±С‹РІР°РµС‚
         default: cmd_alu_raise(ap, bp);
       }
       break;
@@ -290,10 +290,10 @@ bool cmd_alu_swap(Opcode op, bool self, bool flags) {
                                 w.ld_hl_ref(a).ld_a_HL().ld_hl_ref(b).alu_HL(op); break;                                // 16+7+16+7   = 46
         default: cmd_alu_raise(ap, bp);
       }
-      a.place = a.place==pConstStrRefRef8 ? pHLRef8 : pHLRef16; // Оптимизация
+      a.place = a.place==pConstStrRefRef8 ? pHLRef8 : pHLRef16; // РћРїС‚РёРјРёР·Р°С†РёСЏ
       lastHL = stack.size()-2;
       break;
-    case pHLRef8: // Если self, то HL изменять нельзя
+    case pHLRef8: // Р•СЃР»Рё self, С‚Рѕ HL РёР·РјРµРЅСЏС‚СЊ РЅРµР»СЊР·СЏ
       switch(bp) {
         case pA:                        w.alu_HL(op); sw1=!sw1; break;
         case pB:                        w.ld_a_HL().alu_b(op); break;
@@ -335,7 +335,7 @@ bool cmd_alu_swap(Opcode op, bool self, bool flags) {
       }
       break;
     case pStackRef8:
-      switch(bp) { // Оптимизировать этот кусок
+      switch(bp) { // РћРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ СЌС‚РѕС‚ РєСѓСЃРѕРє
         case pA:                          w.pop_de().alu_d(op); sw1=!sw1; break;
         case pB:                          w.pop_de().ld_a_DE().alu_b(op); break;
         case pC:                          w.pop_de().ld_a_DE().alu_c(op); break;

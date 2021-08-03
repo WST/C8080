@@ -5,7 +5,7 @@ std::string replace(const std::string& f, const std::string& t, const std::strin
   int fl=f.size(), tl=t.size();
   if(fl==0) return str;
 
-  // Оптределение длины строки
+  // РћРїС‚СЂРµРґРµР»РµРЅРёРµ РґР»РёРЅС‹ СЃС‚СЂРѕРєРё
   int n=0, c=0;
   while(true) {
     n=str.find(f,n);
@@ -14,12 +14,12 @@ std::string replace(const std::string& f, const std::string& t, const std::strin
     c++;
   }
 
-  // Итоговый буфер
+  // РС‚РѕРіРѕРІС‹Р№ Р±СѓС„РµСЂ
   std::string out;
   out.resize(str.size()+(tl-fl)*c);
   byte_t* p = const_cast<byte_t*>(out.c_str());
 
-  // Копирование
+  // РљРѕРїРёСЂРѕРІР°РЅРёРµ
   const byte_t* tc=t.c_str();
   n=0;
   while(true) {
@@ -43,7 +43,7 @@ std::wstring replace(const std::wstring& f, const std::wstring& t, const std::ws
   int fl=f.size(), tl=t.size();
   if(fl==0) return str;
 
-  // Оптределение длины строки
+  // РћРїС‚СЂРµРґРµР»РµРЅРёРµ РґР»РёРЅС‹ СЃС‚СЂРѕРєРё
   int n=0, c=0;
   while(true) {
     n=str.find(f,n);
@@ -52,12 +52,12 @@ std::wstring replace(const std::wstring& f, const std::wstring& t, const std::ws
     c++;
   }
 
-  // Итоговый буфер
+  // РС‚РѕРіРѕРІС‹Р№ Р±СѓС„РµСЂ
   std::wstring out;
   out.resize(str.size()+(tl-fl)*c);
   wchar_t* p = const_cast<wchar_t*>(out.c_str());
 
-  // Копирование
+  // РљРѕРїРёСЂРѕРІР°РЅРёРµ
   const wchar_t* tc = t.c_str();
   n=0;
   while(true) {

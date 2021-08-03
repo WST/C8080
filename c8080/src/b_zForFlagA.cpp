@@ -3,7 +3,7 @@
 
 bool zFlagForA() {
   Assembler::Item* lastCmd = &out.items[out.ptr-1];
-  // Äîáàâèòü âñå âàðèàíòû
+  // Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð²Ð°Ñ€Ð¸Ð°Ð½Ñ‚Ñ‹
   while(lastCmd->cmd == Assembler::cSTA) lastCmd--;
   if(lastCmd->cmd == Assembler::cALU || lastCmd->cmd == Assembler::cALUI) return true;
   return (lastCmd->cmd == Assembler::cDcr || lastCmd->cmd == Assembler::cInr) && lastCmd->a == Assembler::A;
