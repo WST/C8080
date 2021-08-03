@@ -12,6 +12,7 @@
 // Костыль
 #define _tcslen strlen
 #define _tcsstr strstr
+inline const char* _T(const char* str) { return str; }
 
 // Для удобства
 typedef char char_t;

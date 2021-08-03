@@ -1,6 +1,6 @@
 #pragma once
 
-#include <finlib/string.h>
+#include <finlib/strings.h>
 #include <finlib/exception.h>
 #include <map>
 #include "c80type.h"
