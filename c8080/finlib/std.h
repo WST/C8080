@@ -10,7 +10,7 @@
 //#include "finlib/exec.h"
 #include "finlib/findfiles.h"
 #include "finlib/string.h"
-#include "finlib/winapi_exception.h"
+//#include "finlib/winapi_exception.h"
 
 // Сложение с контролем переполнения //! Оптимизировать
 inline int add(int a, int b) {

@@ -4,7 +4,7 @@
 #ifndef VINLIB_FILE_H
 #define VINLIB_FILE_H
 
-#include <windows.h>
+//#include <windows.h>
 #include "finlib/string.h"
 
 // Режимы создания файла

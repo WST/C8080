@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <assert.h>
-#include <FinLib\FillBuffer.h>
+#include <finlib/fillbuffer.h>
 #include "nodes.h"
 
 enum {

@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <finLib/std.h>
+#include <finlib/std.h>
 #include "c_parser.h"
 #include "ctype.h"
 

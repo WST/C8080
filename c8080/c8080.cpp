@@ -11,7 +11,7 @@
 
 // В getName inx распадается на mov+mov+inx+mov+mov
 
-﻿// Переписать strcmp на асм
+// Переписать strcmp на асм
 
 // Оптимизировать SUB8
 //  lhld drawWindowText_1
@@ -76,7 +76,7 @@
 #include <finlib/file.h>
 #include <finlib/findfiles.h>
 #include <algorithm>
-#include <FinLib/string.h>
+#include <finlib/string.h>
 #include <finlib/fillbuffer.h>
 #include "c_parser.h"
 #include "stackLoadSave.h"
