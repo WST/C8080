@@ -110,7 +110,7 @@ void normalizeDeltaDE() {
 
 inline void saveRegDE() {
   s.de.const_ = false;
-  s.de.tmp = false;
+  s.de.tmp = 0;
   if(s.de.in) {
     if(s.de.changed) {
       normalizeDeltaDE();

@@ -4,8 +4,12 @@
 #ifndef VINLIB_FILE_H
 #define VINLIB_FILE_H
 
+// Костыль
+typedef uint64_t __int64;
+#define INVALID_HANDLE_VALUE 0
+
 //#include <windows.h>
-#include "finlib/string.h"
+#include "finlib/strings.h"
 
 // Режимы создания файла
 enum FileCreateMode {
@@ -16,7 +20,7 @@ enum FileCreateMode {
 
 class File {
 public:
-  HANDLE handle;
+  FILE *handle;
 
   File();
   ~File();

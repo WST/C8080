@@ -1,4 +1,5 @@
 #include <stdafx.h>
+#include <climits>
 #include "b.h"
 
 int deepLimit;

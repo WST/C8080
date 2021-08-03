@@ -4,12 +4,15 @@
 #ifndef VINLIB_STD_H
 #define VINLIB_STD_H
 
+#include <climits>
+#include <list>
+
 #include "finlib/types.h"
 #include "finlib/exception.h"
 #include "finlib/file.h"
 //#include "finlib/exec.h"
 #include "finlib/findfiles.h"
-#include "finlib/string.h"
+#include "finlib/strings.h"
 //#include "finlib/winapi_exception.h"
 
 // Сложение с контролем переполнения //! Оптимизировать

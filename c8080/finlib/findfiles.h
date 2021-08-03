@@ -4,7 +4,7 @@
 #ifndef VINLIB_FINDFILES_H
 #define VINLIB_FINDFILES_H
 
-#include "finlib/string.h"
+#include "finlib/strings.h"
 
 // Используется функцией findFiles
 struct FindData {

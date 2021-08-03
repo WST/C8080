@@ -76,7 +76,7 @@
 #include <finlib/file.h>
 #include <finlib/findfiles.h>
 #include <algorithm>
-#include <finlib/string.h>
+#include <finlib/strings.h>
 #include <finlib/fillbuffer.h>
 #include "c_parser.h"
 #include "stackLoadSave.h"

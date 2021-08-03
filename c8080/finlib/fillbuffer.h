@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "string.h"
+#include "strings.h"
 #include "fillbuffer.h"
 
 // _Ptr: https://stackoverflow.com/questions/43684906/cant-access-std-vector-iterator-ptr-on-mac
